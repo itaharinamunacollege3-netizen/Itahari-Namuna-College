@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  /* Brand Palette Custom Tokens */
+  --color-brand-primary: #045d30;   /* Deep Forest Green */
+  --color-brand-blue: #3db2e1;      /* Electric Sky Blue */
+  --color-brand-gold: #f2b843;      /* Vibrant Gold */
+  --color-brand-crimson: #c22368;   /* Crimson Pink */
+  --color-brand-orange: #e17622;    /* Energetic Orange */
+  --color-brand-dark: #20242b;      /* Dark Slate Neutral */
+  --color-brand-gray: #e7eaef;      /* Platinum Gray Background */
+  --color-brand-white: #fffeff;     /* Pristine White Surface */
+
+  /* Typography Engine Definitions */
+  --font-heading: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Layout Constraints */
+  --radius-xl: 12px;                /* Uniform layout rounding */
+}
