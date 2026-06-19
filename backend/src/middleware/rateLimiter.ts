@@ -40,6 +40,14 @@ export const admissionLimiter = rateLimit({ // admission rate limiter
   legacyHeaders: false, // return the headers
 });
 
+export const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many uploads. Please try again later." },
+});
+
 export const loginSlowDown = slowDown({ // login slow down
   windowMs: 15 * 60 * 1000, // 15 minutes
   delayAfter: 3, // delay after 3 requests

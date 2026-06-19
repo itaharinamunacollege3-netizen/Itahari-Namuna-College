@@ -263,26 +263,28 @@ model FacilityImage {
 }
 
 model GalleryAlbum {
-  id          Int            @id @default(autoincrement())
-  slug        String         @unique
-  title       String
-  coverImage  String?
-  description String?
-  isFeatured  Boolean        @default(false)
-  sortOrder   Int            @default(0)
-  published   Boolean        @default(true)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  images      GalleryImage[]
+  id                     Int            @id @default(autoincrement())
+  slug                   String         @unique
+  title                  String
+  coverImage             String?
+  coverImageCloudinaryId String?
+  description            String?
+  isFeatured             Boolean        @default(false)
+  sortOrder              Int            @default(0)
+  published              Boolean        @default(true)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  images                 GalleryImage[]
 }
 
 model GalleryImage {
-  id        Int          @id @default(autoincrement())
-  albumId   Int
-  imageUrl  String
-  caption   String?
-  sortOrder Int          @default(0)
-  album     GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  id                 Int          @id @default(autoincrement())
+  albumId            Int
+  imageUrl           String
+  cloudinaryPublicId String?
+  caption            String?
+  sortOrder          Int          @default(0)
+  album              GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
 }
 
 model CellUnit {
