@@ -24,3 +24,14 @@ export function validateQuery<T extends Record<string, unknown>>(schema: ZodSche
     next();
   };
 }
+
+export function validateParams<T extends Record<string, unknown>>(schema: ZodSchema<T>) {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.params);
+    if (!result.success) {
+      return next(new AppError(400, result.error.issues[0]?.message ?? "Invalid route parameters"));
+    }
+    req.params = result.data as typeof req.params;
+    next();
+  };
+}

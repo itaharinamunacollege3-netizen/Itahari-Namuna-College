@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -114,14 +115,17 @@ model Notice {
   attachmentUrl  String?
   attachmentType String?
   published      Boolean  @default(true)
+  featured       Boolean  @default(false)
   showInPopup    Boolean  @default(false)
   showInMarquee  Boolean  @default(false)
   marqueeText    String?
+  publishedDate  String
   publishedAt    DateTime
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  @@index([published, publishedAt])
+  @@index([published, publishedDate])
+  @@index([published, featured])
   @@index([category])
   @@index([slug])
 }
@@ -296,25 +300,27 @@ model CellUnit {
 }
 
 model AdmissionApplication {
-  id             Int              @id @default(autoincrement())
-  fullName       String
-  email          String
-  gender         String
-  phone          String
-  address        String
-  programApplied AdmissionProgram
-  plus2Stream    Plus2Stream?
-  session        String?
-  photoUrl       String?
-  transcriptUrl  String?
-  citizenshipUrl String?
-  status         AdmissionStatus  @default(PENDING)
-  adminNotes     String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id              Int              @id @default(autoincrement())
+  fullName        String
+  email           String
+  gender          String
+  phone           String
+  address         String
+  programApplied  AdmissionProgram
+  plus2Stream     Plus2Stream?
+  session         String?
+  photoUrl        String?
+  transcriptUrl   String?
+  citizenshipUrl  String?
+  accessTokenHash String
+  status          AdmissionStatus  @default(PENDING)
+  adminNotes      String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([status, createdAt])
   @@index([programApplied])
+  @@index([email])
 }
 
 model ContactInquiry {
