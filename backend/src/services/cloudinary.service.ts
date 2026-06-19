@@ -115,8 +115,11 @@ export async function uploadNoticePdf(
   if (file.mimetype !== "application/pdf") {
     throw new AppError(400, "Only PDF files are allowed");
   }
-  if (!validatePdfBuffer(file.buffer)) {
-    throw new AppError(400, "File content does not match an allowed PDF format");
+  const pdfCheck = validatePdfBuffer(file.buffer);
+  if (!pdfCheck.valid) {
+    const headerHex = file.buffer.subarray(0, 8).toString("hex");
+    console.error("[PDF Upload Debug] File:", file.originalname, "MIME:", file.mimetype, "Size:", file.buffer.length, "Header hex:", headerHex);
+    throw new AppError(400, pdfCheck.reason ?? "File is not a valid PDF");
   }
 
   const cloudinary = getCloudinary();
