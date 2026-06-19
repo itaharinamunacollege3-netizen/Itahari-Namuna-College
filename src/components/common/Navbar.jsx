@@ -20,7 +20,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-br from-emerald-900/57 via-emerald-950/60 to-stone-950/70 border-brand-gray/50 px-6 py-2 flex justify-between items-center transition-all duration-300">
       {/* Logo */}
       <Link to="/" className="w-18">
-        <img src={logo} className="w-full h-auto" />
+        <img src={logo} alt="Itahari Namuna College" className="w-full h-auto" />
       </Link>
 
       {/* Desktop Links */}
