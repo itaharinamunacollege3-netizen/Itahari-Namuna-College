@@ -1,11 +1,11 @@
 // Import your images at the top
-import accountant from "../../../assets/Administrative Staffs/Accountant.png";
-import AdminHead from "../../../assets/Administrative Staffs/AdminHead.png";
-import BHMLabAssistant from "../../../assets/Administrative Staffs/BHMLabAssistant.png";
-import BSWFieldSupervisor from "../../../assets/Administrative Staffs/BSWFieldSupervisor.png";
-import ExamCoordinator from "../../../assets/Administrative Staffs/ExamCoordinator.png";
-import itCoordinator from "../../../assets/Administrative Staffs/ITCoordinator.png";
-import promotional from "../../../assets/Administrative Staffs/Promotion.png";
+import accountant from "../../../assets/Administrative Staffs/Accountant.webp";
+import AdminHead from "../../../assets/Administrative Staffs/AdminHead.webp";
+import BHMLabAssistant from "../../../assets/Administrative Staffs/BHMLabAssistant.webp";
+import BSWFieldSupervisor from "../../../assets/Administrative Staffs/BSWFieldSupervisor.webp";
+import ExamCoordinator from "../../../assets/Administrative Staffs/ExamCoordinator.webp";
+import itCoordinator from "../../../assets/Administrative Staffs/ITCoordinator.webp";
+import promotional from "../../../assets/Administrative Staffs/Promotion.webp";
 
 // Default placeholder for missing images
 const defaultProfile = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d6d3d1'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v2c0-2.66-5.33-4-8-4z'/></svg>";

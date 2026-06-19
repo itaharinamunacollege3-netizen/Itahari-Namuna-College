@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, CheckCircle, Info } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import courseData from '../data/courseMatrix.json';
 
 // Sub-components

@@ -1,4 +1,3 @@
-import React from 'react';
 import { galleryData } from '../gallery-data/galleryData'
 import AlbumCoverCard from '../components/AlbumCoverCard';
 import AnimatedSection from '../../../components/animations/AnimatedSection';

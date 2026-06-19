@@ -1,5 +1,4 @@
 // src/features/contact/pages/ContactPage.jsx
-import React from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import ContactForm from '../../components/common/contact component/ContactForm';
 import PageBanner from '../../components/common/PageBanner';

@@ -1,5 +1,4 @@
 // src/features/notices/components/NoticeFilterTabs.jsx
-import React from 'react';
 import { Search } from 'lucide-react';
 
 const categories = ["All", "TU Exams", "Admissions", "Holidays"];
