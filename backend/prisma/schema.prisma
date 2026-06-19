@@ -7,14 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum StaffCategory {
-  ADMIN
-  BUS
-  SECURITY
-  CANTEEN
-  OTHER
-}
-
 enum AdmissionProgram {
   PLUS2
   BCA
@@ -157,21 +149,50 @@ model Program {
   updatedAt      DateTime @updatedAt
 }
 
+model StaffCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  staff       Staff[]
+
+  @@index([slug])
+}
+
+model FacultyDepartment {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  faculty     Faculty[]
+
+  @@index([slug])
+}
+
 model Faculty {
-  id            Int      @id @default(autoincrement())
+  id            Int               @id @default(autoincrement())
   name          String
   designation   String
-  department    String
+  departmentId  Int
+  department    FacultyDepartment @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   qualification String?
   bio           String?
   photo         String?
-  isHOD         Boolean  @default(false)
-  sortOrder     Int      @default(0)
-  published     Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  isHOD         Boolean           @default(false)
+  sortOrder     Int               @default(0)
+  published     Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
-  @@index([department, isHOD])
+  @@index([departmentId, isHOD])
 }
 
 model Staff {
@@ -179,14 +200,15 @@ model Staff {
   name       String
   role       String
   department String?
-  category   StaffCategory
+  categoryId Int
+  category   StaffCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   photo      String?
   sortOrder  Int           @default(0)
   published  Boolean       @default(true)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 
-  @@index([category])
+  @@index([categoryId])
 }
 
 model Leadership {
