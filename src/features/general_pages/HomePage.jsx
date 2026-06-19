@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MetricCard from "../../components/common/homeComponent/MetricCard";
 import gsap from "gsap";
@@ -7,35 +7,41 @@ import {
   Award,
   GraduationCap,
   ClipboardList,
+  Bell,
 } from "lucide-react";
 import HomeProgramInfo from "../../components/common/homeComponent/HomeProgramInfo";
 import HomeWhyChooseUs from "../../components/common/homeComponent/HomeWhyChooseUs";
+import NoticePopup from "../notices/components/NoticePopup";
+import { getNotices } from "../notices/services/noticesService";
 import introVideo from '../../assets/video/inc intro.mp4'
 import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
+
+// Picks an icon for a ticker item based on its first tag.
+const TAG_ICONS = {
+  "TU Exams": ClipboardList,
+  Admissions: GraduationCap,
+  Holidays: Calendar,
+  IMPORTANT: Award,
+};
+
 export default function HomePage() {
   const marqueeRef = useRef(null);
+  const [notices, setNotices] = useState([]);
 
-  // Dynamic Notice Board content array matching image_3a0c85.png
-  const urgentNotices = [
-    {
-      text: "Admission Open for BCA, BHM, BBM & BSW — Session 2083/84",
-      icon: GraduationCap,
-    },
-    {
-      text: "TU Examination Routine Released — 4th Semester 2082",
-      icon: ClipboardList,
-    },
-    { text: "Annual Sports Week: June 22–28, 2026", icon: Award },
-    {
-      text: "Scholarship Applications Open — Merit & Need-Based 2083",
-      icon: Calendar,
-    },
-  ];
+  useEffect(() => {
+    let active = true;
+    getNotices().then((data) => {
+      if (active) setNotices(data);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const marqueeTrack = marqueeRef.current;
-    if (!marqueeTrack) return;
+    if (!marqueeTrack || notices.length === 0) return;
 
     // Calculate width of one full track cycle to loop flawlessly
     const trackWidth = marqueeTrack.scrollWidth / 2;
@@ -62,9 +68,10 @@ export default function HomePage() {
         marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
       }
     };
-  }, []);
+  }, [notices]);
   return (
       <div className="w-full bg-brand-gray min-h-screen">
+        <NoticePopup />
         {/* ========================================================================= */}
         {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
         {/* ========================================================================= */}
@@ -134,18 +141,19 @@ export default function HomePage() {
             ref={marqueeRef}
             className="flex whitespace-nowrap space-x-12 pl-12 will-change-transform"
           >
-            {/* Primary Set Loop */}
-            {[...urgentNotices, ...urgentNotices].map((notice, idx) => {
-              const Icon = notice.icon;
+            {/* Primary Set Loop (doubled to stitch the infinite scroll) */}
+            {[...notices, ...notices].map((notice, idx) => {
+              const Icon = TAG_ICONS[notice.tags?.[0]] ?? Bell;
               return (
-                <div
+                <Link
+                  to={`/notices/${notice.id}`}
                   key={idx}
-                  className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide"
+                  className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide hover:text-brand-primary transition-colors"
                 >
-                  <Icon className="w-4 h-4 text-brand-dark shrink-0" />
-                  <span>{notice.text}</span>
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span>{notice.title}</span>
                   <span className="text-brand-dark/40 font-normal px-2">•</span>
-                </div>
+                </Link>
               );
             })}
           </div>

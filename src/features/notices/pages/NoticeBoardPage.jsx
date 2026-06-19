@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { mockNotices } from '../data/mockNotices';
+import { useLoaderData } from 'react-router-dom';
 import NoticeRowCard from '../components/NoticeRowCard';
 import NoticeDetailView from '../components/NoticeDetailView';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
@@ -7,17 +7,18 @@ import NoticeFilterTabs from '../components/NoticeFilterTabs';
 import PageBanner from '../../../components/common/PageBanner';
 
 export default function NoticeBoardPage() {
+  const notices = useLoaderData();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
-  const [selectedId, setSelectedId] = useState(mockNotices[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState(notices[0]?.id ?? null);
 
   const filteredNotices = useMemo(() => {
-    return mockNotices.filter((n) => {
+    return notices.filter((n) => {
       const matchesSearch = n.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = activeCategory === 'All' || n.tags.includes(activeCategory);
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, activeCategory]);
+  }, [notices, searchTerm, activeCategory]);
 
   const selectedNotice =
     filteredNotices.find((n) => n.id === selectedId) ?? filteredNotices[0] ?? null;

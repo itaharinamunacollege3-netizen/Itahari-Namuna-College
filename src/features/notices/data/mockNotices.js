@@ -8,7 +8,8 @@ export const mockNotices = [
     author: "Examination Controller",
     audience: "All Programs",
     tags: ["IMPORTANT", "TU Exams"],
-    pdfUrl: "#"
+    pdfUrl: "#",
+    featured: false
   },
   {
     id: 2,
@@ -19,7 +20,8 @@ export const mockNotices = [
     author: "Admin Office",
     audience: "All Programs",
     tags: ["IMPORTANT", "Admissions"],
-    pdfUrl: "#"
+    pdfUrl: "#",
+    featured: true
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ export const mockNotices = [
     author: "College Management",
     audience: "All Programs",
     tags: ["Holidays"],
-    pdfUrl: "#"
+    pdfUrl: "#",
+    featured: false
   }
 ];
