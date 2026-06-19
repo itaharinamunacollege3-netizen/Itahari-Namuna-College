@@ -11,6 +11,7 @@ import {
 import HomeProgramInfo from "../../components/common/homeComponent/HomeProgramInfo";
 import HomeWhyChooseUs from "../../components/common/homeComponent/HomeWhyChooseUs";
 import introVideo from '../../assets/video/inc intro.mp4'
+import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
 export default function HomePage() {
   const marqueeRef = useRef(null);
@@ -259,7 +260,7 @@ export default function HomePage() {
                   {/* Main Premium Card Image Box */}
                   <div className="relative bg-brand-white p-3 rounded-3xl border border-brand-gray/80 shadow-xl overflow-hidden">
                     <img loading="lazy" decoding="async"
-                      src="https://namunacollege.edu.np/wp-content/themes/namunacollege/assets/hero-image-two.png"
+                      src={heroCampus}
                       alt="Itahari Namuna Campus Main Academic Wing"
                       className="w-full h-80 sm:h-100 object-cover rounded-2xl shadow-inner grayscale-15 hover:grayscale-0 transition-all duration-700"
                     />
