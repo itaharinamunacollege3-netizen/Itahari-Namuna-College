@@ -1,7 +1,6 @@
-import React from 'react';
-import Chairman from "../../../assets/Leadership/Chairman.png";
-import chief from "../../../assets/Leadership/Chief.png";
-import principal from "../../../assets/Leadership/Principal.png";
+import Chairman from "../../../assets/Leadership/Chairman.webp";
+import chief from "../../../assets/Leadership/Chief.webp";
+import principal from "../../../assets/Leadership/Principal.webp";
 import AnimatedSection from '../../animations/AnimatedSection';
 
 const LeadershipTab = () => {
@@ -17,8 +16,9 @@ const LeadershipTab = () => {
       name: "Mukti Raj Subedi",
       role: "PRINCIPAL",
       message: "Education to everyone is indispensable. At the same time, the concept that reading and writing is known as inappropriate in accordance with present newly modernized society. A good quality of education should be based on a good quality of teacher so as to enable students to easily understand and learn in this age.",
-      image: principal
-    },{
+      image: principal,
+    },
+    {
       name: "Keshav Khadka",
       role: "CHAIRMAN",
       message: "Welcome to Itahari Namuna College for the Pre-Level up to Master’s Level Academic Programs under the roof of Dynamic Management. This College is a vibrant and diverse academic centre focused on teaching, learning and helps to realize innovative knowledge in all wings.",
@@ -40,7 +40,7 @@ const LeadershipTab = () => {
             
             {/* Image Block: Matches aspect ratio from image_2b795d.jpg */}
             <div className="md:col-span-4 min-h-60 md:h-auto w-full relative bg-stone-100">
-              <img 
+              <img loading="lazy" decoding="async" 
                 src={chairman.image} 
                 alt={chairman.name}
                 className="w-full h-full object-cover object-top"
@@ -74,7 +74,7 @@ const LeadershipTab = () => {
                 
                 {/* Image Split - Bumped height up to h-64 for structural prominence */}
                 <div className="sm:col-span-5 h-64 sm:h-auto min-h-75 relative bg-stone-100">
-                  <img 
+                  <img loading="lazy" decoding="async" 
                     src={member.image} 
                     alt={member.name}
                     className="w-full h-full object-cover object-center sm:absolute sm:inset-0"
