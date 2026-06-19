@@ -15,7 +15,7 @@ import AnimatedSection from "../../components/animations/AnimatedSection";
 export default function HomePage() {
   const marqueeRef = useRef(null);
 
-  // Dynamic Notice Board content array matching image_3a0c85.png
+  // Dynamic Notice Board content array matching
   const urgentNotices = [
     {
       text: "Admission Open for BCA, BHM, BBM & BSW — Session 2083/84",
@@ -42,7 +42,7 @@ export default function HomePage() {
     // Pure GSAP horizontal translation for smooth infinite sliding motion
     const tickerAnimation = gsap.to(marqueeTrack, {
       x: -trackWidth,
-      duration: 25, // Adjust this integer value to speed up or slow down the notice speed
+      duration:30, // Adjust this integer value to speed up or slow down the notice speed
       ease: "none",
       repeat: -1, // Infinite loops
     });
