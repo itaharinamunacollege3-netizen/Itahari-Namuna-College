@@ -1,4 +1,4 @@
-import { getCloudinary } from "../config/cloudinary";
+import { getCloudinary, rethrowCloudinaryError } from "../config/cloudinary";
 import { env } from "../config/env";
 import { AppError } from "../utils/apiResponse";
 import {
@@ -34,6 +34,14 @@ function galleryUploadOptions() {
   };
 }
 
+async function withCloudinary<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    rethrowCloudinaryError(err);
+  }
+}
+
 export async function uploadGalleryImage(
   file: Express.Multer.File,
   albumSlug: string
@@ -45,16 +53,17 @@ export async function uploadGalleryImage(
   const cloudinary = getCloudinary();
   const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
 
-  const result = await cloudinary.uploader.upload(
-    `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
-    {
-      folder: albumFolder(albumSlug),
-      public_id: `${safeName}-${Date.now()}`,
-      resource_type: "image",
-      overwrite: false,
-      invalidate: true,
-      ...galleryUploadOptions(),
-    }
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+      {
+        folder: albumFolder(albumSlug),
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "image",
+        overwrite: false,
+        ...galleryUploadOptions(),
+      }
+    )
   );
 
   return {
@@ -94,7 +103,9 @@ export async function deleteCloudinaryAsset(
   if (!publicId) return;
 
   const cloudinary = getCloudinary();
-  await cloudinary.uploader.destroy(publicId, { resource_type: resourceType, invalidate: true });
+  await withCloudinary(() =>
+    cloudinary.uploader.destroy(publicId, { resource_type: resourceType })
+  );
 }
 
 export async function uploadNoticePdf(
@@ -111,15 +122,16 @@ export async function uploadNoticePdf(
   const cloudinary = getCloudinary();
   const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
 
-  const result = await cloudinary.uploader.upload(
-    `data:application/pdf;base64,${file.buffer.toString("base64")}`,
-    {
-      folder: noticeFolder(noticeSlug),
-      public_id: `${safeName}-${Date.now()}`,
-      resource_type: "raw",
-      overwrite: false,
-      invalidate: true,
-    }
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:application/pdf;base64,${file.buffer.toString("base64")}`,
+      {
+        folder: noticeFolder(noticeSlug),
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "raw",
+        overwrite: false,
+      }
+    )
   );
 
   return {
@@ -140,20 +152,21 @@ export async function uploadNoticeImage(
   const cloudinary = getCloudinary();
   const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
 
-  const result = await cloudinary.uploader.upload(
-    `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
-    {
-      folder: noticeFolder(noticeSlug),
-      public_id: `${safeName}-${Date.now()}`,
-      resource_type: "image",
-      overwrite: false,
-      invalidate: true,
-      format: "webp",
-      transformation: [
-        { width: env.CLOUDINARY_MAX_IMAGE_WIDTH, crop: "limit" },
-        { quality: env.CLOUDINARY_WEBP_QUALITY },
-      ],
-    }
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+      {
+        folder: noticeFolder(noticeSlug),
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "image",
+        overwrite: false,
+        format: "webp",
+        transformation: [
+          { width: env.CLOUDINARY_MAX_IMAGE_WIDTH, crop: "limit" },
+          { quality: env.CLOUDINARY_WEBP_QUALITY },
+        ],
+      }
+    )
   );
 
   return {
