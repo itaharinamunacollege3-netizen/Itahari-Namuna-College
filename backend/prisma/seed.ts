@@ -1,3 +1,5 @@
+// prisma/seed.ts
+
 import "dotenv/config";
 import { prisma } from "../src/config/prisma";
 import { hashPassword } from "../src/utils/hash";
