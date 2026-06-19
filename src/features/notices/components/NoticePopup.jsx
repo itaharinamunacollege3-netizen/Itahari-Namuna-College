@@ -70,10 +70,24 @@ export default function NoticePopup() {
           ref={closeButtonRef}
           onClick={handleClose}
           aria-label="Close notice"
-          className="absolute top-3 right-3 p-1.5 rounded-full text-brand-dark/50 hover:bg-brand-gray/20 hover:text-brand-dark transition"
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition"
         >
           <X size={18} />
         </button>
+
+        {notice.image && (
+          <button
+            onClick={handleRead}
+            aria-label={`Open ${notice.title}`}
+            className="block w-full"
+          >
+            <img
+              src={notice.image}
+              alt={notice.title}
+              className="w-full max-h-72 object-cover"
+            />
+          </button>
+        )}
 
         <div className="p-7">
           <div className="flex flex-wrap gap-2 mb-3">

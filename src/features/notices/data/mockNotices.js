@@ -1,3 +1,5 @@
+import noticePoster from '../../../assets/others/hero-campus.webp';
+
 export const mockNotices = [
   {
     id: 1,
@@ -9,6 +11,7 @@ export const mockNotices = [
     audience: "All Programs",
     tags: ["IMPORTANT", "TU Exams"],
     pdfUrl: "#",
+    image: noticePoster,
     featured: false
   },
   {
@@ -21,6 +24,7 @@ export const mockNotices = [
     audience: "All Programs",
     tags: ["IMPORTANT", "Admissions"],
     pdfUrl: "#",
+    image: noticePoster,
     featured: true
   },
   {
@@ -33,6 +37,7 @@ export const mockNotices = [
     audience: "All Programs",
     tags: ["Holidays"],
     pdfUrl: "#",
+    image: noticePoster,
     featured: false
   }
 ];
