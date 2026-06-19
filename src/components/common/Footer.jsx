@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-brand-primary text-brand-white pt-12 pb-6 border-t border-brand-primary/20 font-body">
+    <footer className="bg-linear-to-br from-emerald-900 via-emerald-950 to-stone-950/90 text-brand-white pt-12 pb-6 border-t border-brand-primary/20 font-body">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 border-b border-brand-white/10 pb-10">
         
         {/* Identity Panel Summary Frame */}
