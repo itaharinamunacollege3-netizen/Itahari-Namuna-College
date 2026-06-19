@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { galleryData } from '../gallery-data/galleryData';
 import PhotoGridTile from '../components/PhotoGridTile';

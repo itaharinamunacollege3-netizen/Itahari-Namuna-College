@@ -1,4 +1,3 @@
-import React from "react";
 import AnimatedSection from "../../../components/animations/AnimatedSection";
 
 const FacilityRow = ({ data, isReversed }) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { facilitiesData } from "../data/facilitiesData";
 import FacilityRow from "../components/FacilityRow";
 import PageBanner from "../../../components/common/PageBanner";

@@ -19,7 +19,6 @@ export default function CellOverviewCard({ unit, borderColor }) {
         <img loading="lazy" decoding="async"
           src={unit.icon}
           alt={unit.title}
-          // Change object-contain to object-cover
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
         />
       </div>

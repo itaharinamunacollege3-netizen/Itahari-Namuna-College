@@ -2,7 +2,7 @@ export const galleryData = [
   {
     id: "bca",
     title: "BCA Department",
-    coverImage: "https://namunacollege.edu.np/wp-content/uploads/2024/03/Screenshot-2024-03-12-at-8.35.23%E2%80%AFAM.png",
+    coverImage: "/images/campus-3.webp",
     description: "Computing, Coding, and Technical Innovation",
     images: [
       "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0001.jpg",
@@ -22,7 +22,7 @@ export const galleryData = [
   {
     id: "bhm",
     title: "BHM Department",
-    coverImage: "https://namunacollege.edu.np/wp-content/uploads/2024/03/Screenshot-2024-03-12-at-8.36.13%E2%80%AFAM.png",
+    coverImage: "/images/campus-1.webp",
     description: "Culinary Arts, Hospitality & Management",
     images: [
       "https://namunacollege.edu.np/wp-content/uploads/2024/05/431483808_795662615915204_394360178496327343_n.jpg",
@@ -37,7 +37,7 @@ export const galleryData = [
   {
     id: "bsw",
     title: "BSW Department",
-    coverImage: "https://namunacollege.edu.np/wp-content/uploads/2024/05/61e21c87-c185-43c7-85d7-c219cc076bf7-1024x577.jpeg",
+    coverImage: "/images/campus-2.webp",
     description: "Fieldwork, Social Impact & Community Services",
     images: [
       "https://namunacollege.edu.np/wp-content/uploads/2024/05/1-1-3.jpg",
