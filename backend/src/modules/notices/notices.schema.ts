@@ -1,34 +1,68 @@
 import { z } from "zod";
 
+const bsDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "publishedDate must use YYYY-MM-DD format");
+
+const pdfUrlSchema = z.string().url().optional().or(z.literal(""));
+
 export const listNoticesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(50).default(15),
+  limit: z.coerce.number().int().min(1).max(100).default(100),
   search: z.string().optional(),
-  category: z.string().optional(),
   tag: z.string().optional(),
 });
 
-export const latestNoticesQuerySchema = z.object({
-  popup: z.enum(["true", "false"]).optional(),
-  marquee: z.enum(["true", "false"]).optional(),
+export const noticeIdParamSchema = z.object({
+  id: z.coerce.number().int().positive(),
 });
 
-export const createNoticeSchema = z.object({
-  title: z.string().min(3),
-  content: z.string().min(1),
-  summary: z.string().optional(),
-  category: z.string().min(1),
-  tags: z.array(z.string()).default([]),
-  audience: z.string().optional(),
-  author: z.string().optional(),
-  attachmentUrl: z.string().url().optional().or(z.literal("")),
-  attachmentType: z.enum(["pdf", "image"]).optional(),
+const noticeFieldsSchema = z.object({
+  title: z.string().trim().min(3),
+  description: z.string().trim().min(1),
+  publishedDate: bsDateSchema,
+  category: z.string().trim().min(1),
+  tags: z.array(z.string().trim().min(1)).default([]),
+  audience: z.string().trim().optional(),
+  author: z.string().trim().optional(),
+  pdfUrl: pdfUrlSchema,
+  featured: z.boolean().default(false),
   published: z.boolean().default(true),
-  showInPopup: z.boolean().default(false),
-  showInMarquee: z.boolean().default(false),
-  marqueeText: z.string().optional(),
-  publishedAt: z.coerce.date().optional(),
-  slug: z.string().optional(),
+  slug: z.string().trim().optional(),
 });
 
-export const updateNoticeSchema = createNoticeSchema.partial();
+function normalizeNoticeBody(body: unknown): unknown {
+  if (typeof body !== "object" || body === null) return body;
+
+  const input = body as Record<string, unknown>;
+  const publishedAt =
+    input.publishedAt instanceof Date
+      ? input.publishedAt
+      : typeof input.publishedAt === "string"
+        ? new Date(input.publishedAt)
+        : null;
+
+  return {
+    title: input.title,
+    description: input.description ?? input.content,
+    publishedDate:
+      input.publishedDate ??
+      (publishedAt && !Number.isNaN(publishedAt.getTime())
+        ? publishedAt.toISOString().slice(0, 10)
+        : undefined),
+    category: input.category,
+    tags: input.tags,
+    audience: input.audience,
+    author: input.author,
+    pdfUrl: input.pdfUrl ?? input.attachmentUrl ?? "",
+    featured: input.featured ?? input.showInPopup ?? false,
+    published: input.published,
+    slug: input.slug,
+  };
+}
+
+export const createNoticeSchema = z.preprocess(normalizeNoticeBody, noticeFieldsSchema);
+export const updateNoticeSchema = z.preprocess(
+  normalizeNoticeBody,
+  noticeFieldsSchema.partial()
+);

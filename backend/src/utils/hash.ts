@@ -10,6 +10,10 @@ export function generateRefreshToken(): string {
   return randomBytes(48).toString("hex");
 }
 
+export function generateAdmissionAccessToken(): string {
+  return randomBytes(32).toString("hex");
+}
+
 export async function hashPassword(password: string): Promise<string> { // hash the password
   return bcrypt.hash(password, env.BCRYPT_ROUNDS);
 }

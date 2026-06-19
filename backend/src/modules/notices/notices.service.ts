@@ -3,8 +3,11 @@ import { prisma } from "../../config/prisma";
 import { uniqueSlug } from "../../utils/slug";
 import { AppError } from "../../utils/apiResponse";
 import { formatNoticeForApi } from "./notices.formatter";
+import type { ListNoticesParams, NoticeWriteInput } from "./notices.types";
 
-function sanitizeContent(html: string) { // sanitize the content to prevent XSS attacks
+const BS_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function sanitizeContent(html: string) {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2"]),
     allowedAttributes: {
@@ -15,130 +18,193 @@ function sanitizeContent(html: string) { // sanitize the content to prevent XSS 
   });
 }
 
-export async function listNotices(params: { // list the notices
-  page: number;
-  limit: number;
-  search?: string;
-  category?: string;
-  tag?: string;
-  publishedOnly?: boolean;
-}) {
-  const { page, limit, search, category, tag, publishedOnly = true } = params;
-  const where: Record<string, unknown> = {};
+function assertPublishedDate(value: string) {
+  if (!BS_DATE_PATTERN.test(value)) {
+    throw new AppError(400, "publishedDate must use YYYY-MM-DD format");
+  }
+}
 
-  if (publishedOnly) where.published = true;
-  if (category) where.category = category;
-  if (search) {
+function buildPublishedWhere(params: ListNoticesParams) {
+  const where: Record<string, unknown> = {};
+  if (params.publishedOnly !== false) where.published = true;
+  if (params.search) {
     where.OR = [
-      { title: { contains: search, mode: "insensitive" } },
-      { content: { contains: search, mode: "insensitive" } },
-      { summary: { contains: search, mode: "insensitive" } },
+      { title: { contains: params.search, mode: "insensitive" } },
+      { content: { contains: params.search, mode: "insensitive" } },
+      { author: { contains: params.search, mode: "insensitive" } },
     ];
   }
+  return where;
+}
 
-  const [items, total] = await Promise.all([ // get the notices and the total number of notices
+function filterByTag<T extends { tags: unknown }>(items: T[], tag?: string) {
+  if (!tag) return items;
+  return items.filter((item) => {
+    const tags = Array.isArray(item.tags) ? (item.tags as string[]) : [];
+    return tags.includes(tag);
+  });
+}
+
+/** Ensures at most one notice is featured at any time. */
+async function clearOtherFeatured(
+  tx: Pick<typeof prisma, "notice">,
+  noticeId: number
+) {
+  await tx.notice.updateMany({
+    where: { featured: true, id: { not: noticeId } },
+    data: { featured: false, showInPopup: false },
+  });
+}
+
+function mapWriteInputToDb(data: NoticeWriteInput) {
+  assertPublishedDate(data.publishedDate);
+
+  return {
+    title: data.title.trim(),
+    content: sanitizeContent(data.description),
+    publishedDate: data.publishedDate,
+    category: data.category,
+    tags: data.tags,
+    audience: data.audience?.trim() || null,
+    author: data.author?.trim() || null,
+    attachmentUrl: data.pdfUrl?.trim() || null,
+    attachmentType: data.pdfUrl?.trim() ? "pdf" : null,
+    published: data.published ?? true,
+    featured: data.featured ?? false,
+    showInPopup: data.featured ?? false,
+    publishedAt: new Date(),
+  };
+}
+
+export async function listNotices(params: ListNoticesParams = {}) {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 100;
+  const where = buildPublishedWhere(params);
+
+  const [items, total] = await Promise.all([
     prisma.notice.findMany({
       where,
-      orderBy: { publishedAt: "desc" },
+      orderBy: [{ publishedDate: "desc" }, { id: "desc" }],
       skip: (page - 1) * limit,
       take: limit,
     }),
     prisma.notice.count({ where }),
   ]);
 
-  let filtered = items;
-  if (tag) { // filter the notices by tag
-    filtered = items.filter((n) => (n.tags as string[]).includes(tag));
-  }
+  const filtered = filterByTag(items, params.tag);
 
   return {
     items: filtered.map(formatNoticeForApi),
     meta: {
       page,
       limit,
-      total,
-      totalPages: Math.ceil(total / limit),
+      total: params.tag ? filtered.length : total,
+      totalPages: Math.ceil((params.tag ? filtered.length : total) / limit),
     },
   };
 }
 
-export async function getNoticeBySlug(slug: string, publishedOnly = true) { // get the notice by slug
+export async function getNoticeById(id: number, publishedOnly = true) {
+  if (!Number.isInteger(id) || id < 1) {
+    throw new AppError(400, "Invalid notice id");
+  }
+
   const notice = await prisma.notice.findFirst({
-    where: { slug, ...(publishedOnly ? { published: true } : {}) },
+    where: { id, ...(publishedOnly ? { published: true } : {}) },
   });
+
   if (!notice) throw new AppError(404, "Notice not found");
   return formatNoticeForApi(notice);
 }
 
-export async function getLatestNotices(options: { popup?: boolean; marquee?: boolean }) { // get the latest notices
-  const where: Record<string, unknown> = { published: true };
-  if (options.popup) where.showInPopup = true;
-  if (options.marquee) where.showInMarquee = true;
-
-  const notices = await prisma.notice.findMany({
-    where,
-    orderBy: { publishedAt: "desc" },
-    take: options.marquee ? 10 : 1,
+export async function getFeaturedNotice() {
+  const featured = await prisma.notice.findFirst({
+    where: { published: true, featured: true },
+    orderBy: [{ publishedDate: "desc" }, { id: "desc" }],
   });
 
-  return notices.map(formatNoticeForApi);
+  if (featured) return formatNoticeForApi(featured);
+
+  const newest = await prisma.notice.findFirst({
+    where: { published: true },
+    orderBy: [{ publishedDate: "desc" }, { id: "desc" }],
+  });
+
+  if (!newest) throw new AppError(404, "No notices available");
+  return formatNoticeForApi(newest);
 }
 
-export async function createNotice(data: {
-  title: string;
-  content: string;
-  summary?: string;
-  category: string;
-  tags: string[];
-  audience?: string;
-  author?: string;
-  attachmentUrl?: string;
-  attachmentType?: string;
-  published: boolean;
-  showInPopup: boolean;
-  showInMarquee: boolean;
-  marqueeText?: string;
-  publishedAt?: Date;
-  slug?: string;
-}) {
+export async function createNotice(data: NoticeWriteInput) {
   const slug =
     data.slug ||
     (await uniqueSlug(data.title, async (s) => !!(await prisma.notice.findUnique({ where: { slug: s } }))));
 
-  const notice = await prisma.notice.create({
-    data: {
-      ...data,
-      slug,
-      content: sanitizeContent(data.content),
-      summary: data.summary ? sanitizeContent(data.summary) : undefined,
-      publishedAt: data.publishedAt ?? new Date(),
-      attachmentUrl: data.attachmentUrl || null,
-      attachmentType: data.attachmentType || null,
-    },
+  const dbData = mapWriteInputToDb(data);
+
+  const notice = await prisma.$transaction(async (tx) => {
+    const created = await tx.notice.create({
+      data: { ...dbData, slug },
+    });
+
+    if (created.featured) {
+      await clearOtherFeatured(tx, created.id);
+    }
+
+    return created;
   });
 
   return formatNoticeForApi(notice);
 }
 
-export async function updateNotice(id: number, data: Partial<Parameters<typeof createNotice>[0]>) { // update the notice
+export async function updateNotice(id: number, data: Partial<NoticeWriteInput>) {
   const existing = await prisma.notice.findUnique({ where: { id } });
   if (!existing) throw new AppError(404, "Notice not found");
 
-  const updateData: Record<string, unknown> = { ...data };
-  if (data.content) updateData.content = sanitizeContent(data.content);
-  if (data.summary) updateData.summary = sanitizeContent(data.summary);
+  const updateData: Record<string, unknown> = {};
+
+  if (data.title !== undefined) updateData.title = data.title.trim();
+  if (data.description !== undefined) updateData.content = sanitizeContent(data.description);
+  if (data.publishedDate !== undefined) {
+    assertPublishedDate(data.publishedDate);
+    updateData.publishedDate = data.publishedDate;
+  }
+  if (data.category !== undefined) updateData.category = data.category;
+  if (data.tags !== undefined) updateData.tags = data.tags;
+  if (data.audience !== undefined) updateData.audience = data.audience?.trim() || null;
+  if (data.author !== undefined) updateData.author = data.author?.trim() || null;
+  if (data.pdfUrl !== undefined) {
+    updateData.attachmentUrl = data.pdfUrl?.trim() || null;
+    updateData.attachmentType = data.pdfUrl?.trim() ? "pdf" : null;
+  }
+  if (data.published !== undefined) updateData.published = data.published;
+  if (data.featured !== undefined) {
+    updateData.featured = data.featured;
+    updateData.showInPopup = data.featured;
+  }
+
   if (data.title && !data.slug) {
     updateData.slug = await uniqueSlug(data.title, async (s) => {
       const found = await prisma.notice.findUnique({ where: { slug: s } });
       return !!found && found.id !== id;
     });
+  } else if (data.slug) {
+    updateData.slug = data.slug;
   }
 
-  const notice = await prisma.notice.update({ where: { id }, data: updateData });
+  const notice = await prisma.$transaction(async (tx) => {
+    const updated = await tx.notice.update({ where: { id }, data: updateData });
+
+    if (data.featured === true) {
+      await clearOtherFeatured(tx, updated.id);
+    }
+
+    return tx.notice.findUniqueOrThrow({ where: { id } });
+  });
+
   return formatNoticeForApi(notice);
 }
 
-export async function deleteNotice(id: number) { // delete the notice
+export async function deleteNotice(id: number) {
   const existing = await prisma.notice.findUnique({ where: { id } });
   if (!existing) throw new AppError(404, "Notice not found");
   await prisma.notice.delete({ where: { id } });

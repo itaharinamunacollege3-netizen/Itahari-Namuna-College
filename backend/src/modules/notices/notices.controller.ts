@@ -2,11 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import * as noticesService from "./notices.service";
 import { sendSuccess } from "../../utils/apiResponse";
 import { writeAuditLog } from "../../utils/audit";
-import { latestNoticesQuerySchema, listNoticesQuerySchema } from "./notices.schema";
+import { listNoticesQuerySchema } from "./notices.schema";
 import { z } from "zod";
 
 type ListQuery = z.infer<typeof listNoticesQuerySchema>;
-type LatestQuery = z.infer<typeof latestNoticesQuerySchema>;
 
 function getListQuery(req: Request): ListQuery {
   return (req.validatedQuery ?? {}) as ListQuery;
@@ -19,8 +18,8 @@ export async function listPublic(req: Request, res: Response, next: NextFunction
       page: query.page,
       limit: query.limit,
       search: query.search,
-      category: query.category,
       tag: query.tag,
+      publishedOnly: true,
     });
     sendSuccess(res, result.items, result.meta);
   } catch (err) {
@@ -28,22 +27,19 @@ export async function listPublic(req: Request, res: Response, next: NextFunction
   }
 }
 
-export async function latest(req: Request, res: Response, next: NextFunction) {
+export async function getById(req: Request, res: Response, next: NextFunction) {
   try {
-    const query = (req.validatedQuery ?? {}) as LatestQuery;
-    const data = await noticesService.getLatestNotices({
-      popup: query.popup === "true",
-      marquee: query.marquee === "true",
-    });
+    const id = Number(req.params.id);
+    const data = await noticesService.getNoticeById(id);
     sendSuccess(res, data);
   } catch (err) {
     next(err);
   }
 }
 
-export async function getBySlug(req: Request, res: Response, next: NextFunction) {
+export async function getFeatured(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await noticesService.getNoticeBySlug(req.params.slug as string);
+    const data = await noticesService.getFeaturedNotice();
     sendSuccess(res, data);
   } catch (err) {
     next(err);
@@ -57,7 +53,7 @@ export async function listAdmin(req: Request, res: Response, next: NextFunction)
       page: query.page,
       limit: query.limit,
       search: query.search,
-      category: query.category,
+      tag: query.tag,
       publishedOnly: false,
     });
     sendSuccess(res, result.items, result.meta);

@@ -9,6 +9,11 @@ declare global {
       };
       validatedQuery?: Record<string, unknown>;
       validatedBody?: unknown;
+      admissionApplication?: {
+        id: number;
+        status: string;
+        accessTokenHash: string;
+      };
     }
   }
 }

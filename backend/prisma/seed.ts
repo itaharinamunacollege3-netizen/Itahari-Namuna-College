@@ -26,25 +26,39 @@ async function main() {
     {
       title: "Semester End Examination Routine — BCA/BBM/BHM/BSW 2080",
       content:
-        "The Semester End Examination routine for all TU-affiliated programs for the academic year 2080/81 has been published.",
-      summary: "Examination routine published for all programs.",
+        "The Semester End Examination routine for all TU-affiliated programs for the academic year 2080/81 has been published. Students are advised to download the routine and prepare accordingly. Examination halls will be allotted one week prior to the commencement date.",
       category: "TU Exams",
       tags: ["IMPORTANT", "TU Exams"],
       audience: "All Programs",
       author: "Examination Controller",
+      publishedDate: "2081-03-10",
       publishedAt: new Date("2024-06-10"),
+      featured: false,
     },
     {
       title: "Scholarship Application Open — Merit & Need-Based 2081/82",
-      content: "Applications for scholarships are now open for the 2081/82 session.",
-      summary: "Scholarship applications open.",
+      content:
+        "Applications for the 2081/82 academic session scholarships are now open. Interested candidates must submit their documents to the administration office by the end of the month.",
       category: "Admissions",
       tags: ["IMPORTANT", "Admissions"],
       audience: "All Programs",
       author: "Admin Office",
+      publishedDate: "2081-03-05",
       publishedAt: new Date("2024-06-05"),
-      showInMarquee: true,
-      marqueeText: "Scholarship Applications Open — Merit & Need-Based 2083",
+      featured: true,
+      showInPopup: true,
+    },
+    {
+      title: "Public Holiday Notice — Eid-ul-Adha & International Yoga Day",
+      content:
+        "The college will remain closed on the occasion of Eid-ul-Adha and International Yoga Day. Regular classes will resume the following day.",
+      category: "Holidays",
+      tags: ["Holidays"],
+      audience: "All Programs",
+      author: "College Management",
+      publishedDate: "2081-02-28",
+      publishedAt: new Date("2024-05-28"),
+      featured: false,
     },
   ];
 
@@ -52,13 +66,19 @@ async function main() {
     const slug = slugify(n.title);
     await prisma.notice.upsert({
       where: { slug },
-      update: {},
+      update: {
+        content: n.content,
+        publishedDate: n.publishedDate,
+        featured: n.featured,
+        showInPopup: n.showInPopup ?? n.featured,
+        tags: n.tags,
+      },
       create: {
         ...n,
         slug,
-        showInPopup: false,
-        showInMarquee: n.showInMarquee ?? false,
-        marqueeText: n.marqueeText ?? null,
+        showInMarquee: false,
+        marqueeText: null,
+        attachmentUrl: null,
       },
     });
   }
