@@ -17,9 +17,9 @@ export default function Navbar() {
   ];
 
   return (
-    
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-br from-emerald-900/57 via-emerald-950/60 to-stone-950/70 border-brand-gray/50 px-8 py-2 flex justify-between items-center transition-all duration-300">
-      {/* Logo */}
+
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-linear-to-tr from-emerald-900 via-emerald-950 to-stone-950/90 border-b  px-8 py-2 flex justify-between items-center transition-all duration-300">      
+    {/* Logo */}
       <Link to="/" className="w-18">
         <img src={logo} alt="Itahari Namuna College" className="w-full h-auto" />
       </Link>
@@ -31,10 +31,9 @@ export default function Navbar() {
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `font-body transition-all duration-300 relative pb-1 hover:text-brand-blue cursor-pointer ${
-                isActive 
-                  ? 'text-brand-blue font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-brand-blue after:rounded-full' 
-                  : 'text-brand-white/80'
+              `font-body transition-all duration-300 relative pb-1 hover:text-brand-blue cursor-pointer ${isActive
+                ? 'text-brand-blue font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-brand-blue after:rounded-full'
+                : 'text-brand-white/80'
               }`
             }
           >
@@ -44,8 +43,8 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile Toggle */}
-      <button 
-        className="xl:hidden p-2 text-brand-dark" 
+      <button
+        className="xl:hidden p-2 text-brand-white"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

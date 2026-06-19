@@ -57,6 +57,10 @@ export default function HomePage() {
   ];
 
   useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 2500); // Swipes every 5 seconds
+    return () => clearInterval(timer);
     const marqueeTrack = marqueeRef.current;
     if (!marqueeTrack) return;
 
@@ -71,10 +75,7 @@ export default function HomePage() {
       repeat: -1, // Infinite loops
 
     });
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 2000); // Swipes every 5 seconds
-    return () => clearInterval(timer);
+    
     // UX Touch: Pause notice crawl when a user hovers mouse over it to easily read it
     const handleMouseEnter = () => tickerAnimation.pause();
     const handleMouseLeave = () => tickerAnimation.play();
@@ -108,7 +109,7 @@ export default function HomePage() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1 }}
                 // Use absolute so the new image sits ON TOP of the fading image
-                className="absolute w-full h-full object-cover object-center"
+                className="absolute w-full h-full object-cover"
               />
             </AnimatePresence>
 
