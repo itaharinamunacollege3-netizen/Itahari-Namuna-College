@@ -83,6 +83,70 @@ async function main() {
     });
   }
 
+  const galleryAlbums = [
+    {
+      slug: "bca",
+      title: "BCA Department",
+      description: "Computing, Coding, and Technical Innovation",
+      coverImage:
+        "https://namunacollege.edu.np/wp-content/uploads/2024/03/Screenshot-2024-03-12-at-8.35.23%E2%80%AFAM.png",
+      imageUrls: ["/images/gallery/bca-1.jpg", "/images/gallery/bca-2.jpg"],
+      sortOrder: 1,
+    },
+    {
+      slug: "bhm",
+      title: "BHM Department",
+      description: "Culinary Arts, Hospitality & Management",
+      coverImage:
+        "https://namunacollege.edu.np/wp-content/uploads/2024/03/Screenshot-2024-03-12-at-8.36.13%E2%80%AFAM.png",
+      imageUrls: ["/images/gallery/bhm-1.jpg", "/images/gallery/bhm-2.jpg"],
+      sortOrder: 2,
+      isFeatured: true,
+    },
+    {
+      slug: "bsw",
+      title: "BSW Department",
+      description: "Fieldwork, Social Impact & Community Services",
+      coverImage:
+        "https://namunacollege.edu.np/wp-content/uploads/2024/05/61e21c87-c185-43c7-85d7-c219cc076bf7-1024x577.jpeg",
+      imageUrls: ["/images/gallery/bsw-1.jpg", "/images/gallery/bsw-2.jpg"],
+      sortOrder: 3,
+    },
+  ];
+
+  for (const album of galleryAlbums) {
+    const saved = await prisma.galleryAlbum.upsert({
+      where: { slug: album.slug },
+      update: {
+        title: album.title,
+        description: album.description,
+        coverImage: album.coverImage,
+        isFeatured: album.isFeatured ?? false,
+        sortOrder: album.sortOrder,
+      },
+      create: {
+        slug: album.slug,
+        title: album.title,
+        description: album.description,
+        coverImage: album.coverImage,
+        isFeatured: album.isFeatured ?? false,
+        sortOrder: album.sortOrder,
+        published: true,
+      },
+    });
+
+    const imageCount = await prisma.galleryImage.count({ where: { albumId: saved.id } });
+    if (imageCount === 0) {
+      await prisma.galleryImage.createMany({
+        data: album.imageUrls.map((url, index) => ({
+          albumId: saved.id,
+          imageUrl: url,
+          sortOrder: index,
+        })),
+      });
+    }
+  }
+
   console.log("Seed complete.");
   console.log(`Admin: ${adminEmail}`);
 }

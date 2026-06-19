@@ -184,22 +184,22 @@ export async function updateAdmissionStatus(
 }
 
 export async function exportAdmissionsCsv(params: Omit<ListAdmissionsParams, "page" | "limit"> = {}) {
-  const filters = mapListFilters({
+  const filters = mapListFilters({ //
     page: 1,
-    limit: 100,
-    status: params.status,
-    program: params.program,
-    search: params.search,
+    limit: 100,// maximum number of items to export
+    status: params.status, // filter by status
+    program: params.program, // filter by program
+    search: params.search, // filter by search
   });
 
-  const where = buildWhere(filters);
+  const where = buildWhere(filters); // build the where clause for the query
 
-  const items = await prisma.admissionApplication.findMany({
+  const items = await prisma.admissionApplication.findMany({ // find the items
     where,
     orderBy: { createdAt: "desc" },
-    take: 10_000,
+    take: 10_000, // maximum number of items to export
   });
 
-  const rows = items.map(formatAdmissionCsvRow);
-  return [ADMISSION_CSV_HEADER, ...rows].join("\n");
+  const rows = items.map(formatAdmissionCsvRow); // format the items for csv
+  return [ADMISSION_CSV_HEADER, ...rows].join("\n"); // return the csv
 }

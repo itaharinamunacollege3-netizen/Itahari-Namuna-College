@@ -3,6 +3,7 @@ import authRoutes from "../modules/auth/auth.routes";
 import { noticesPublicRoutes, noticesAdminRoutes } from "../modules/notices/notices.routes";
 import { contactsPublicRoutes, contactsAdminRoutes } from "../modules/contacts/contacts.routes";
 import { admissionsPublicRoutes, admissionsAdminRoutes } from "../modules/admissions/admissions.routes";
+import { galleryPublicRoutes, galleryAdminRoutes } from "../modules/gallery/gallery.routes";
 import { sendSuccess } from "../utils/apiResponse";
 
 const router = Router();
@@ -15,9 +16,11 @@ router.use("/auth", authRoutes);
 router.use("/notices", noticesPublicRoutes);
 router.use("/contacts", contactsPublicRoutes);
 router.use("/admissions", admissionsPublicRoutes);
+router.use("/gallery", galleryPublicRoutes);
 
 router.use("/admin/notices", noticesAdminRoutes);
 router.use("/admin/contacts", contactsAdminRoutes);
 router.use("/admin/admissions", admissionsAdminRoutes);
+router.use("/admin/gallery", galleryAdminRoutes);
 
 export default router;
