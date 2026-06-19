@@ -17,8 +17,9 @@ const LeadershipTab = () => {
       name: "Mukti Raj Subedi",
       role: "PRINCIPAL",
       message: "Education to everyone is indispensable. At the same time, the concept that reading and writing is known as inappropriate in accordance with present newly modernized society. A good quality of education should be based on a good quality of teacher so as to enable students to easily understand and learn in this age.",
-      image: principal
-    },{
+      image: principal,
+    },
+    {
       name: "Keshav Khadka",
       role: "CHAIRMAN",
       message: "Welcome to Itahari Namuna College for the Pre-Level up to Master’s Level Academic Programs under the roof of Dynamic Management. This College is a vibrant and diverse academic centre focused on teaching, learning and helps to realize innovative knowledge in all wings.",

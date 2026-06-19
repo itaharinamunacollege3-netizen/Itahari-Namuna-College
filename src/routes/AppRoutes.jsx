@@ -13,6 +13,7 @@ import GalleryHubPage from '../features/gallery/pages/GalleryHubPage';
 import CategoryGridPage from '../features/gallery/pages/CategoryGridPage';
 import ContactPage from '../features/general_pages/ContactPage';
 import SmoothScrollProvider from '../components/common/SmoothScrollProvider';
+import FacilitiesPage from '../features/facilities/pages/FacilitiesPage';
 
 
 //router configuration
@@ -47,7 +48,10 @@ const router = createBrowserRouter([
       { path: 'contact', element: <ContactPage /> },
 
       // Fallback Route: Redirects any typos back to Home
-      { path: '*', element: <Navigate to="/" replace /> }
+      { path: '*', element: <Navigate to="/" replace /> },
+
+      // facilities page
+      {path:'facilities', element: <FacilitiesPage /> }
     ]
   }
 ]);
