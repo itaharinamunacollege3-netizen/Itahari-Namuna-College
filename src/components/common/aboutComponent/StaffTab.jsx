@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AnimatedSection from "../../animations/AnimatedSection";
 import { staffData } from "../../common/aboutComponent/staffData"; // Adjust path as needed
 
@@ -42,7 +42,7 @@ const StaffTab = () => {
             >
               <div className="w-full flex flex-col items-center">
                 <div className="w-24 h-24 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200/50 mb-4 flex items-center justify-center">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={staff.image}
                     alt={staff.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

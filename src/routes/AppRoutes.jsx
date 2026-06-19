@@ -1,52 +1,47 @@
-import React from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
-import HomePage from '../features/general_pages/HomePage';
-import AboutPage from '../features/general_pages/AboutPage';
-import AcademicHubPage from '../features/academics/pages/AcademicHubPage';
-import ProgramDetailPage from '../features/academics/pages/ProgramDetailPage';
-import CellsHubPage from '../features/cells_and_units/pages/CellsHubPage';
-import UnitDetailPage from '../features/cells_and_units/pages/UnitDetailPage';
-import NoticeBoardPage from '../features/notices/pages/NoticeBoardPage';
-import NoticeViewerPage from '../features/notices/pages/NoticeViewerPage';
-import GalleryHubPage from '../features/gallery/pages/GalleryHubPage';
-import CategoryGridPage from '../features/gallery/pages/CategoryGridPage';
-import ContactPage from '../features/general_pages/ContactPage';
 import SmoothScrollProvider from '../components/common/SmoothScrollProvider';
 
+const HomePage = lazy(() => import('../features/general_pages/HomePage'));
+const AboutPage = lazy(() => import('../features/general_pages/AboutPage'));
+const AcademicHubPage = lazy(() => import('../features/academics/pages/AcademicHubPage'));
+const ProgramDetailPage = lazy(() => import('../features/academics/pages/ProgramDetailPage'));
+const CellsHubPage = lazy(() => import('../features/cells_and_units/pages/CellsHubPage'));
+const UnitDetailPage = lazy(() => import('../features/cells_and_units/pages/UnitDetailPage'));
+const NoticeBoardPage = lazy(() => import('../features/notices/pages/NoticeBoardPage'));
+const NoticeViewerPage = lazy(() => import('../features/notices/pages/NoticeViewerPage'));
+const GalleryHubPage = lazy(() => import('../features/gallery/pages/GalleryHubPage'));
+const CategoryGridPage = lazy(() => import('../features/gallery/pages/CategoryGridPage'));
+const ContactPage = lazy(() => import('../features/general_pages/ContactPage'));
 
-//router configuration
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element:
+    element: (
       <SmoothScrollProvider>
-      <PublicLayout />,// Wraps the entire application structure
-     </SmoothScrollProvider>, 
+        <PublicLayout />
+      </SmoothScrollProvider>
+    ),
     children: [
       { index: true, element: <HomePage /> },
       { path: 'about', element: <AboutPage /> },
 
-      // Academics Section
       { path: 'academic', element: <AcademicHubPage /> },
       { path: 'academic/:id', element: <ProgramDetailPage /> },
 
-      // Organizational Units
       { path: 'cells-and-units', element: <CellsHubPage /> },
       { path: 'cells-and-units/:unitId', element: <UnitDetailPage /> },
 
-      // Notice Suite
       { path: 'notices', element: <NoticeBoardPage /> },
       { path: 'notices/:id', element: <NoticeViewerPage /> },
 
-      // Media Folders
       { path: 'gallery', element: <GalleryHubPage /> },
       { path: 'gallery/:category', element: <CategoryGridPage /> },
 
-      // Communication Hub
       { path: 'contact', element: <ContactPage /> },
 
-      // Fallback Route: Redirects any typos back to Home
       { path: '*', element: <Navigate to="/" replace /> }
     ]
   }

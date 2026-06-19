@@ -1,7 +1,6 @@
-import React from 'react';
-import Chairman from "../../../assets/Leadership/Chairman.png";
-import chief from "../../../assets/Leadership/Chief.png";
-import principal from "../../../assets/Leadership/Principal.png";
+import Chairman from "../../../assets/Leadership/Chairman.webp";
+import chief from "../../../assets/Leadership/Chief.webp";
+import principal from "../../../assets/Leadership/Principal.webp";
 import AnimatedSection from '../../animations/AnimatedSection';
 
 const LeadershipTab = () => {
@@ -40,7 +39,7 @@ const LeadershipTab = () => {
             
             {/* Image Block: Matches aspect ratio from image_2b795d.jpg */}
             <div className="md:col-span-4 min-h-60 md:h-auto w-full relative bg-stone-100">
-              <img 
+              <img loading="lazy" decoding="async" 
                 src={chairman.image} 
                 alt={chairman.name}
                 className="w-full h-full object-cover object-top"
@@ -74,7 +73,7 @@ const LeadershipTab = () => {
                 
                 {/* Image Split - Bumped height up to h-64 for structural prominence */}
                 <div className="sm:col-span-5 h-64 sm:h-auto min-h-75 relative bg-stone-100">
-                  <img 
+                  <img loading="lazy" decoding="async" 
                     src={member.image} 
                     alt={member.name}
                     className="w-full h-full object-cover object-center sm:absolute sm:inset-0"

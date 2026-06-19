@@ -16,7 +16,7 @@ export default function CellOverviewCard({ unit, borderColor }) {
     <div style={cardStyle} className="cell-card">
       {/* Icon Placeholder */}
       <div className="w-full h-50 bg-gray-50 border border-gray-100 rounded-2xl mb-5 flex items-center justify-center overflow-hidden shadow-inner shrink-0 relative">
-        <img
+        <img loading="lazy" decoding="async"
           src={unit.icon}
           alt={unit.title}
           // Change object-contain to object-cover

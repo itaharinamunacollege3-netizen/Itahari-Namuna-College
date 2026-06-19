@@ -1,16 +1,14 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Banner from '../../../components/common/PageBanner'; // Path to your common folder
-import ProgramCard from '../components/ProgramCard'; // Academic component
+import Banner from '../../../components/common/PageBanner';
+import ProgramCard from '../components/ProgramCard';
 import courseData from '../data/courseMatrix.json';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
 
 const AcademicHubPage = () => {
   const navigate = useNavigate();
-const handleExploreProgram = (programId) => {
-  console.log("Navigating to:", `/academic/${programId}`); // Check the console
-  navigate(`/academic/${programId}`); 
-};
+  const handleExploreProgram = (programId) => {
+    navigate(`/academic/${programId}`);
+  };
 
   return (
     <AnimatedSection>

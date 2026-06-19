@@ -1,4 +1,3 @@
-import React from 'react';
 import { Download, Printer, User, Calendar, BookOpen } from 'lucide-react';
 
 export default function NoticeDetailView({ notice }) {
