@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
 import SmoothScrollProvider from '../components/common/SmoothScrollProvider';
+import FacilitiesPage from '../features/facilities/pages/FacilitiesPage';
 
 const HomePage = lazy(() => import('../features/general_pages/HomePage'));
 const AboutPage = lazy(() => import('../features/general_pages/AboutPage'));
@@ -42,7 +43,11 @@ const router = createBrowserRouter([
 
       { path: 'contact', element: <ContactPage /> },
 
-      { path: '*', element: <Navigate to="/" replace /> }
+      // Fallback Route: Redirects any typos back to Home
+      { path: '*', element: <Navigate to="/" replace /> },
+
+      // facilities page
+      {path:'facilities', element: <FacilitiesPage /> }
     ]
   }
 ]);
