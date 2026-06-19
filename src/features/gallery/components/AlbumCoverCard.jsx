@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AlbumCoverCard({ data }) {
@@ -10,7 +9,7 @@ export default function AlbumCoverCard({ data }) {
       className="group relative overflow-hidden rounded-2xl cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
     >
       {/* Background Image */}
-      <img 
+      <img loading="lazy" decoding="async" 
         src={data.coverImage} 
         alt={data.title} 
         className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-105"

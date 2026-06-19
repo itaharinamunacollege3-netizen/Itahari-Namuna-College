@@ -1,9 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import MetricCard from "../../components/common/homeComponent/MetricCard";
 import gsap from "gsap";
 import {
-  ArrowRight,
   Calendar,
   Award,
   GraduationCap,
@@ -259,7 +258,7 @@ export default function HomePage() {
 
                   {/* Main Premium Card Image Box */}
                   <div className="relative bg-brand-white p-3 rounded-3xl border border-brand-gray/80 shadow-xl overflow-hidden">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src="https://namunacollege.edu.np/wp-content/themes/namunacollege/assets/hero-image-two.png"
                       alt="Itahari Namuna Campus Main Academic Wing"
                       className="w-full h-80 sm:h-100 object-cover rounded-2xl shadow-inner grayscale-15 hover:grayscale-0 transition-all duration-700"

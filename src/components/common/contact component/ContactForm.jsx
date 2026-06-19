@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -15,8 +15,6 @@ export default function ContactForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
-    // Add your email/API submission logic here
   };
 
   return (

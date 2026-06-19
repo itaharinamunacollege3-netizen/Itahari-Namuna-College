@@ -1,4 +1,3 @@
-import React from "react";
 import { unitsData } from "../data/unitaData"; // Assuming the data structure we built
 import CellOverviewCard from "../components/CellOverviewCard";
 import PageBanner from "../../../components/common/PageBanner";
