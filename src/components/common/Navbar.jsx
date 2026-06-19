@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
 
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-linear-to-tr from-emerald-900 via-emerald-950 to-stone-950/90 border-b  px-8 py-2 flex justify-between items-center transition-all duration-300">      
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-linear-to-tr from-emerald-900 via-emerald-950 to-stone-950/90  px-8 py-2 flex justify-between items-center transition-all duration-300">      
     {/* Logo */}
       <Link to="/" className="w-18">
         <img src={logo} alt="Itahari Namuna College" className="w-full h-auto" />
