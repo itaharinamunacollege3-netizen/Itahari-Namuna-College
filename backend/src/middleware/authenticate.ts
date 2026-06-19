@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { verifyAccessToken } from "../utils/jwt";
 import { AppError } from "../utils/apiResponse";
 
-export function authenticate(req: Request, _res: Response, next: NextFunction) {
+export function authenticate(req: Request, _res: Response, next: NextFunction) { // authenticate the user
   try {
     const bearer = req.headers.authorization?.startsWith("Bearer ")
       ? req.headers.authorization.slice(7)

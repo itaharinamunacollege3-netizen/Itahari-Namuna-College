@@ -4,7 +4,7 @@ import { uniqueSlug } from "../../utils/slug";
 import { AppError } from "../../utils/apiResponse";
 import { formatNoticeForApi } from "./notices.formatter";
 
-function sanitizeContent(html: string) {
+function sanitizeContent(html: string) { // sanitize the content to prevent XSS attacks
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2"]),
     allowedAttributes: {
@@ -15,7 +15,7 @@ function sanitizeContent(html: string) {
   });
 }
 
-export async function listNotices(params: {
+export async function listNotices(params: { // list the notices
   page: number;
   limit: number;
   search?: string;
@@ -36,7 +36,7 @@ export async function listNotices(params: {
     ];
   }
 
-  const [items, total] = await Promise.all([
+  const [items, total] = await Promise.all([ // get the notices and the total number of notices
     prisma.notice.findMany({
       where,
       orderBy: { publishedAt: "desc" },
@@ -47,7 +47,7 @@ export async function listNotices(params: {
   ]);
 
   let filtered = items;
-  if (tag) {
+  if (tag) { // filter the notices by tag
     filtered = items.filter((n) => (n.tags as string[]).includes(tag));
   }
 
@@ -62,7 +62,7 @@ export async function listNotices(params: {
   };
 }
 
-export async function getNoticeBySlug(slug: string, publishedOnly = true) {
+export async function getNoticeBySlug(slug: string, publishedOnly = true) { // get the notice by slug
   const notice = await prisma.notice.findFirst({
     where: { slug, ...(publishedOnly ? { published: true } : {}) },
   });
@@ -70,7 +70,7 @@ export async function getNoticeBySlug(slug: string, publishedOnly = true) {
   return formatNoticeForApi(notice);
 }
 
-export async function getLatestNotices(options: { popup?: boolean; marquee?: boolean }) {
+export async function getLatestNotices(options: { popup?: boolean; marquee?: boolean }) { // get the latest notices
   const where: Record<string, unknown> = { published: true };
   if (options.popup) where.showInPopup = true;
   if (options.marquee) where.showInMarquee = true;
@@ -120,7 +120,7 @@ export async function createNotice(data: {
   return formatNoticeForApi(notice);
 }
 
-export async function updateNotice(id: number, data: Partial<Parameters<typeof createNotice>[0]>) {
+export async function updateNotice(id: number, data: Partial<Parameters<typeof createNotice>[0]>) { // update the notice
   const existing = await prisma.notice.findUnique({ where: { id } });
   if (!existing) throw new AppError(404, "Notice not found");
 
@@ -138,7 +138,7 @@ export async function updateNotice(id: number, data: Partial<Parameters<typeof c
   return formatNoticeForApi(notice);
 }
 
-export async function deleteNotice(id: number) {
+export async function deleteNotice(id: number) { // delete the notice
   const existing = await prisma.notice.findUnique({ where: { id } });
   if (!existing) throw new AppError(404, "Notice not found");
   await prisma.notice.delete({ where: { id } });

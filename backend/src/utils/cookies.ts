@@ -8,10 +8,10 @@ const cookieBase = {
   domain: env.COOKIE_DOMAIN === "localhost" ? undefined : env.COOKIE_DOMAIN,
 };
 
-export function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+export function setAuthCookies(res: Response, accessToken: string, refreshToken: string) { // set the auth cookies
   res.cookie("accessToken", accessToken, {
     ...cookieBase,
-    maxAge: 15 * 60 * 1000,
+    maxAge: 15 * 60 * 1000, // 15 minutes
     path: "/",
   });
   res.cookie("refreshToken", refreshToken, {

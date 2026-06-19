@@ -1,15 +1,19 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "./auth.service";
-import { setAuthCookies, clearAuthCookies } from "../../utils/cookies";
-import { sendSuccess } from "../../utils/apiResponse";
-import { AppError } from "../../utils/apiResponse";
+import { clearAuthCookies } from "../../utils/cookies";
+import { sendSuccess, AppError } from "../../utils/apiResponse";
+import { sendAuthSuccess, getRefreshTokenFromRequest } from "../../utils/authResponse";
+import { AuthUser } from "../../types/auth";
 
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { email, password } = req.body;
     const result = await authService.login(email, password, req);
-    setAuthCookies(res, result.accessToken, result.refreshToken);
-    sendSuccess(res, { user: result.user });
+    sendAuthSuccess(res, {
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
   } catch (err) {
     next(err);
   }
@@ -17,11 +21,20 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function refresh(req: Request, res: Response, next: NextFunction) {
   try {
-    const token = req.cookies?.refreshToken;
-    if (!token) throw new AppError(401, "Refresh token required");
+    const token = getRefreshTokenFromRequest(req.cookies, req.body);
+    if (!token) {
+      throw new AppError(
+        401,
+        "Refresh token required. Send cookie refreshToken or JSON body: { \"refreshToken\": \"...\" }"
+      );
+    }
+
     const result = await authService.refreshSession(token, req);
-    setAuthCookies(res, result.accessToken, result.refreshToken);
-    sendSuccess(res, { user: result.user });
+    sendAuthSuccess(res, {
+      user: result.user as AuthUser,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
   } catch (err) {
     next(err);
   }
@@ -29,7 +42,8 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
-    await authService.logout(req.cookies?.refreshToken, req.user?.id, req);
+    const refreshToken = getRefreshTokenFromRequest(req.cookies, req.body);
+    await authService.logout(refreshToken, req.user?.id, req);
     clearAuthCookies(res);
     sendSuccess(res, { message: "Logged out" });
   } catch (err) {

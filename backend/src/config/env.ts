@@ -23,6 +23,10 @@ const envSchema = z.object({
   SEED_ADMIN_EMAIL: z.string().email().optional(),
   SEED_ADMIN_PASSWORD: z.string().optional(),
   SEED_ADMIN_NAME: z.string().optional(),
+  EXPOSE_AUTH_TOKENS_IN_BODY: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -35,4 +39,7 @@ if (!parsed.success) {
 export const env = {
   ...parsed.data,
   isProduction: parsed.data.NODE_ENV === "production",
+  exposeAuthTokensInBody:
+    parsed.data.EXPOSE_AUTH_TOKENS_IN_BODY === true ||
+    parsed.data.NODE_ENV !== "production",
 };

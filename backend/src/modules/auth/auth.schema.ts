@@ -15,3 +15,7 @@ export const changePasswordSchema = z.object({
     .regex(/[0-9]/, "Must include number")
     .regex(/[^A-Za-z0-9]/, "Must include special character"),
 });
+
+export const refreshTokenSchema = z.object({
+  refreshToken: z.string().min(1).optional(),
+});
