@@ -8,6 +8,14 @@
   src: url("/fonts/inter-latin-variable.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-latin-variable.woff2") format("woff2");
+}
+
 @theme {
   /* Brand Palette Custom Tokens */
   --color-brand-primary: #045d30;   /* Deep Forest Green */
