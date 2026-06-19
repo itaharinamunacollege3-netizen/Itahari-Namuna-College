@@ -17,6 +17,35 @@ export const noticeIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
+function parseBoolean(value: unknown, fallback = false): boolean {
+  if (typeof value === "boolean") return value;
+  if (value === "true" || value === "1") return true;
+  if (value === "false" || value === "0") return false;
+  return fallback;
+}
+
+function parseTags(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map(String).map((tag) => tag.trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+    if (trimmed.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return Array.isArray(parsed)
+          ? parsed.map(String).map((tag) => tag.trim()).filter(Boolean)
+          : [];
+      } catch {
+        return trimmed.split(",").map((tag) => tag.trim()).filter(Boolean);
+      }
+    }
+    return trimmed.split(",").map((tag) => tag.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 const noticeFieldsSchema = z.object({
   title: z.string().trim().min(3),
   description: z.string().trim().min(1),
@@ -29,6 +58,8 @@ const noticeFieldsSchema = z.object({
   featured: z.boolean().default(false),
   published: z.boolean().default(true),
   slug: z.string().trim().optional(),
+  removePdf: z.boolean().default(false),
+  removeImage: z.boolean().default(false),
 });
 
 function normalizeNoticeBody(body: unknown): unknown {
@@ -51,13 +82,15 @@ function normalizeNoticeBody(body: unknown): unknown {
         ? publishedAt.toISOString().slice(0, 10)
         : undefined),
     category: input.category,
-    tags: input.tags,
+    tags: parseTags(input.tags),
     audience: input.audience,
     author: input.author,
     pdfUrl: input.pdfUrl ?? input.attachmentUrl ?? "",
-    featured: input.featured ?? input.showInPopup ?? false,
-    published: input.published,
+    featured: parseBoolean(input.featured ?? input.showInPopup, false),
+    published: parseBoolean(input.published, true),
     slug: input.slug,
+    removePdf: parseBoolean(input.removePdf, false),
+    removeImage: parseBoolean(input.removeImage, false),
   };
 }
 

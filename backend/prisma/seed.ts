@@ -3,6 +3,7 @@
 import "dotenv/config";
 import { prisma } from "../src/config/prisma";
 import { hashPassword } from "../src/utils/hash";
+import { slugify } from "../src/utils/slug";
 
 async function main() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@namunacollege.edu.np";

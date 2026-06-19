@@ -11,6 +11,7 @@ export function formatNoticeForApi(notice: Notice): NoticeApiDto {
     audience: notice.audience,
     tags: Array.isArray(notice.tags) ? (notice.tags as string[]) : [],
     featured: notice.featured,
-    pdfUrl: notice.attachmentUrl ?? "",
+    pdfUrl: notice.attachmentType === "pdf" ? (notice.attachmentUrl ?? "") : "",
+    imageUrl: notice.imageUrl ?? "",
   };
 }

@@ -59,3 +59,73 @@ export function runMultiImageUpload(fieldName: string, maxCount: number) {
     });
   };
 }
+
+const PDF_MIME = "application/pdf";
+
+function noticeFileFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) {
+  if (file.fieldname === "pdf") {
+    if (file.mimetype !== PDF_MIME) {
+      return cb(new AppError(400, "Only PDF files are allowed for the pdf field"));
+    }
+  } else if (file.fieldname === "image") {
+    if (!isAllowedImageMime(file.mimetype)) {
+      return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for the image field"));
+    }
+  } else {
+    return cb(new AppError(400, `Unexpected file field: ${file.fieldname}`));
+  }
+  cb(null, true);
+}
+
+export const noticeFileUpload = multer({
+  storage,
+  limits: { fileSize: env.maxUploadBytes, files: 2 },
+  fileFilter: noticeFileFilter,
+});
+
+export function runNoticeFileUpload() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    noticeFileUpload.fields([
+      { name: "pdf", maxCount: 1 },
+      { name: "image", maxCount: 1 },
+    ])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function runSinglePdfUpload(fieldName: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    noticeFileUpload.fields([{ name: fieldName, maxCount: 1 }])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function runSingleNoticeImageUpload(fieldName: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    noticeFileUpload.fields([{ name: fieldName, maxCount: 1 }])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function getNoticeUploadFiles(req: Request) {
+  const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  return {
+    pdf: files?.pdf?.[0],
+    image: files?.image?.[0],
+  };
+}
+
+export function getUploadedFile(req: Request, fieldName: string) {
+  const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  return files?.[fieldName]?.[0];
+}

@@ -25,6 +25,10 @@ export function validateImageBuffer(buffer: Buffer, mime: string): boolean {
   return false;
 }
 
+export function validatePdfBuffer(buffer: Buffer): boolean {
+  return buffer.length >= 4 && buffer.toString("ascii", 0, 4) === "%PDF";
+}
+
 export function sanitizeUploadFilename(name: string): string {
   return name
     .replace(/[^a-zA-Z0-9._-]/g, "-")

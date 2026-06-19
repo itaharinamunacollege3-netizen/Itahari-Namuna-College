@@ -112,8 +112,11 @@ model Notice {
   tags           Json
   audience       String?
   author         String?
-  attachmentUrl  String?
-  attachmentType String?
+  attachmentUrl            String?
+  attachmentType           String?
+  attachmentCloudinaryId   String?
+  imageUrl                 String?
+  imageCloudinaryId        String?
   published      Boolean  @default(true)
   featured       Boolean  @default(false)
   showInPopup    Boolean  @default(false)
