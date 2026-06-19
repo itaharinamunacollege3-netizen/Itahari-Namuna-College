@@ -9,6 +9,7 @@ export interface NoticeApiDto {
   tags: string[];
   featured: boolean;
   pdfUrl: string;
+  imageUrl: string;
 }
 
 export interface ListNoticesParams {
@@ -31,4 +32,11 @@ export interface NoticeWriteInput {
   featured?: boolean;
   published?: boolean;
   slug?: string;
+  removePdf?: boolean;
+  removeImage?: boolean;
+}
+
+export interface NoticeUploadFiles {
+  pdf?: Express.Multer.File;
+  image?: Express.Multer.File;
 }

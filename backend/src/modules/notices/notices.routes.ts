@@ -9,6 +9,12 @@ import {
 } from "./notices.schema";
 import { authenticate } from "../../middleware/authenticate";
 import { requireAdmin } from "../../middleware/adminGuard";
+import {
+  runNoticeFileUpload,
+  runSingleNoticeImageUpload,
+  runSinglePdfUpload,
+} from "../../middleware/upload";
+import { uploadLimiter } from "../../middleware/rateLimiter";
 
 const publicRouter = Router();
 
@@ -19,8 +25,38 @@ publicRouter.get("/:id", validateParams(noticeIdParamSchema), noticesController.
 const adminRouter = Router();
 adminRouter.use(authenticate, requireAdmin);
 adminRouter.get("/", validateQuery(listNoticesQuerySchema), noticesController.listAdmin);
-adminRouter.post("/", validateBody(createNoticeSchema), noticesController.create);
-adminRouter.patch("/:id", validateBody(updateNoticeSchema), noticesController.update);
-adminRouter.delete("/:id", noticesController.remove);
+adminRouter.post(
+  "/",
+  uploadLimiter,
+  runNoticeFileUpload(),
+  validateBody(createNoticeSchema),
+  noticesController.create
+);
+adminRouter.patch(
+  "/:id",
+  uploadLimiter,
+  validateParams(noticeIdParamSchema),
+  runNoticeFileUpload(),
+  validateBody(updateNoticeSchema),
+  noticesController.update
+);
+adminRouter.delete("/:id", validateParams(noticeIdParamSchema), noticesController.remove);
+
+adminRouter.post(
+  "/:id/pdf",
+  uploadLimiter,
+  validateParams(noticeIdParamSchema),
+  runSinglePdfUpload("pdf"),
+  noticesController.uploadPdf
+);
+adminRouter.post(
+  "/:id/image",
+  uploadLimiter,
+  validateParams(noticeIdParamSchema),
+  runSingleNoticeImageUpload("image"),
+  noticesController.uploadImage
+);
+adminRouter.delete("/:id/pdf", validateParams(noticeIdParamSchema), noticesController.removePdf);
+adminRouter.delete("/:id/image", validateParams(noticeIdParamSchema), noticesController.removeImage);
 
 export { publicRouter as noticesPublicRoutes, adminRouter as noticesAdminRoutes };
