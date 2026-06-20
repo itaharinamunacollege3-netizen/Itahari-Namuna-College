@@ -1,4 +1,3 @@
-import React from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 const ProgramCard = ({ program, onExplore }) => {
@@ -30,7 +29,7 @@ const ProgramCard = ({ program, onExplore }) => {
         {/* Deep background gradient mask overlay for stark white typography contrast */}
         <div className="absolute inset-0 bg-linear-to-t from-stone-950/80 via-stone-900/20 to-transparent z-10" />
 
-        <img
+        <img loading="lazy" decoding="async"
           src={program.image}
           alt={program.title}
           className="w-full h-full object-cover"

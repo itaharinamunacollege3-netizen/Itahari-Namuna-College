@@ -1,33 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 
 export default function SmoothScrollProvider({ children }) {
-  // 1. Get the current route
-  const location = useLocation();
+  const lenisRef = useRef(null);
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    // 2. Initialize Lenis
-    const lenis = new Lenis({
-      lerp: 0.1,
-      smoothWheel: true,
+    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenisRef.current = lenis;
+
+    let frameId = requestAnimationFrame(function raf(time) {
+      lenis.raf(time);
+      frameId = requestAnimationFrame(raf);
     });
 
-    // 3. Animation frame loop
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    // 4. Force scroll to top whenever location (route) changes
-    lenis.scrollTo(0, { immediate: true });
-
-    // 5. Cleanup
     return () => {
+      cancelAnimationFrame(frameId);
       lenis.destroy();
+      lenisRef.current = null;
     };
-  }, [location]); // Triggered every time the route changes
+  }, []);
+
+  useEffect(() => {
+    lenisRef.current?.scrollTo(0, { immediate: true });
+  }, [pathname]);
 
   return children;
 }

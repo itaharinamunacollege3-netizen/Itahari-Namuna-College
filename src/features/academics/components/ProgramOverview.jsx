@@ -1,4 +1,3 @@
-import React from 'react';
 import { BookOpen, Target, Briefcase } from 'lucide-react';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
 
