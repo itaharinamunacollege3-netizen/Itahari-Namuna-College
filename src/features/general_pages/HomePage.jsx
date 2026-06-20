@@ -90,10 +90,6 @@ export default function HomePage() {
       repeat: -1,
     });
 
-    // Define handlers as variables so they can be removed properly
-      repeat: -1, // Infinite loops
-    });
-
     // UX Touch: Pause notice crawl when a user hovers mouse over it to easily read it
     const handleMouseEnter = () => tickerAnimation.pause();
     const handleMouseLeave = () => tickerAnimation.play();
@@ -115,7 +111,6 @@ export default function HomePage() {
     }, 2000);
     return () => clearInterval(timer);
   }, [carouselImages.length]);
-  }, [notices]);
   return (
     <div className="w-full bg-brand-gray min-h-screen">
       <NoticePopup />
