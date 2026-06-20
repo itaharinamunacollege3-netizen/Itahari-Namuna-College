@@ -17,14 +17,6 @@ import { getNotices } from "../notices/services/noticesService";
 import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
 
-// Picks a ticker icon based on a notice's first tag.
-const TAG_ICONS = {
-  "TU Exams": ClipboardList,
-  Admissions: GraduationCap,
-  Holidays: Calendar,
-  IMPORTANT: Award,
-};
-
 export default function HomePage() {
   const marqueeRef = useRef(null);
   const [index, setIndex] = useState(0);
@@ -37,20 +29,36 @@ export default function HomePage() {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
     "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0001.jpg",
     "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0046.jpg",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0035.jpg",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0008.jpg",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0023.jpg",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0032.jpg",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8Al9YKLxUiu56-gggo1i7bF0LXktwA0KIiaRvWJ6ycerUoTxGn3q47t8&s=10",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0032.jpg",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0036.jpg",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq2MjMjPa-QAKZstcozBLbq8rrVbMsKZcIkP7-mod2OQ&s",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0042.jpg",
-      "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0059.jpg",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0035.jpg",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0008.jpg",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0023.jpg",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0032.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8Al9YKLxUiu56-gggo1i7bF0LXktwA0KIiaRvWJ6ycerUoTxGn3q47t8&s=10",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0032.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0036.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq2MjMjPa-QAKZstcozBLbq8rrVbMsKZcIkP7-mod2OQ&s",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0042.jpg",
+    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0059.jpg",
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
   ];
 
+  // Dynamic Notice Board content array matching
+  const urgentNotices = [
+    {
+      text: "Admission Open for BCA, BHM, BBM & BSW — Session 2083/84",
+      icon: GraduationCap,
+    },
+    {
+      text: "TU Examination Routine Released — 4th Semester 2082",
+      icon: ClipboardList,
+    },
+    { text: "Annual Sports Week: June 22–28, 2026", icon: Award },
+    {
+      text: "Scholarship Applications Open — Merit & Need-Based 2083",
+      icon: Calendar,
+    },
+  ]; 
   useEffect(() => {
     let active = true;
     getNotices().then((data) => {
@@ -61,6 +69,7 @@ export default function HomePage() {
     };
   }, []);
 
+  // 1. Separate the Marquee logic into its own useEffect
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % carouselImages.length);
@@ -72,14 +81,16 @@ export default function HomePage() {
     const marqueeTrack = marqueeRef.current;
     if (!marqueeTrack || notices.length === 0) return;
 
-    // Calculate width of one full track cycle to loop flawlessly
     const trackWidth = marqueeTrack.scrollWidth / 2;
 
-    // Pure GSAP horizontal translation for smooth infinite sliding motion
     const tickerAnimation = gsap.to(marqueeTrack, {
       x: -trackWidth,
-      duration: 30, // Adjust this integer value to speed up or slow down the notice speed
+      duration: 30,
       ease: "none",
+      repeat: -1,
+    });
+
+    // Define handlers as variables so they can be removed properly
       repeat: -1, // Infinite loops
     });
 
@@ -92,11 +103,18 @@ export default function HomePage() {
 
     return () => {
       tickerAnimation.kill();
-      if (marqueeTrack) {
-        marqueeTrack.removeEventListener("mouseenter", handleMouseEnter);
-        marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
-      }
+      marqueeTrack.removeEventListener("mouseenter", handleMouseEnter);
+      marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
     };
+  }, []); // Empty dependency array ensures this runs once
+
+  // 2. Keep the Carousel timer in a separate useEffect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [carouselImages.length]);
   }, [notices]);
   return (
     <div className="w-full bg-brand-gray min-h-screen">
@@ -105,7 +123,7 @@ export default function HomePage() {
       {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
       {/* ========================================================================= */}
       <AnimatedSection>
-        <section className="relative w-full h-[85vh] min-h-137.5 flex items-center justify-center bg-brand-dark overflow-hidden">
+        <section className="relative w-full h-[82vh] min-h-137.5 flex items-center justify-center bg-brand-dark overflow-hidden">
           {/* 1. College Background Image Media Layer */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <AnimatePresence> {/* Removed mode='wait' */}
@@ -216,7 +234,7 @@ export default function HomePage() {
               </div>
 
               <div className="font-body text-sm sm:text-base text-brand-dark/80 space-y-5 leading-relaxed font-normal max-w-3xl">
-                <p className="first-letter:text-4xl first-letter:font-extrabold first-letter:text-brand-primary first-letter:mr-2 first-letter:float-left first-letter:lh-1">
+                <p className="first-letter:text-5xl first-letter:font-semibold first-letter:text-brand-primary first-letter:mr-2 first-letter:float-left first-letter:lh-1">
                   Itahari Namuna College, a leading institute of Itahari Sunsari,
                   established in 2070 BS, is heading towards a decade of operation
                   now. It has proven to be a reputed educational institution
