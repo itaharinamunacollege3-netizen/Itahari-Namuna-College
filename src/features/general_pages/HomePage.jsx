@@ -55,7 +55,7 @@ export default function HomePage() {
       text: "Scholarship Applications Open — Merit & Need-Based 2083",
       icon: Calendar,
     },
-  ];
+  ]; 
 
   // 1. Separate the Marquee logic into its own useEffect
   useEffect(() => {
