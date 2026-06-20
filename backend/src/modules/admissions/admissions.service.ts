@@ -19,6 +19,11 @@ import {
   updateAdmissionSchema,
 } from "./admissions.schema";
 import type { ListAdmissionsParams } from "./admissions.types";
+import {
+  dispatchNotification,
+  notifyAdmissionStatusChange,
+  notifyNewAdmission,
+} from "../notifications/notifications.service";
 import { z } from "zod";
 
 const EDITABLE_STATUSES = new Set(["PENDING", "UNDER_REVIEW"]);
@@ -73,6 +78,8 @@ export async function createAdmission(data: z.infer<typeof admissionSchema>) {
       accessTokenHash,
     },
   });
+
+  dispatchNotification(() => notifyNewAdmission(application));
 
   const formatted = formatAdmissionForApi(application);
 
@@ -179,6 +186,8 @@ export async function updateAdmissionStatus(
       adminNotes: adminNotes ?? existing.adminNotes,
     },
   });
+
+  dispatchNotification(() => notifyAdmissionStatusChange(application, existing.status));
 
   return formatAdmissionForApi(application);
 }

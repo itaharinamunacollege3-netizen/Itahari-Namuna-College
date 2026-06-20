@@ -38,6 +38,16 @@ export async function getById(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function getAdminById(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const data = await noticesService.getNoticeById(id, false);
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getFeatured(req: Request, res: Response, next: NextFunction) {
   try {
     const data = await noticesService.getFeaturedNotice();
