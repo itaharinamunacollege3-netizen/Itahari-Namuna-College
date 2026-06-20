@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 export function ProtectedRoute() {
   const { isAuthenticated, isInitializing } = useAuth();
@@ -17,5 +18,9 @@ export function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  return <Outlet />;
+  return (
+    <NotificationProvider>
+      <Outlet />
+    </NotificationProvider>
+  );
 }

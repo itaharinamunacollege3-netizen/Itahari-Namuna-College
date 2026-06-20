@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import {
@@ -20,7 +20,6 @@ import {
   getProgram,
   listPrograms,
   removeProgramCover,
-  uploadProgramSemesterSyllabus,
   updateProgram,
   uploadProgramCover,
 } from "@/services/programs.service";
@@ -30,7 +29,7 @@ const SEMESTER_OPTIONS = Array.from({ length: 8 }, (_, index) => String(index + 
 
 function normalizeCurriculum(curriculum) {
   const base = Object.fromEntries(
-    SEMESTER_OPTIONS.map((semester) => [semester, { subjects: [], syllabusPdf: "" }])
+    SEMESTER_OPTIONS.map((semester) => [semester, { subjects: [] }])
   );
 
   if (!curriculum || typeof curriculum !== "object" || Array.isArray(curriculum)) {
@@ -43,7 +42,6 @@ function normalizeCurriculum(curriculum) {
     if (Array.isArray(value)) {
       base[semester] = {
         subjects: value.map(String).map((item) => item.trim()).filter(Boolean),
-        syllabusPdf: "",
       };
       continue;
     }
@@ -53,7 +51,6 @@ function normalizeCurriculum(curriculum) {
         subjects: Array.isArray(value.subjects)
           ? value.subjects.map(String).map((item) => item.trim()).filter(Boolean)
           : [],
-        syllabusPdf: typeof value.syllabusPdf === "string" ? value.syllabusPdf : "",
       };
     }
   }
@@ -63,19 +60,14 @@ function normalizeCurriculum(curriculum) {
 
 function curriculumToPayload(curriculumDraft) {
   return SEMESTER_OPTIONS.reduce((acc, semester) => {
-    const semesterData = curriculumDraft?.[semester] ?? { subjects: [], syllabusPdf: "" };
+    const semesterData = curriculumDraft?.[semester] ?? { subjects: [] };
     acc[semester] = {
       subjects: Array.isArray(semesterData.subjects)
         ? semesterData.subjects.map(String).map((item) => item.trim()).filter(Boolean)
         : [],
-      syllabusPdf: (semesterData.syllabusPdf ?? "").trim(),
     };
     return acc;
   }, {});
-}
-
-function normalizeSyllabusFiles() {
-  return Object.fromEntries(SEMESTER_OPTIONS.map((semester) => [semester, null]));
 }
 
 const emptyForm = {
@@ -139,17 +131,76 @@ function toPayload(form, curriculum) {
   };
 }
 
+/* Semester subjects editor card */
+function SemesterCard({ semester, subjects, onUpdate }) {
+  const [expanded, setExpanded] = useState(false);
+  const textValue = subjects.join("\n");
+  const count = subjects.length;
+
+  function handleChange(value) {
+    const lines = value
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    onUpdate(semester, lines);
+  }
+
+  return (
+    <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--color-surface)] overflow-hidden transition-all">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between p-3 text-left cursor-pointer hover:bg-stone-50 dark:hover:bg-white/5 transition-colors"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-primary)] text-xs font-bold text-white">
+            {semester}
+          </span>
+          <div>
+            <p className="text-sm font-semibold">Semester {semester}</p>
+            <p className="text-[11px] text-[var(--text-muted)]">
+              {count > 0 ? `${count} subject${count !== 1 ? "s" : ""}` : "No subjects yet"}
+            </p>
+          </div>
+        </div>
+        <ChevronDown className={`h-4 w-4 text-[var(--text-muted)] transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
+      </button>
+
+      {expanded && (
+        <div className="border-t border-[var(--border-subtle)] p-3">
+          <textarea
+            className="w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--color-bg)] p-3 text-sm font-mono leading-relaxed focus:border-[var(--color-brand-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-primary)]/30 resize-y min-h-[120px]"
+            value={textValue}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={`Enter subjects, one per line:\nSubject 1\nSubject 2\nSubject 3`}
+            rows={Math.max(4, count + 1)}
+          />
+          <FormHint>
+            Type one subject name per line. Empty lines are ignored.
+          </FormHint>
+
+          {count > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {subjects.map((s, i) => (
+                <span key={i} className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProgramsPage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [curriculumDraft, setCurriculumDraft] = useState(() => normalizeCurriculum({}));
-  const [syllabusFiles, setSyllabusFiles] = useState(() => normalizeSyllabusFiles());
-  const [uploadTargetSemester, setUploadTargetSemester] = useState(null);
-  const [uploadingSemester, setUploadingSemester] = useState(null);
   const [existingImage, setExistingImage] = useState(null);
   const [saving, setSaving] = useState(false);
-  const syllabusInputRef = useRef(null);
 
   const { data, loading, error, reload } = useAsyncData(() => listPrograms(), []);
 
@@ -158,7 +209,6 @@ export default function ProgramsPage() {
     setExistingImage(null);
     setForm(emptyForm);
     setCurriculumDraft(normalizeCurriculum({}));
-    setSyllabusFiles(normalizeSyllabusFiles());
     setOpen(true);
   }
 
@@ -169,7 +219,6 @@ export default function ProgramsPage() {
       setExistingImage(program.image ?? null);
       setForm(toForm(program));
       setCurriculumDraft(normalizeCurriculum(program.curriculum));
-      setSyllabusFiles(normalizeSyllabusFiles());
       setOpen(true);
     } catch (err) {
       toast.error(err.message);
@@ -194,18 +243,9 @@ export default function ProgramsPage() {
         await uploadProgramCover(id, form.cover);
       }
 
-      if (id) {
-        for (const semester of SEMESTER_OPTIONS) {
-          const file = syllabusFiles[semester];
-          if (!file) continue;
-          await uploadProgramSemesterSyllabus(id, semester, file);
-        }
-      }
-
       setOpen(false);
       setForm(emptyForm);
       setEditId(null);
-      setSyllabusFiles(normalizeSyllabusFiles());
       reload();
     } catch (err) {
       toast.error(err.message);
@@ -237,50 +277,11 @@ export default function ProgramsPage() {
     }
   }
 
-  function handleSemesterCardClick(semester) {
-    if (!syllabusInputRef.current) return;
-    setUploadTargetSemester(semester);
-    syllabusInputRef.current.value = "";
-    syllabusInputRef.current.click();
-  }
-
-  async function handleSemesterFileChange(event) {
-    const file = event.target.files?.[0] ?? null;
-    const semester = uploadTargetSemester;
-    if (!file || !semester) return;
-
+  function handleSubjectsUpdate(semester, subjects) {
     setCurriculumDraft((prev) => ({
       ...prev,
-      [semester]: prev[semester] ?? { subjects: [], syllabusPdf: "" },
+      [semester]: { subjects },
     }));
-
-    setSyllabusFiles((prev) => ({
-      ...prev,
-      [semester]: file,
-    }));
-
-    if (!editId) {
-      toast.success(`Semester ${semester} PDF selected. Save program to upload.`);
-      setUploadTargetSemester(null);
-      return;
-    }
-
-    try {
-      setUploadingSemester(semester);
-      const { data: updatedProgram } = await uploadProgramSemesterSyllabus(editId, semester, file);
-      setCurriculumDraft(normalizeCurriculum(updatedProgram.curriculum));
-      setSyllabusFiles((prev) => ({
-        ...prev,
-        [semester]: null,
-      }));
-      toast.success(`Semester ${semester} syllabus uploaded`);
-      reload();
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setUploadingSemester(null);
-      setUploadTargetSemester(null);
-    }
   }
 
   return (
@@ -296,7 +297,7 @@ export default function ProgramsPage() {
         }
       />
 
-      <div className="card-surface p-4">
+      <div className="card-surface c-4">
         {error ? (
           <div className="alert alert-error">{error}</div>
         ) : loading ? (
@@ -383,46 +384,22 @@ export default function ProgramsPage() {
             <FormField label="Highlights *">
               <FormInput value={form.highlights} onChange={(e) => setForm({ ...form, highlights: e.target.value })} required />
             </FormField>
-            <FormField label="Semester curriculum & syllabus PDFs">
-              <input
-                ref={syllabusInputRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={handleSemesterFileChange}
-              />
+          </FormSection>
 
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                {SEMESTER_OPTIONS.map((semester) => {
-                  const file = syllabusFiles[semester];
-                  const hasUploadedPdf = Boolean(curriculumDraft[semester]?.syllabusPdf);
-                  const isUploading = uploadingSemester === semester;
-
-                  return (
-                    <button
-                      key={semester}
-                      type="button"
-                      className="rounded-xl border border-[var(--border-subtle)] bg-[var(--color-surface)] p-3 text-left transition hover:border-[var(--color-brand-primary)]"
-                      onClick={() => handleSemesterCardClick(semester)}
-                      disabled={saving || isUploading}
-                    >
-                      <p className="text-sm font-semibold">Semester {semester}</p>
-                      <p className="mt-1 text-xs text-[var(--text-muted)]">
-                        {isUploading
-                          ? "Uploading..."
-                          : file
-                            ? `Selected: ${file.name}`
-                            : hasUploadedPdf
-                              ? "PDF uploaded (click to replace)"
-                              : "Click to upload PDF"}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <FormHint>Click a semester card to choose and upload its PDF syllabus.</FormHint>
-            </FormField>
+          <FormSection title="Semester subjects">
+            <FormHint className="mb-3">
+              Click each semester to expand, then enter subject names — one per line.
+            </FormHint>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {SEMESTER_OPTIONS.map((semester) => (
+                <SemesterCard
+                  key={semester}
+                  semester={semester}
+                  subjects={curriculumDraft[semester]?.subjects ?? []}
+                  onUpdate={handleSubjectsUpdate}
+                />
+              ))}
+            </div>
           </FormSection>
 
           <FormSection title="Media & visibility">
