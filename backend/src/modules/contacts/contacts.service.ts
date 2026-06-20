@@ -1,5 +1,6 @@
 import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/apiResponse";
+import { dispatchNotification, notifyNewContact } from "../notifications/notifications.service";
 
 export async function createContact(data: {
   fullName: string;
@@ -13,7 +14,7 @@ export async function createContact(data: {
     throw new AppError(400, "Invalid submission");
   }
 
-  return prisma.contactInquiry.create({
+  const inquiry = await prisma.contactInquiry.create({
     data: {
       fullName: data.fullName,
       email: data.email,
@@ -22,6 +23,10 @@ export async function createContact(data: {
       message: data.message,
     },
   });
+
+  dispatchNotification(() => notifyNewContact(inquiry));
+
+  return inquiry;
 }
 
 export async function listContacts(page = 1, limit = 20) {
