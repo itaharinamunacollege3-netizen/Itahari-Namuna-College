@@ -134,15 +134,21 @@ function toPayload(form, curriculum) {
 /* Semester subjects editor card */
 function SemesterCard({ semester, subjects, onUpdate }) {
   const [expanded, setExpanded] = useState(false);
-  const textValue = subjects.join("\n");
-  const count = subjects.length;
+  const count = subjects.filter(Boolean).length;
 
-  function handleChange(value) {
-    const lines = value
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    onUpdate(semester, lines);
+  function addSubject() {
+    onUpdate(semester, [...subjects, ""]);
+  }
+
+  function updateSubject(index, value) {
+    const next = [...subjects];
+    next[index] = value;
+    onUpdate(semester, next);
+  }
+
+  function removeSubject(index) {
+    const next = subjects.filter((_, i) => i !== index);
+    onUpdate(semester, next);
   }
 
   return (
@@ -168,26 +174,36 @@ function SemesterCard({ semester, subjects, onUpdate }) {
 
       {expanded && (
         <div className="border-t border-[var(--border-subtle)] p-3">
-          <textarea
-            className="w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--color-bg)] p-3 text-sm font-mono leading-relaxed focus:border-[var(--color-brand-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-primary)]/30 resize-y min-h-[120px]"
-            value={textValue}
-            onChange={(e) => handleChange(e.target.value)}
-            placeholder={`Enter subjects, one per line:\nSubject 1\nSubject 2\nSubject 3`}
-            rows={Math.max(4, count + 1)}
-          />
-          <FormHint>
-            Type one subject name per line. Empty lines are ignored.
-          </FormHint>
+          <div className="space-y-2">
+            {subjects.map((subject, index) => (
+              <div key={`${semester}-${index}`} className="flex items-center gap-2">
+                <FormInput
+                  value={subject}
+                  onChange={(e) => updateSubject(index, e.target.value)}
+                  placeholder={`Subject ${index + 1}`}
+                />
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm text-rose-600"
+                  onClick={() => removeSubject(index)}
+                  aria-label={`Remove subject ${index + 1}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
 
-          {count > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {subjects.map((s, i) => (
-                <span key={i} className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
-                  {s}
-                </span>
-              ))}
-            </div>
-          )}
+            <button
+              type="button"
+              className="btn btn-sm border border-[var(--border-subtle)] bg-[var(--color-surface)]"
+              onClick={addSubject}
+            >
+              <Plus className="h-4 w-4" />
+              Add Subject
+            </button>
+          </div>
+
+          <FormHint>Use + to create subjects for this semester.</FormHint>
         </div>
       )}
     </div>
@@ -388,7 +404,7 @@ export default function ProgramsPage() {
 
           <FormSection title="Semester subjects">
             <FormHint className="mb-3">
-              Click each semester to expand, then enter subject names — one per line.
+              Click each semester, then use + icon to create subject rows.
             </FormHint>
             <div className="grid gap-2 sm:grid-cols-2">
               {SEMESTER_OPTIONS.map((semester) => (
