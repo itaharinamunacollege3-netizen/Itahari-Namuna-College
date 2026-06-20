@@ -29,16 +29,22 @@ const AboutPage = () => {
         />
         <div className="max-w-7xl mx-auto px-6 mt-12 text-left">
           {/* PREMIUM SLIDING PILL SWITCHER CONTAINER */}
-          <div className="inline-block bg-stone-200/60 p-1.5 rounded-2xl border border-stone-200/60 relative overflow-hidden backdrop-blur-xs">
-            <div role="tablist" className="relative flex items-center gap-1 z-10">
-              {/* THE SLIDING ACCENT PILL: Moves horizontally using transform inline-styles based on active index */}
+          {/* PREMIUM SLIDING PILL SWITCHER CONTAINER */}
+          <div className="inline-block w-full sm:w-auto bg-stone-200/60 p-1.5 rounded-2xl border border-stone-200/60 relative overflow-hidden backdrop-blur-xs">
+
+            {/* GRID CONTAINER: Ensures perfect alignment for the sliding pill */}
+            <div
+              role="tablist"
+              className="grid grid-cols-1 sm:grid-cols-4 gap-1 relative z-10"
+            >
+              {/* THE SLIDING ACCENT PILL: Now transitions based on grid columns */}
               <div
-                className="absolute top-0 bottom-0 left-0 bg-white shadow-md shadow-stone-300/60 rounded-xl transition-all duration-300 ease-out pointer-events-none"
+                className="absolute top-0 bottom-0 bg-white shadow-md shadow-stone-300/60 rounded-xl transition-all duration-300 ease-out pointer-events-none hidden sm:block"
                 style={{
-                  width: `${100 / tabsConfig.length}%`,
+                  width: `calc(25% - 0.375rem)`,
                   transform: `translateX(${getActiveIndex() * 100}%)`,
                 }}
-                />
+              />
 
               {/* TAB BUTTON TRIGGER HOOKS */}
               {tabsConfig.map((tab) => (
@@ -46,18 +52,16 @@ const AboutPage = () => {
                   key={tab.id}
                   role="tab"
                   aria-selected={activeTab === tab.id}
-                  className={`relative z-10 flex-1 font-heading font-bold cursor-pointer text-xs sm:text-sm px-5 sm:px-6 h-9 transition-colors duration-300 focus:outline-hidden whitespace-nowrap ${activeTab === tab.id
-                    ? "text-emerald-800"
-                    : "text-stone-500 hover:text-stone-800"
+                  className={`relative z-10 font-heading font-bold cursor-pointer text-xs sm:text-sm px-4 h-9 transition-colors duration-300 focus:outline-hidden whitespace-nowrap flex items-center justify-center ${activeTab === tab.id
+                      ? "text-emerald-800"
+                      : "text-stone-500 hover:text-stone-800"
                     }`}
-                  style={{ width: "200px" }} // Keeps sizing uniform for perfect sliding track calculation
                   onClick={() => setActiveTab(tab.id)}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
-            
           </div>
 
           {/* CONTENT ENVELOPE: Smoothly glides and fades up whenever a tab changes */}
