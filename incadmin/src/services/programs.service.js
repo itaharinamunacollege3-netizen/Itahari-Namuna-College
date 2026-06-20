@@ -42,9 +42,3 @@ export async function uploadProgramCover(id, file) {
 export async function removeProgramCover(id) {
   return apiRequest(`/admin/programs/${id}/image`, { method: "DELETE" });
 }
-
-export async function uploadProgramSemesterSyllabus(id, semester, file) {
-  const form = new FormData();
-  form.append("pdf", file);
-  return apiFormRequest(`/admin/programs/${id}/syllabus/${semester}/pdf`, form);
-}

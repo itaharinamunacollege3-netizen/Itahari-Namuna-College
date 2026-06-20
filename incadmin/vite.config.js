@@ -23,6 +23,13 @@ export default defineConfig({
       "/socket.io": {
         target: "http://localhost:5000",
         ws: true,
+        configure: (proxy) => {
+          proxy.on("error", (err) => {
+            // Suppress noisy WS proxy errors when backend is offline
+            if (err.code === "ECONNRESET" || err.code === "ECONNREFUSED" || err.code === "EPIPE") return;
+            console.error("[ws proxy]", err.message);
+          });
+        },
       },
       "/uploads": {
         target: "http://localhost:5000",

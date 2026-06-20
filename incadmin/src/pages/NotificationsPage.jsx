@@ -6,6 +6,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { formatDate } from "@/utils/format";
+import { useNotifications } from "@/contexts/NotificationContext";
 import {
   deleteNotification,
   listNotifications,
@@ -15,6 +16,7 @@ import {
 
 export default function NotificationsPage() {
   const [page, setPage] = useState(1);
+  const { markRead: ctxMarkRead, markAllRead: ctxMarkAllRead, refresh: ctxRefresh } = useNotifications();
 
   const { data, meta, loading, error, reload } = useAsyncData(
     () => listNotifications({ page, limit: 20 }),
@@ -24,6 +26,7 @@ export default function NotificationsPage() {
   async function handleMarkRead(id) {
     try {
       await markNotificationRead(id);
+      ctxMarkRead(id);
       toast.success("Marked as read");
       reload();
     } catch (err) {
@@ -34,6 +37,7 @@ export default function NotificationsPage() {
   async function handleMarkAll() {
     try {
       await markAllNotificationsRead();
+      ctxMarkAllRead();
       toast.success("All notifications marked read");
       reload();
     } catch (err) {
@@ -45,6 +49,7 @@ export default function NotificationsPage() {
     if (!confirm("Delete this notification?")) return;
     try {
       await deleteNotification(id);
+      ctxRefresh();
       toast.success("Notification deleted");
       reload();
     } catch (err) {

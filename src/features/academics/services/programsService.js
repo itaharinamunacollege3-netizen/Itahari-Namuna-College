@@ -8,13 +8,11 @@ function normalizeCurriculum(curriculum) {
   const result = {};
   for (const [semester, value] of Object.entries(curriculum)) {
     if (Array.isArray(value)) {
-      result[String(semester)] = { subjects: value, syllabusPdf: "" };
+      result[String(semester)] = { subjects: value };
       continue;
     }
-
     result[String(semester)] = {
       subjects: Array.isArray(value?.subjects) ? value.subjects : [],
-      syllabusPdf: typeof value?.syllabusPdf === "string" ? value.syllabusPdf : "",
     };
   }
   return result;
