@@ -7,10 +7,12 @@ const slugSchema = z
   .max(60)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be lowercase letters, numbers, and hyphens");
 
-const curriculumSchema = z.record(
-  z.string().trim().min(1),
-  z.array(z.string().trim().min(1)).min(1)
-);
+const curriculumSemesterSchema = z.object({
+  subjects: z.array(z.string().trim().min(1)).default([]),
+  syllabusPdf: z.string().trim().max(2000).optional(),
+});
+
+const curriculumSchema = z.record(z.string().trim().min(1), curriculumSemesterSchema);
 
 const programFieldsSchema = z.object({
   title: z.string().trim().min(3).max(200),
@@ -54,7 +56,9 @@ function parseStringArray(value: unknown): string[] {
   return [];
 }
 
-function parseCurriculum(value: unknown): Record<string, string[]> {
+function parseCurriculum(
+  value: unknown
+): Record<string, { subjects: string[]; syllabusPdf?: string }> {
   if (typeof value === "string") {
     try {
       return parseCurriculum(JSON.parse(value));
@@ -63,10 +67,31 @@ function parseCurriculum(value: unknown): Record<string, string[]> {
     }
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const result: Record<string, string[]> = {};
-  for (const [semester, subjects] of Object.entries(value as Record<string, unknown>)) {
-    result[String(semester)] = parseStringArray(subjects);
+  const result: Record<string, { subjects: string[]; syllabusPdf?: string }> = {};
+
+  for (const [semester, details] of Object.entries(value as Record<string, unknown>)) {
+    if (Array.isArray(details)) {
+      result[String(semester)] = {
+        subjects: parseStringArray(details),
+      };
+      continue;
+    }
+
+    if (details && typeof details === "object") {
+      const record = details as Record<string, unknown>;
+      const syllabusPdf =
+        typeof record.syllabusPdf === "string" ? record.syllabusPdf.trim() : undefined;
+
+      result[String(semester)] = {
+        subjects: parseStringArray(record.subjects),
+        ...(syllabusPdf ? { syllabusPdf } : {}),
+      };
+      continue;
+    }
+
+    result[String(semester)] = { subjects: [] };
   }
+
   return result;
 }
 
@@ -115,6 +140,14 @@ export const publicListProgramsQuerySchema = z.object({
 
 export const programIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
+});
+
+export const programSemesterParamSchema = z.object({
+  id: z.coerce.number().int().positive(),
+  semester: z
+    .string()
+    .trim()
+    .regex(/^[1-8]$/, "semester must be between 1 and 8"),
 });
 
 export const programSlugParamSchema = z.object({
