@@ -8,15 +8,27 @@ import {
   Award,
   GraduationCap,
   ClipboardList,
+  Bell,
 } from "lucide-react";
 import HomeProgramInfo from "../../components/common/homeComponent/HomeProgramInfo";
 import HomeWhyChooseUs from "../../components/common/homeComponent/HomeWhyChooseUs";
-import introVideo from '../../assets/video/inc intro.mp4'
+import NoticePopup from "../notices/components/NoticePopup";
+import { getNotices } from "../notices/services/noticesService";
 import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
+
+// Picks a ticker icon based on a notice's first tag.
+const TAG_ICONS = {
+  "TU Exams": ClipboardList,
+  Admissions: GraduationCap,
+  Holidays: Calendar,
+  IMPORTANT: Award,
+};
+
 export default function HomePage() {
   const marqueeRef = useRef(null);
   const [index, setIndex] = useState(0);
+  const [notices, setNotices] = useState([]);
   const carouselImages = [
     "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0013.jpg",
     "https://namunacollege.edu.np/wp-content/uploads/2024/05/431483808_795662615915204_394360178496327343_n.jpg",
@@ -39,30 +51,26 @@ export default function HomePage() {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
   ];
 
-  // Dynamic Notice Board content array matching
-  const urgentNotices = [
-    {
-      text: "Admission Open for BCA, BHM, BBM & BSW — Session 2083/84",
-      icon: GraduationCap,
-    },
-    {
-      text: "TU Examination Routine Released — 4th Semester 2082",
-      icon: ClipboardList,
-    },
-    { text: "Annual Sports Week: June 22–28, 2026", icon: Award },
-    {
-      text: "Scholarship Applications Open — Merit & Need-Based 2083",
-      icon: Calendar,
-    },
-  ];
+  useEffect(() => {
+    let active = true;
+    getNotices().then((data) => {
+      if (active) setNotices(data);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 2500); // Swipes every 5 seconds
+    }, 2500); // Swipes every 2.5 seconds
     return () => clearInterval(timer);
+  }, [carouselImages.length]);
+
+  useEffect(() => {
     const marqueeTrack = marqueeRef.current;
-    if (!marqueeTrack) return;
+    if (!marqueeTrack || notices.length === 0) return;
 
     // Calculate width of one full track cycle to loop flawlessly
     const trackWidth = marqueeTrack.scrollWidth / 2;
@@ -73,9 +81,8 @@ export default function HomePage() {
       duration: 30, // Adjust this integer value to speed up or slow down the notice speed
       ease: "none",
       repeat: -1, // Infinite loops
-
     });
-    
+
     // UX Touch: Pause notice crawl when a user hovers mouse over it to easily read it
     const handleMouseEnter = () => tickerAnimation.pause();
     const handleMouseLeave = () => tickerAnimation.play();
@@ -90,9 +97,10 @@ export default function HomePage() {
         marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
       }
     };
-  }, []);
+  }, [notices]);
   return (
     <div className="w-full bg-brand-gray min-h-screen">
+      <NoticePopup />
       {/* ========================================================================= */}
       {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
       {/* ========================================================================= */}
@@ -165,18 +173,19 @@ export default function HomePage() {
           ref={marqueeRef}
           className="flex whitespace-nowrap space-x-12 pl-12 will-change-transform"
         >
-          {/* Primary Set Loop */}
-          {[...urgentNotices, ...urgentNotices].map((notice, idx) => {
-            const Icon = notice.icon;
+          {/* Primary Set Loop (doubled to stitch the infinite scroll) */}
+          {[...notices, ...notices].map((notice, idx) => {
+            const Icon = TAG_ICONS[notice.tags?.[0]] ?? Bell;
             return (
-              <div
+              <Link
+                to={`/notices/${notice.id}`}
                 key={idx}
-                className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide"
+                className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide hover:text-brand-primary transition-colors"
               >
-                <Icon className="w-4 h-4 text-brand-dark shrink-0" />
-                <span>{notice.text}</span>
+                <Icon className="w-4 h-4 shrink-0" />
+                <span>{notice.title}</span>
                 <span className="text-brand-dark/40 font-normal px-2">•</span>
-              </div>
+              </Link>
             );
           })}
         </div>
