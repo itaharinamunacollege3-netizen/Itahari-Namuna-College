@@ -118,9 +118,12 @@ const ProgramDetailPage = () => {
           <div className="bg-white border border-stone-200 rounded-3xl p-6 space-y-4 shadow-2xs h-fit">
             <h4 className="font-bold text-stone-800">Admissions Open</h4>
             <p className="text-xs text-stone-500">Enrollment pathways are active under TU guidelines.</p>
-            <button className="w-full bg-[#006A38] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#00522b] transition-colors">
+            <Link
+              to={`/admissions?program=${id}`}
+              className="block text-center w-full bg-[#006A38] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#00522b] transition-colors"
+            >
               Apply For Admission
-            </button>
+            </Link>
           </div>
         </div>
       </div>

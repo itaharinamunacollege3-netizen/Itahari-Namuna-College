@@ -165,7 +165,7 @@ export default function HomePage() {
                 Explore Academics
               </Link>
               <Link
-                to="/contact"
+                to="/admissions"
                 className="w-full sm:w-auto bg-brand-white/10 backdrop-blur-xs text-brand-white border border-brand-white/30 font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-white/20 hover:scale-103 active:scale-97 transition-all duration-300 text-center"
               >
                 Admissions
