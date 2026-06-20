@@ -31,11 +31,21 @@ export const contactLimiter = rateLimit({ // contact rate limiter
   legacyHeaders: false, // return the headers
 });
 
+const isDev = process.env.NODE_ENV !== "production";
+
 export const admissionLimiter = rateLimit({ // admission rate limiter
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // 3 requests per hour
+  max: isDev ? 100 : 3, // 100/hr in dev, 3/hr in production
   standardHeaders: true, // return the headers
   legacyHeaders: false, // return the headers
+});
+
+export const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many uploads. Please try again later." },
 });
 
 export const loginSlowDown = slowDown({ // login slow down

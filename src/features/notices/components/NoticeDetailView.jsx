@@ -37,6 +37,13 @@ export default function NoticeDetailView({ notice }) {
 
       {/* Content Area */}
       <div className="prose prose-sm max-w-none text-brand-dark/80 leading-relaxed">
+        {notice.image && (
+          <img
+            src={notice.image}
+            alt={notice.title}
+            className="w-full max-h-96 object-cover rounded-xl mb-6 border border-brand-gray/20"
+          />
+        )}
         <p>{notice.description}</p>
         
         {/* Document Attachment Box */}

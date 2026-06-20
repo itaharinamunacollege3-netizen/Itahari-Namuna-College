@@ -7,10 +7,14 @@ export function formatNoticeForApi(notice: Notice): NoticeApiDto {
     title: notice.title,
     description: notice.content,
     publishedDate: notice.publishedDate,
+    category: notice.category,
+    slug: notice.slug,
     author: notice.author,
     audience: notice.audience,
     tags: Array.isArray(notice.tags) ? (notice.tags as string[]) : [],
     featured: notice.featured,
-    pdfUrl: notice.attachmentUrl ?? "",
+    published: notice.published,
+    pdfUrl: notice.attachmentType === "pdf" ? (notice.attachmentUrl ?? "") : "",
+    imageUrl: notice.imageUrl ?? "",
   };
 }

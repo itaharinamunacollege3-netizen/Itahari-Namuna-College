@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import path from "path";
 import { env } from "../config/env";
 import apiRoutes from "../routes/index";
 import { errorHandler } from "../middleware/errorHandler";
@@ -21,7 +22,14 @@ export function createApp(): Application {
 
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,
+      origin(origin, callback) {
+        const allowed = env.corsOrigins;
+        if (!origin || allowed.includes(origin)) {
+          callback(null, origin || allowed[0]);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
     })
   );
@@ -30,6 +38,9 @@ export function createApp(): Application {
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true, limit: "1mb" }));
   app.use(globalLimiter);
+
+  // Serve uploaded photos (staff, faculty, etc.)
+  app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
   app.use("/api", apiRoutes);
 

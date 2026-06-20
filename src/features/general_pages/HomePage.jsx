@@ -8,16 +8,19 @@ import {
   Award,
   GraduationCap,
   ClipboardList,
+  Bell,
 } from "lucide-react";
 import HomeProgramInfo from "../../components/common/homeComponent/HomeProgramInfo";
 import HomeWhyChooseUs from "../../components/common/homeComponent/HomeWhyChooseUs";
-import introVideo from '../../assets/video/inc intro.mp4'
+import NoticePopup from "../notices/components/NoticePopup";
+import { getNotices } from "../notices/services/noticesService";
 import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
 
 export default function HomePage() {
   const marqueeRef = useRef(null);
   const [index, setIndex] = useState(0);
+  const [notices, setNotices] = useState([]);
   const carouselImages = [
     "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0013.jpg",
     "https://namunacollege.edu.np/wp-content/uploads/2024/05/431483808_795662615915204_394360178496327343_n.jpg",
@@ -56,11 +59,27 @@ export default function HomePage() {
       icon: Calendar,
     },
   ]; 
+  useEffect(() => {
+    let active = true;
+    getNotices().then((data) => {
+      if (active) setNotices(data);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // 1. Separate the Marquee logic into its own useEffect
   useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 2500); // Swipes every 2.5 seconds
+    return () => clearInterval(timer);
+  }, [carouselImages.length]);
+
+  useEffect(() => {
     const marqueeTrack = marqueeRef.current;
-    if (!marqueeTrack) return;
+    if (!marqueeTrack || notices.length === 0) return;
 
     const trackWidth = marqueeTrack.scrollWidth / 2;
 
@@ -72,6 +91,10 @@ export default function HomePage() {
     });
 
     // Define handlers as variables so they can be removed properly
+      repeat: -1, // Infinite loops
+    });
+
+    // UX Touch: Pause notice crawl when a user hovers mouse over it to easily read it
     const handleMouseEnter = () => tickerAnimation.pause();
     const handleMouseLeave = () => tickerAnimation.play();
 
@@ -92,8 +115,10 @@ export default function HomePage() {
     }, 2000);
     return () => clearInterval(timer);
   }, [carouselImages.length]);
+  }, [notices]);
   return (
     <div className="w-full bg-brand-gray min-h-screen">
+      <NoticePopup />
       {/* ========================================================================= */}
       {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
       {/* ========================================================================= */}
@@ -166,18 +191,19 @@ export default function HomePage() {
           ref={marqueeRef}
           className="flex whitespace-nowrap space-x-12 pl-12 will-change-transform"
         >
-          {/* Primary Set Loop */}
-          {[...urgentNotices, ...urgentNotices].map((notice, idx) => {
-            const Icon = notice.icon;
+          {/* Primary Set Loop (doubled to stitch the infinite scroll) */}
+          {[...notices, ...notices].map((notice, idx) => {
+            const Icon = TAG_ICONS[notice.tags?.[0]] ?? Bell;
             return (
-              <div
+              <Link
+                to={`/notices/${notice.id}`}
                 key={idx}
-                className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide"
+                className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide hover:text-brand-primary transition-colors"
               >
-                <Icon className="w-4 h-4 text-brand-dark shrink-0" />
-                <span>{notice.text}</span>
+                <Icon className="w-4 h-4 shrink-0" />
+                <span>{notice.title}</span>
                 <span className="text-brand-dark/40 font-normal px-2">•</span>
-              </div>
+              </Link>
             );
           })}
         </div>

@@ -8,14 +8,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum StaffCategory {
-  ADMIN
-  BUS
-  SECURITY
-  CANTEEN
-  OTHER
-}
-
 enum AdmissionProgram {
   PLUS2
   BCA
@@ -37,6 +29,13 @@ enum AdmissionStatus {
   REJECTED
 }
 
+enum NotificationType {
+  ADMISSION_NEW
+  CONTACT_NEW
+  ADMISSION_STATUS
+  SYSTEM
+}
+
 model User {
   id                  Int       @id @default(autoincrement())
   email               String    @unique
@@ -56,6 +55,7 @@ model User {
   refreshTokens   RefreshToken[]
   passwordHistory PasswordHistory[]
   auditLogs       AuditLog[]
+  notifications   Notification[]
 }
 
 model RefreshToken {
@@ -120,8 +120,11 @@ model Notice {
   tags           Json
   audience       String?
   author         String?
-  attachmentUrl  String?
-  attachmentType String?
+  attachmentUrl            String?
+  attachmentType           String?
+  attachmentCloudinaryId   String?
+  imageUrl                 String?
+  imageCloudinaryId        String?
   published      Boolean  @default(true)
   featured       Boolean  @default(false)
   showInPopup    Boolean  @default(false)
@@ -161,21 +164,50 @@ model Program {
   updatedAt      DateTime @updatedAt
 }
 
+model StaffCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  staff       Staff[]
+
+  @@index([slug])
+}
+
+model FacultyDepartment {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  faculty     Faculty[]
+
+  @@index([slug])
+}
+
 model Faculty {
-  id            Int      @id @default(autoincrement())
+  id            Int               @id @default(autoincrement())
   name          String
   designation   String
-  department    String
+  departmentId  Int
+  department    FacultyDepartment @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   qualification String?
   bio           String?
   photo         String?
-  isHOD         Boolean  @default(false)
-  sortOrder     Int      @default(0)
-  published     Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  isHOD         Boolean           @default(false)
+  sortOrder     Int               @default(0)
+  published     Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
-  @@index([department, isHOD])
+  @@index([departmentId, isHOD])
 }
 
 model Staff {
@@ -183,14 +215,15 @@ model Staff {
   name       String
   role       String
   department String?
-  category   StaffCategory
+  categoryId Int
+  category   StaffCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   photo      String?
   sortOrder  Int           @default(0)
   published  Boolean       @default(true)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 
-  @@index([category])
+  @@index([categoryId])
 }
 
 model Leadership {
@@ -241,26 +274,28 @@ model FacilityImage {
 }
 
 model GalleryAlbum {
-  id          Int            @id @default(autoincrement())
-  slug        String         @unique
-  title       String
-  coverImage  String?
-  description String?
-  isFeatured  Boolean        @default(false)
-  sortOrder   Int            @default(0)
-  published   Boolean        @default(true)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  images      GalleryImage[]
+  id                     Int            @id @default(autoincrement())
+  slug                   String         @unique
+  title                  String
+  coverImage             String?
+  coverImageCloudinaryId String?
+  description            String?
+  isFeatured             Boolean        @default(false)
+  sortOrder              Int            @default(0)
+  published              Boolean        @default(true)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  images                 GalleryImage[]
 }
 
 model GalleryImage {
-  id        Int          @id @default(autoincrement())
-  albumId   Int
-  imageUrl  String
-  caption   String?
-  sortOrder Int          @default(0)
-  album     GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  id                 Int          @id @default(autoincrement())
+  albumId            Int
+  imageUrl           String
+  cloudinaryPublicId String?
+  caption            String?
+  sortOrder          Int          @default(0)
+  album              GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
 }
 
 model CellUnit {
@@ -311,6 +346,24 @@ model ContactInquiry {
   message    String
   isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
+
+  @@index([isRead, createdAt])
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+  @@index([userId, createdAt])
 }
 
 model Download {
