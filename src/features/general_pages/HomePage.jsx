@@ -17,6 +17,13 @@ import { getNotices } from "../notices/services/noticesService";
 import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
 
+const TAG_ICONS = {
+  IMPORTANT: Award,
+  "TU Exams": ClipboardList,
+  Admissions: GraduationCap,
+  Holidays: Calendar,
+};
+
 export default function HomePage() {
   const marqueeRef = useRef(null);
   const [index, setIndex] = useState(0);
@@ -43,22 +50,6 @@ export default function HomePage() {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
   ];
 
-  // Dynamic Notice Board content array matching
-  const urgentNotices = [
-    {
-      text: "Admission Open for BCA, BHM, BBM & BSW — Session 2083/84",
-      icon: GraduationCap,
-    },
-    {
-      text: "TU Examination Routine Released — 4th Semester 2082",
-      icon: ClipboardList,
-    },
-    { text: "Annual Sports Week: June 22–28, 2026", icon: Award },
-    {
-      text: "Scholarship Applications Open — Merit & Need-Based 2083",
-      icon: Calendar,
-    },
-  ]; 
   useEffect(() => {
     let active = true;
     getNotices().then((data) => {
