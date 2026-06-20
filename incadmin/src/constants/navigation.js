@@ -1,0 +1,58 @@
+import {
+  LayoutDashboard,
+  Megaphone,
+  BookOpen,
+  Image,
+  Users,
+  UserCog,
+  Tags,
+  GraduationCap,
+  Mail,
+  LogOut,
+} from "lucide-react";
+
+export const NAV_SECTIONS = [
+  {
+    title: "MAIN",
+    items: [{ label: "Dashboard", path: "/dashboard", icon: LayoutDashboard }],
+  },
+  {
+    title: "CONTENT",
+    items: [
+      { label: "Notices", path: "/notices", icon: Megaphone },
+      { label: "Programs", path: "/programs", icon: BookOpen },
+      { label: "Gallery", path: "/gallery", icon: Image },
+    ],
+  },
+  {
+    title: "PEOPLE",
+    items: [
+      { label: "Faculty", path: "/faculty", icon: Users },
+      { label: "Staff", path: "/staff", icon: UserCog },
+      { label: "Categories", path: "/categories", icon: Tags },
+    ],
+  },
+  {
+    title: "SUBMISSIONS",
+    items: [
+      { label: "Admissions", path: "/admissions", icon: GraduationCap },
+      { label: "Contacts", path: "/contacts", icon: Mail },
+    ],
+  },
+];
+
+export const LOGOUT_ITEM = { label: "Logout", icon: LogOut };
+
+const EXTRA_ROUTE_LABELS = {
+  "/notifications": "Notifications",
+  "/settings": "Settings",
+};
+
+export function getRouteLabel(pathname) {
+  for (const section of NAV_SECTIONS) {
+    for (const item of section.items) {
+      if (item.path === pathname) return item.label;
+    }
+  }
+  return EXTRA_ROUTE_LABELS[pathname] ?? "Dashboard";
+}

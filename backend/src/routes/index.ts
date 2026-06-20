@@ -7,6 +7,8 @@ import { galleryPublicRoutes, galleryAdminRoutes } from "../modules/gallery/gall
 import { staffPublicRoutes, staffAdminRoutes } from "../modules/staff/staff.routes";
 import { facultyPublicRoutes, facultyAdminRoutes } from "../modules/faculty/faculty.routes";
 import { categoriesPublicRoutes, categoriesAdminRoutes } from "../modules/categories/categories.routes";
+import { programsPublicRoutes, programsAdminRoutes } from "../modules/programs/programs.routes";
+import { notificationsAdminRoutes } from "../modules/notifications/notifications.routes";
 import { sendSuccess } from "../utils/apiResponse";
 
 const router = Router();
@@ -23,6 +25,7 @@ router.use("/gallery", galleryPublicRoutes);
 router.use("/staff", staffPublicRoutes);
 router.use("/faculty", facultyPublicRoutes);
 router.use("/categories", categoriesPublicRoutes);
+router.use("/programs", programsPublicRoutes);
 
 router.use("/admin/notices", noticesAdminRoutes);
 router.use("/admin/contacts", contactsAdminRoutes);
@@ -31,5 +34,7 @@ router.use("/admin/gallery", galleryAdminRoutes);
 router.use("/admin/staff", staffAdminRoutes);
 router.use("/admin/faculty", facultyAdminRoutes);
 router.use("/admin/categories", categoriesAdminRoutes);
+router.use("/admin/programs", programsAdminRoutes);
+router.use("/admin/notifications", notificationsAdminRoutes);
 
 export default router;

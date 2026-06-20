@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown, BookOpen } from 'lucide-react';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
 

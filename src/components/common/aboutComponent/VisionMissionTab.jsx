@@ -1,11 +1,9 @@
-import React from 'react';
 import { 
   Eye, 
   Target, 
   Compass, 
-  GraduationCap, 
-  Users, 
-  ShieldCheck, 
+  GraduationCap,
+  ShieldCheck,
   Award, 
   Briefcase, 
   Cpu, 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle, FileText, ClipboardList } from 'lucide-react';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
 

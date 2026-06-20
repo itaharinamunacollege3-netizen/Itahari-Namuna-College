@@ -1,4 +1,3 @@
-import React from 'react';
 import { School, Handshake, Globe, GraduationCap, DollarSign, Trophy } from 'lucide-react';
 
 export default function HomeWhyChooseUs() {

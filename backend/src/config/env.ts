@@ -48,6 +48,9 @@ if (!parsed.success) {
 
 export const env = {
   ...parsed.data,
+  corsOrigins: parsed.data.CORS_ORIGIN.split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   isProduction: parsed.data.NODE_ENV === "production",
   exposeAuthTokensInBody:
     parsed.data.EXPOSE_AUTH_TOKENS_IN_BODY === true ||

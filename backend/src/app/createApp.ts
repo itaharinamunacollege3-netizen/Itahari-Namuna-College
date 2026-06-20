@@ -22,7 +22,14 @@ export function createApp(): Application {
 
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,
+      origin(origin, callback) {
+        const allowed = env.corsOrigins;
+        if (!origin || allowed.includes(origin)) {
+          callback(null, origin || allowed[0]);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
     })
   );

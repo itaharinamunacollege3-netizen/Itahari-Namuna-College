@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PageBanner from "../../components/common/PageBanner";
 import LeadershipTab from "../../components/common/aboutComponent/LeadershipTab";
 import VisionMissionTab from "../../components/common/aboutComponent/VisionMissionTab";
