@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { galleryData } from '../gallery-data/galleryData';
 import PhotoGridTile from '../components/PhotoGridTile';
 import CategoryBanner from '../components/CategoryBanner';
 import LightboxModal from '../components/LightboxModal';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
-
+import { useState } from 'react';
 export default function CategoryGridPage() {
   const { category } = useParams(); // Matches route path 'gallery/:category'
   const [selectedImage, setSelectedImage] = useState(null);
