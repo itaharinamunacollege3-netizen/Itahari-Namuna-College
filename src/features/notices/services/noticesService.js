@@ -45,13 +45,31 @@ async function fetchJson(path) {
   return body.data;
 }
 
-export async function getNotices() {
-  if (!BASE_URL) return sortByNewest(mockNotices);
+// Applies the same search/tag rules the backend uses, for the mock fallback.
+function matchesFilters(notice, search, tag) {
+  const haystack = [notice.title, notice.content, notice.description, notice.author]
+    .map((field) => String(field ?? '').toLowerCase());
+  const matchesSearch = !search || haystack.some((field) => field.includes(search.toLowerCase()));
+  const tags = Array.isArray(notice.tags) ? notice.tags : [];
+  const matchesTag = !tag || tags.includes(tag);
+  return matchesSearch && matchesTag;
+}
+
+export async function getNotices(params = {}) {
+  const search = params.search?.trim() ?? '';
+  const tag = params.tag?.trim() ?? '';
+  if (!BASE_URL) {
+    return sortByNewest(mockNotices.filter((n) => matchesFilters(n, search, tag)));
+  }
   try {
-    const data = await fetchJson('/notices');
+    const query = new URLSearchParams();
+    if (search) query.set('search', search);
+    if (tag) query.set('tag', tag);
+    const qs = query.toString();
+    const data = await fetchJson(`/notices${qs ? `?${qs}` : ''}`);
     return sortByNewest((data ?? []).map(adaptNotice));
   } catch {
-    return sortByNewest(mockNotices);
+    return sortByNewest(mockNotices.filter((n) => matchesFilters(n, search, tag)));
   }
 }
 
