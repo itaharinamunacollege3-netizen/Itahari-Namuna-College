@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -20,10 +20,63 @@ import {
   getProgram,
   listPrograms,
   removeProgramCover,
+  uploadProgramSemesterSyllabus,
   updateProgram,
   uploadProgramCover,
 } from "@/services/programs.service";
 import { nullableNumber, optionalString, splitCsv } from "@/utils/formHelpers";
+
+const SEMESTER_OPTIONS = Array.from({ length: 8 }, (_, index) => String(index + 1));
+
+function normalizeCurriculum(curriculum) {
+  const base = Object.fromEntries(
+    SEMESTER_OPTIONS.map((semester) => [semester, { subjects: [], syllabusPdf: "" }])
+  );
+
+  if (!curriculum || typeof curriculum !== "object" || Array.isArray(curriculum)) {
+    return base;
+  }
+
+  for (const semester of SEMESTER_OPTIONS) {
+    const value = curriculum[semester];
+
+    if (Array.isArray(value)) {
+      base[semester] = {
+        subjects: value.map(String).map((item) => item.trim()).filter(Boolean),
+        syllabusPdf: "",
+      };
+      continue;
+    }
+
+    if (value && typeof value === "object") {
+      base[semester] = {
+        subjects: Array.isArray(value.subjects)
+          ? value.subjects.map(String).map((item) => item.trim()).filter(Boolean)
+          : [],
+        syllabusPdf: typeof value.syllabusPdf === "string" ? value.syllabusPdf : "",
+      };
+    }
+  }
+
+  return base;
+}
+
+function curriculumToPayload(curriculumDraft) {
+  return SEMESTER_OPTIONS.reduce((acc, semester) => {
+    const semesterData = curriculumDraft?.[semester] ?? { subjects: [], syllabusPdf: "" };
+    acc[semester] = {
+      subjects: Array.isArray(semesterData.subjects)
+        ? semesterData.subjects.map(String).map((item) => item.trim()).filter(Boolean)
+        : [],
+      syllabusPdf: (semesterData.syllabusPdf ?? "").trim(),
+    };
+    return acc;
+  }, {});
+}
+
+function normalizeSyllabusFiles() {
+  return Object.fromEntries(SEMESTER_OPTIONS.map((semester) => [semester, null]));
+}
 
 const emptyForm = {
   title: "",
@@ -37,7 +90,6 @@ const emptyForm = {
   careerPathways: "",
   eligibility: "",
   highlights: "",
-  curriculum: '{"Semester 1":["Subject 1","Subject 2"]}',
   seats: "",
   isFeatured: true,
   sortOrder: 0,
@@ -58,7 +110,6 @@ function toForm(program) {
     careerPathways: Array.isArray(program.careerPathways) ? program.careerPathways.join(", ") : "",
     eligibility: Array.isArray(program.eligibility) ? program.eligibility.join(", ") : "",
     highlights: Array.isArray(program.highlights) ? program.highlights.join(", ") : "",
-    curriculum: JSON.stringify(program.curriculum ?? {}, null, 2),
     seats: program.seats ?? "",
     isFeatured: program.isFeatured !== false,
     sortOrder: program.sortOrder ?? 0,
@@ -67,14 +118,7 @@ function toForm(program) {
   };
 }
 
-function toPayload(form) {
-  let curriculum;
-  try {
-    curriculum = JSON.parse(form.curriculum);
-  } catch {
-    throw new Error("Curriculum must be valid JSON");
-  }
-
+function toPayload(form, curriculum) {
   return {
     title: form.title.trim(),
     code: optionalString(form.code),
@@ -87,7 +131,7 @@ function toPayload(form) {
     careerPathways: splitCsv(form.careerPathways),
     eligibility: splitCsv(form.eligibility),
     highlights: splitCsv(form.highlights),
-    curriculum,
+    curriculum: curriculumToPayload(curriculum),
     seats: nullableNumber(form.seats),
     isFeatured: form.isFeatured,
     sortOrder: Number(form.sortOrder) || 0,
@@ -99,8 +143,13 @@ export default function ProgramsPage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(emptyForm);
+  const [curriculumDraft, setCurriculumDraft] = useState(() => normalizeCurriculum({}));
+  const [syllabusFiles, setSyllabusFiles] = useState(() => normalizeSyllabusFiles());
+  const [uploadTargetSemester, setUploadTargetSemester] = useState(null);
+  const [uploadingSemester, setUploadingSemester] = useState(null);
   const [existingImage, setExistingImage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const syllabusInputRef = useRef(null);
 
   const { data, loading, error, reload } = useAsyncData(() => listPrograms(), []);
 
@@ -108,6 +157,8 @@ export default function ProgramsPage() {
     setEditId(null);
     setExistingImage(null);
     setForm(emptyForm);
+    setCurriculumDraft(normalizeCurriculum({}));
+    setSyllabusFiles(normalizeSyllabusFiles());
     setOpen(true);
   }
 
@@ -117,6 +168,8 @@ export default function ProgramsPage() {
       setEditId(id);
       setExistingImage(program.image ?? null);
       setForm(toForm(program));
+      setCurriculumDraft(normalizeCurriculum(program.curriculum));
+      setSyllabusFiles(normalizeSyllabusFiles());
       setOpen(true);
     } catch (err) {
       toast.error(err.message);
@@ -127,7 +180,7 @@ export default function ProgramsPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const payload = toPayload(form);
+      const payload = toPayload(form, curriculumDraft);
       let id = editId;
       if (editId) {
         await updateProgram(editId, payload);
@@ -140,9 +193,19 @@ export default function ProgramsPage() {
       if (form.cover && id) {
         await uploadProgramCover(id, form.cover);
       }
+
+      if (id) {
+        for (const semester of SEMESTER_OPTIONS) {
+          const file = syllabusFiles[semester];
+          if (!file) continue;
+          await uploadProgramSemesterSyllabus(id, semester, file);
+        }
+      }
+
       setOpen(false);
       setForm(emptyForm);
       setEditId(null);
+      setSyllabusFiles(normalizeSyllabusFiles());
       reload();
     } catch (err) {
       toast.error(err.message);
@@ -171,6 +234,52 @@ export default function ProgramsPage() {
       reload();
     } catch (err) {
       toast.error(err.message);
+    }
+  }
+
+  function handleSemesterCardClick(semester) {
+    if (!syllabusInputRef.current) return;
+    setUploadTargetSemester(semester);
+    syllabusInputRef.current.value = "";
+    syllabusInputRef.current.click();
+  }
+
+  async function handleSemesterFileChange(event) {
+    const file = event.target.files?.[0] ?? null;
+    const semester = uploadTargetSemester;
+    if (!file || !semester) return;
+
+    setCurriculumDraft((prev) => ({
+      ...prev,
+      [semester]: prev[semester] ?? { subjects: [], syllabusPdf: "" },
+    }));
+
+    setSyllabusFiles((prev) => ({
+      ...prev,
+      [semester]: file,
+    }));
+
+    if (!editId) {
+      toast.success(`Semester ${semester} PDF selected. Save program to upload.`);
+      setUploadTargetSemester(null);
+      return;
+    }
+
+    try {
+      setUploadingSemester(semester);
+      const { data: updatedProgram } = await uploadProgramSemesterSyllabus(editId, semester, file);
+      setCurriculumDraft(normalizeCurriculum(updatedProgram.curriculum));
+      setSyllabusFiles((prev) => ({
+        ...prev,
+        [semester]: null,
+      }));
+      toast.success(`Semester ${semester} syllabus uploaded`);
+      reload();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setUploadingSemester(null);
+      setUploadTargetSemester(null);
     }
   }
 
@@ -274,9 +383,45 @@ export default function ProgramsPage() {
             <FormField label="Highlights *">
               <FormInput value={form.highlights} onChange={(e) => setForm({ ...form, highlights: e.target.value })} required />
             </FormField>
-            <FormField label="Curriculum (JSON) *">
-              <FormTextarea value={form.curriculum} onChange={(e) => setForm({ ...form, curriculum: e.target.value })} rows={6} required />
-              <FormHint>Example: {`{"Semester 1":["Math","English"]}`}</FormHint>
+            <FormField label="Semester curriculum & syllabus PDFs">
+              <input
+                ref={syllabusInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={handleSemesterFileChange}
+              />
+
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                {SEMESTER_OPTIONS.map((semester) => {
+                  const file = syllabusFiles[semester];
+                  const hasUploadedPdf = Boolean(curriculumDraft[semester]?.syllabusPdf);
+                  const isUploading = uploadingSemester === semester;
+
+                  return (
+                    <button
+                      key={semester}
+                      type="button"
+                      className="rounded-xl border border-[var(--border-subtle)] bg-[var(--color-surface)] p-3 text-left transition hover:border-[var(--color-brand-primary)]"
+                      onClick={() => handleSemesterCardClick(semester)}
+                      disabled={saving || isUploading}
+                    >
+                      <p className="text-sm font-semibold">Semester {semester}</p>
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">
+                        {isUploading
+                          ? "Uploading..."
+                          : file
+                            ? `Selected: ${file.name}`
+                            : hasUploadedPdf
+                              ? "PDF uploaded (click to replace)"
+                              : "Click to upload PDF"}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <FormHint>Click a semester card to choose and upload its PDF syllabus.</FormHint>
             </FormField>
           </FormSection>
 

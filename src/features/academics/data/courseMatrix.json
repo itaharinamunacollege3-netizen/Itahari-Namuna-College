@@ -28,8 +28,38 @@
       ],
       "highlights": ["F&B Management", "Hotel Operations", "Event Planning", "Tourism Economics"],
       "curriculum": {
-        "1": ["Food Production & Patisserie I", "Food & Beverage Service I"],
-        "2": ["Food Production & Patisserie II", "Food & Beverage Service II"]
+        "1": {
+          "subjects": ["Food Production & Patisserie I", "Food & Beverage Service I"],
+          "syllabusPdf": "/syllabus/bhm/semester-1.pdf"
+        },
+        "2": {
+          "subjects": ["Food Production & Patisserie II", "Food & Beverage Service II"],
+          "syllabusPdf": "/syllabus/bhm/semester-2.pdf"
+        },
+        "3": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bhm/semester-3.pdf"
+        },
+        "4": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bhm/semester-4.pdf"
+        },
+        "5": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bhm/semester-5.pdf"
+        },
+        "6": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bhm/semester-6.pdf"
+        },
+        "7": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bhm/semester-7.pdf"
+        },
+        "8": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bhm/semester-8.pdf"
+        }
       }
     },
     {
@@ -59,8 +89,38 @@
       ],
       "highlights": ["Community Development", "Counselling Skills", "Policy & Advocacy", "NGO Field Placement"],
       "curriculum": {
-        "1": ["Concepts and Principles of Social Work", "arko subject"],
-        "2": ["Social Case Work and Group Work"]
+        "1": {
+          "subjects": ["Concepts and Principles of Social Work", "Arko Subject"],
+          "syllabusPdf": "/syllabus/bsw/semester-1.pdf"
+        },
+        "2": {
+          "subjects": ["Social Case Work and Group Work"],
+          "syllabusPdf": "/syllabus/bsw/semester-2.pdf"
+        },
+        "3": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bsw/semester-3.pdf"
+        },
+        "4": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bsw/semester-4.pdf"
+        },
+        "5": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bsw/semester-5.pdf"
+        },
+        "6": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bsw/semester-6.pdf"
+        },
+        "7": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bsw/semester-7.pdf"
+        },
+        "8": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bsw/semester-8.pdf"
+        }
       }
     },
     {
@@ -90,8 +150,38 @@
       ],
       "highlights": ["AI & Machine Learning", "Full Stack Web Dev", "Cloud Computing", "Cyber Security"],
       "curriculum": {
-        "1": ["Computer Fundamentals & Applications"],
-        "2": ["C Programming"]
+        "1": {
+          "subjects": ["Computer Fundamentals & Applications"],
+          "syllabusPdf": "/syllabus/bca/semester-1.pdf"
+        },
+        "2": {
+          "subjects": ["C Programming"],
+          "syllabusPdf": "/syllabus/bca/semester-2.pdf"
+        },
+        "3": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bca/semester-3.pdf"
+        },
+        "4": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bca/semester-4.pdf"
+        },
+        "5": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bca/semester-5.pdf"
+        },
+        "6": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bca/semester-6.pdf"
+        },
+        "7": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bca/semester-7.pdf"
+        },
+        "8": {
+          "subjects": [],
+          "syllabusPdf": "/syllabus/bca/semester-8.pdf"
+        }
       }
     }
   ]

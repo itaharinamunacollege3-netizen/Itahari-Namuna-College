@@ -26,10 +26,10 @@ export default function ContactPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoCard icon={<MapPin size={20} />} title="Address" text="Kathmandu, Bagmati Province, Nepal" />
-              <InfoCard icon={<Phone size={20} />} title="Phone" text="+977-01-4567890 / 4567891" />
-              <InfoCard icon={<Mail size={20} />} title="Email" text="info@everestcampus.edu.np" />
-              <InfoCard icon={<Clock size={20} />} title="Hours" text="Sun-Fri: 7:00 AM – 5:00 PM" />
+              <InfoCard icon={<MapPin size={20} />} title="Address" text="Itahari,Sunsari Biratnagar Line" />
+              <InfoCard icon={<Phone size={20} />} title="Phone" text="Tel 025-586701/585701" />
+              <InfoCard icon={<Mail size={20} />} title="Email" text="contact@namunacollege.edu.np" />
+              <InfoCard icon={<Clock size={20} />} title="Hours" text="Mon-Fri: 5:00 AM – 4:40 PM" />
             </div>
           </div>
 

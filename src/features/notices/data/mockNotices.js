@@ -1,3 +1,5 @@
+import noticePoster from '../../../assets/others/hero-campus.webp';
+
 export const mockNotices = [
   {
     id: 1,
@@ -8,7 +10,9 @@ export const mockNotices = [
     author: "Examination Controller",
     audience: "All Programs",
     tags: ["IMPORTANT", "TU Exams"],
-    pdfUrl: "#"
+    pdfUrl: "#",
+    image: noticePoster,
+    featured: false
   },
   {
     id: 2,
@@ -19,7 +23,9 @@ export const mockNotices = [
     author: "Admin Office",
     audience: "All Programs",
     tags: ["IMPORTANT", "Admissions"],
-    pdfUrl: "#"
+    pdfUrl: "#",
+    image: noticePoster,
+    featured: true
   },
   {
     id: 3,
@@ -30,6 +36,8 @@ export const mockNotices = [
     author: "College Management",
     audience: "All Programs",
     tags: ["Holidays"],
-    pdfUrl: "#"
+    pdfUrl: "#",
+    image: noticePoster,
+    featured: false
   }
 ];

@@ -37,10 +37,9 @@ export default function Navbar() {
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `font-body transition-all duration-300 relative pb-1 hover:text-brand-blue cursor-pointer ${
-                isActive 
-                  ? 'text-brand-blue font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-brand-blue after:rounded-full' 
-                  : 'text-brand-white/80'
+              `font-body transition-all duration-300 relative pb-1 hover:text-brand-blue cursor-pointer ${isActive
+                ? 'text-brand-blue font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-brand-blue after:rounded-full'
+                : 'text-brand-white/80'
               }`
             }
           >
@@ -50,8 +49,8 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile Toggle */}
-      <button 
-        className="xl:hidden p-2 text-brand-dark" 
+      <button
+        className="xl:hidden p-2 text-brand-white"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

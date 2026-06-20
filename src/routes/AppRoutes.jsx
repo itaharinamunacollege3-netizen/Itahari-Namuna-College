@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import PublicLayout from '../layouts/PublicLayout';
 import SmoothScrollProvider from '../components/common/SmoothScrollProvider';
 import FacilitiesPage from '../features/facilities/pages/FacilitiesPage';
+import { getNotices, getNoticeById } from '../features/notices/services/noticesService';
 
 const HomePage = lazy(() => import('../features/general_pages/HomePage'));
 const AboutPage = lazy(() => import('../features/general_pages/AboutPage'));
@@ -35,8 +36,8 @@ const router = createBrowserRouter([
       { path: 'cells-and-units', element: <CellsHubPage /> },
       { path: 'cells-and-units/:unitId', element: <UnitDetailPage /> },
 
-      { path: 'notices', element: <NoticeBoardPage /> },
-      { path: 'notices/:id', element: <NoticeViewerPage /> },
+      { path: 'notices', element: <NoticeBoardPage />, loader: () => getNotices() },
+      { path: 'notices/:id', element: <NoticeViewerPage />, loader: ({ params }) => getNoticeById(params.id) },
 
       { path: 'gallery', element: <GalleryHubPage /> },
       { path: 'gallery/:category', element: <CategoryGridPage /> },

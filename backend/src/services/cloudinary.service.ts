@@ -1,4 +1,5 @@
 import { getCloudinary, rethrowCloudinaryError } from "../config/cloudinary";
+import { PDFDocument } from "pdf-lib";
 import { env } from "../config/env";
 import { AppError } from "../utils/apiResponse";
 import {
@@ -27,6 +28,10 @@ function programFolder(programSlug: string) {
   return `${env.CLOUDINARY_FOLDER}/programs/${programSlug}`;
 }
 
+function programSyllabusFolder(programSlug: string, semester: string) {
+  return `${programFolder(programSlug)}/syllabus/semester-${semester}`;
+}
+
 /** Resize, convert to WebP, and compress before storage (values from .env). */
 function galleryUploadOptions() {
   return {
@@ -43,6 +48,19 @@ async function withCloudinary<T>(fn: () => Promise<T>): Promise<T> {
     return await fn();
   } catch (err) {
     rethrowCloudinaryError(err);
+  }
+}
+
+async function compressPdfBuffer(inputBuffer: Buffer): Promise<Buffer> {
+  try {
+    const pdf = await PDFDocument.load(inputBuffer, { ignoreEncryption: true });
+    const compressed = await pdf.save({
+      useObjectStreams: true,
+      updateFieldAppearances: false,
+    });
+    return Buffer.from(compressed);
+  } catch {
+    return inputBuffer;
   }
 }
 
@@ -218,6 +236,44 @@ export async function uploadProgramImage(
     publicId: result.public_id,
     width: result.width,
     height: result.height,
+    bytes: result.bytes,
+  };
+}
+
+export async function uploadProgramSyllabusPdf(
+  file: Express.Multer.File,
+  programSlug: string,
+  semester: string
+): Promise<CloudinaryUploadResult> {
+  if (file.mimetype !== "application/pdf") {
+    throw new AppError(400, "Only PDF files are allowed");
+  }
+
+  const pdfCheck = validatePdfBuffer(file.buffer);
+  if (!pdfCheck.valid) {
+    throw new AppError(400, pdfCheck.reason ?? "File is not a valid PDF");
+  }
+
+  const compressedBuffer = await compressPdfBuffer(file.buffer);
+
+  const cloudinary = getCloudinary();
+  const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
+
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:application/pdf;base64,${compressedBuffer.toString("base64")}`,
+      {
+        folder: programSyllabusFolder(programSlug, semester),
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "raw",
+        overwrite: false,
+      }
+    )
+  );
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
     bytes: result.bytes,
   };
 }

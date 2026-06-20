@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import courseData from '../data/courseMatrix.json';
+import { getProgramBySlug } from '../services/programsService';
 
 // Sub-components
 import RequirementsChecklist from '../components/RequirementsChecklist';
@@ -11,8 +11,28 @@ import AnimatedSection from '../../../components/animations/AnimatedSection';
 
 const ProgramDetailPage = () => {
   const { id } = useParams();
-  const program = courseData?.programs?.find(p => p.id === id);
+  const [program, setProgram] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    setLoading(true);
+    getProgramBySlug(id)
+      .then((item) => {
+        if (!isMounted) return;
+        setProgram(item);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   const tabsConfig = [
     { id: 'overview', label: 'Overview & Highlights' },
@@ -21,6 +41,14 @@ const ProgramDetailPage = () => {
   ];
 
   const getActiveIndex = () => tabsConfig.findIndex((tab) => tab.id === activeTab);
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center p-6 text-center">
+        <p className="text-stone-500 text-sm">Loading program details...</p>
+      </div>
+    );
+  }
 
   if (!program) {
     return (

@@ -1,10 +1,20 @@
 import sanitizeHtml from "sanitize-html";
+import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "../../config/prisma";
 import { uniqueSlug } from "../../utils/slug";
 import { AppError } from "../../utils/apiResponse";
-import { deleteCloudinaryAsset, uploadProgramImage } from "../../services/cloudinary.service";
+import {
+  deleteCloudinaryAsset,
+  uploadProgramImage,
+  uploadProgramSyllabusPdf,
+} from "../../services/cloudinary.service";
 import { formatProgramAdmin, formatProgramPublic } from "./programs.formatter";
-import type { ListProgramsParams, ProgramWriteInput, ReorderProgramItem } from "./programs.types";
+import type {
+  ListProgramsParams,
+  ProgramCurriculum,
+  ProgramWriteInput,
+  ReorderProgramItem,
+} from "./programs.types";
 
 function sanitizeOverview(text: string) {
   return sanitizeHtml(text, {
@@ -32,6 +42,40 @@ function buildWhere(params: ListProgramsParams) {
   return where;
 }
 
+function normalizeCurriculum(value: unknown): ProgramCurriculum {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const result: ProgramCurriculum = {};
+
+  for (const [semester, details] of Object.entries(value as Record<string, unknown>)) {
+    if (Array.isArray(details)) {
+      result[String(semester)] = {
+        subjects: details.map(String).map((item) => item.trim()).filter(Boolean),
+      };
+      continue;
+    }
+
+    if (details && typeof details === "object") {
+      const record = details as Record<string, unknown>;
+      const subjects = Array.isArray(record.subjects)
+        ? record.subjects.map(String).map((item) => item.trim()).filter(Boolean)
+        : [];
+      const syllabusPdf =
+        typeof record.syllabusPdf === "string" ? record.syllabusPdf.trim() : undefined;
+
+      result[String(semester)] = {
+        subjects,
+        ...(syllabusPdf ? { syllabusPdf } : {}),
+      };
+    }
+  }
+
+  return result;
+}
+
+function toCurriculumJson(curriculum: ProgramCurriculum): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(curriculum)) as Prisma.InputJsonValue;
+}
+
 function mapWriteInputToDb(data: ProgramWriteInput, slug: string) {
   return {
     slug,
@@ -46,7 +90,7 @@ function mapWriteInputToDb(data: ProgramWriteInput, slug: string) {
     careerPathways: data.careerPathways,
     eligibility: data.eligibility,
     highlights: data.highlights,
-    curriculum: data.curriculum,
+    curriculum: toCurriculumJson(data.curriculum),
     seats: data.seats ?? null,
     isFeatured: data.isFeatured ?? true,
     sortOrder: data.sortOrder ?? 0,
@@ -137,7 +181,7 @@ export async function updateProgram(id: number, data: Partial<ProgramWriteInput>
   if (data.careerPathways !== undefined) updateData.careerPathways = data.careerPathways;
   if (data.eligibility !== undefined) updateData.eligibility = data.eligibility;
   if (data.highlights !== undefined) updateData.highlights = data.highlights;
-  if (data.curriculum !== undefined) updateData.curriculum = data.curriculum;
+  if (data.curriculum !== undefined) updateData.curriculum = toCurriculumJson(data.curriculum);
   if (data.seats !== undefined) updateData.seats = data.seats;
   if (data.isFeatured !== undefined) updateData.isFeatured = data.isFeatured;
   if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
@@ -213,6 +257,31 @@ export async function removeProgramCover(id: number) {
   const program = await prisma.program.update({
     where: { id },
     data: { image: null },
+  });
+
+  return formatProgramAdmin(program);
+}
+
+export async function uploadProgramSemesterSyllabus(
+  id: number,
+  semester: string,
+  file: Express.Multer.File
+) {
+  const existing = await prisma.program.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, "Program not found");
+
+  const upload = await uploadProgramSyllabusPdf(file, existing.slug, semester);
+
+  const curriculum = normalizeCurriculum(existing.curriculum);
+  const semesterCurriculum = curriculum[semester] ?? { subjects: [] };
+  curriculum[semester] = {
+    ...semesterCurriculum,
+    syllabusPdf: upload.url,
+  };
+
+  const program = await prisma.program.update({
+    where: { id },
+    data: { curriculum: toCurriculumJson(curriculum) },
   });
 
   return formatProgramAdmin(program);
