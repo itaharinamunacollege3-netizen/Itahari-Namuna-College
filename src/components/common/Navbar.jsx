@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-br from-emerald-900/57 via-emerald-950/60 to-stone-950/70 border-brand-gray/50 px-8 py-2 flex justify-between items-center transition-all duration-300">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-tr from-emerald-900 via-emerald-950 to-stone-950/90 border-brand-gray/50 px-8 py-2 flex justify-between items-center transition-all duration-300">
       {/* Logo */}
       <Link to="/" className="flex items-center gap-3">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/95 p-1.5 shadow-md ring-1 ring-white/30">

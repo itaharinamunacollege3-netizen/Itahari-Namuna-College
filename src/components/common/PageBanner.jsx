@@ -1,8 +1,9 @@
+import { Link } from "react-router-dom";
 
 const PageBanner = ({ title, subtitle }) => {
   return (
     <div className="relative w-full bg-linear-to-br from-emerald-900 via-emerald-950 to-stone-950/90 py-16 md:py-20 overflow-hidden border-b border-emerald-800/20">
-      
+
       {/* Abstract Architectural Geometric Accents */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute -top-12 -right-12 w-96 h-96 border-4 border-emerald-500 rounded-full" />
@@ -13,7 +14,10 @@ const PageBanner = ({ title, subtitle }) => {
       <div className="max-w-7xl mx-auto px-6 relative z-10 text-left">
         {/* Minimalist Path Tracker */}
         <div className="text-xs font-semibold text-emerald-400/80 tracking-wider uppercase mb-3 flex items-center gap-2">
-          <span>Home</span>
+          {/* <span>Home</span> */}
+          <Link to="/">
+            Home
+          </Link>
           <span className="text-stone-500">/</span>
           <span className="text-stone-300">{title}</span>
         </div>
@@ -22,7 +26,7 @@ const PageBanner = ({ title, subtitle }) => {
         <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-stone-100 tracking-tight max-w-4xl leading-tight">
           {title}
         </h1>
-        
+
         {subtitle && (
           <p className="font-body text-sm sm:text-base text-stone-400 font-medium max-w-2xl mt-2 leading-relaxed">
             {subtitle}
