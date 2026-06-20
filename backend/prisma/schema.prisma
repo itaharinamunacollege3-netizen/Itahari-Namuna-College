@@ -218,52 +218,9 @@ model Staff {
   @@index([categoryId])
 }
 
-model Leadership {
-  id          Int      @id @default(autoincrement())
-  name        String
-  role        String
-  message     String
-  photo       String?
-  isSpotlight Boolean  @default(false)
-  sortOrder   Int      @default(0)
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
 
-model BoardMember {
-  id          Int      @id @default(autoincrement())
-  name        String
-  designation String?
-  bio         String?
-  photo       String?
-  sortOrder   Int      @default(0)
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
 
-model Facility {
-  id          Int             @id @default(autoincrement())
-  title       String
-  slug        String          @unique
-  description String
-  icon        String?
-  sortOrder   Int             @default(0)
-  published   Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  images      FacilityImage[]
-}
 
-model FacilityImage {
-  id         Int      @id @default(autoincrement())
-  facilityId Int
-  imageUrl   String
-  caption    String?
-  sortOrder  Int      @default(0)
-  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
-}
 
 model GalleryAlbum {
   id                     Int            @id @default(autoincrement())
@@ -290,19 +247,7 @@ model GalleryImage {
   album              GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
 }
 
-model CellUnit {
-  id         Int      @id @default(autoincrement())
-  slug       String   @unique
-  title      String
-  icon       String?
-  objectives Json
-  duties     Json
-  actionPlan Json
-  sortOrder  Int      @default(0)
-  published  Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
+
 
 model AdmissionApplication {
   id              Int              @id @default(autoincrement())
@@ -351,38 +296,4 @@ model Download {
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model SiteSetting {
-  id    Int    @id @default(autoincrement())
-  key   String @unique
-  value Json
-}
-
-model HeroSlide {
-  id        Int      @id @default(autoincrement())
-  imageUrl  String
-  caption   String?
-  sortOrder Int      @default(0)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-}
-
-model SiteStatistic {
-  id        Int     @id @default(autoincrement())
-  label     String
-  value     Int
-  suffix    String?
-  icon      String?
-  sortOrder Int     @default(0)
-  published Boolean @default(true)
-}
-
-model ContentBlock {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique
-  title     String?
-  body      String
-  metadata  Json?
-  updatedAt DateTime @updatedAt
 }
