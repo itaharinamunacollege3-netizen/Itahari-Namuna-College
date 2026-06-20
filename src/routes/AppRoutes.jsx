@@ -16,6 +16,7 @@ const NoticeViewerPage = lazy(() => import('../features/notices/pages/NoticeView
 const GalleryHubPage = lazy(() => import('../features/gallery/pages/GalleryHubPage'));
 const CategoryGridPage = lazy(() => import('../features/gallery/pages/CategoryGridPage'));
 const ContactPage = lazy(() => import('../features/general_pages/ContactPage'));
+const AdmissionWizardPage = lazy(() => import('../features/admissions/pages/AdmissionWizardPage'));
 
 
 const router = createBrowserRouter([
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
       { path: 'gallery/:category', element: <CategoryGridPage /> },
 
       { path: 'contact', element: <ContactPage /> },
+      { path: 'admissions', element: <AdmissionWizardPage /> },
 
       // Fallback Route: Redirects any typos back to Home
       { path: '*', element: <Navigate to="/" replace /> },
