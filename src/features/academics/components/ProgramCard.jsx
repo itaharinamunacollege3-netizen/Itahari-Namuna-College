@@ -18,9 +18,11 @@ const ProgramCard = ({ program, onExplore }) => {
     bsw: "text-rose-700 bg-rose-50 border-rose-100",
   };
 
-  const currentBadgeColor = badgeColors[program.id] || "bg-stone-600";
+  const programKey = String(program.code ?? program.id ?? "").toLowerCase();
+  const displayCode = String(program.code ?? program.id ?? "").toUpperCase();
+  const currentBadgeColor = badgeColors[programKey] || "bg-stone-600";
   const currentTagTheme =
-    tagThemes[program.id] || "text-stone-700 bg-stone-50 border-stone-100";
+    tagThemes[programKey] || "text-stone-700 bg-stone-50 border-stone-100";
 
   return (
     <div className="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow duration-300 text-left h-full">
@@ -39,7 +41,7 @@ const ProgramCard = ({ program, onExplore }) => {
         <div
           className={`absolute top-4 left-4 z-20 ${currentBadgeColor} text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider`}
         >
-          {program.id}
+          {displayCode}
         </div>
 
         {/* Floating Duration Frame Indicator (Right side) */}
@@ -92,7 +94,7 @@ const ProgramCard = ({ program, onExplore }) => {
           }}
           className="w-full py-2.5 px-4 border border-[#006A38] text-[#006A38] font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-50/40 transition-all duration-200 cursor-pointer mt-auto"
         >
-          <span>Explore {program.id.toUpperCase()} Program</span>
+          <span>Explore {displayCode} Program</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

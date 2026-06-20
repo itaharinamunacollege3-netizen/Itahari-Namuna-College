@@ -1,11 +1,27 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Banner from '../../../components/common/PageBanner';
 import ProgramCard from '../components/ProgramCard';
-import courseData from '../data/courseMatrix.json';
+import { getPrograms } from '../services/programsService';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
 
 const AcademicHubPage = () => {
   const navigate = useNavigate();
+  const [programs, setPrograms] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    getPrograms().then((items) => {
+      if (!isMounted) return;
+      setPrograms(items);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const handleExploreProgram = (programId) => {
     navigate(`/academic/${programId}`);
   };
@@ -25,7 +41,7 @@ const AcademicHubPage = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-          {courseData.programs.map((program) => (
+          {programs.map((program) => (
             <div key={program.id} className="h-full">
               <ProgramCard 
                 program={program} 
