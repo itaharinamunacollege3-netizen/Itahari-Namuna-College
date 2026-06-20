@@ -9,6 +9,14 @@ import { getUnreadCount } from "./notifications.service";
 
 const ADMISSION_STATUSES = ["pending", "under_review", "approved", "rejected"];
 
+/**
+ * Safely extract total count from a paginated API response.
+ * Prefers `meta.total` (accurate), falls back to `data.length` (page count).
+ */
+function totalOf(res) {
+  return res?.meta?.total ?? res?.data?.length ?? 0;
+}
+
 function buildMonthlyTrend(applications) {
   const buckets = new Map();
   const now = new Date();
@@ -53,20 +61,21 @@ export async function fetchDashboardStats() {
   ] = await Promise.all([
     ...ADMISSION_STATUSES.map((status) => listAdmissions({ status, limit: 1 })),
     listAdmissions({ limit: 100 }),
-    listContacts(1, 50),
+    listContacts(1, 100),
     listNotices({ limit: 1 }),
     listPrograms({ limit: 1 }),
-    listGalleryAlbums(),
-    listFaculty(),
-    listStaff(),
+    listGalleryAlbums({ limit: 1 }),
+    listFaculty({ limit: 1 }),
+    listStaff({ limit: 1 }),
     getUnreadCount(),
   ]);
 
-  const publishedNotices = noticesRes.meta?.total ?? noticesRes.data.length;
-  const programs = programsRes.meta?.total ?? programsRes.data.length;
-  const galleryAlbums = galleryRes.data.length;
-  const facultyMembers = facultyRes.data.length;
-  const staffMembers = staffRes.data.length;
+  // Use meta.total for accurate counts (not data.length which is page-limited)
+  const publishedNotices = totalOf(noticesRes);
+  const programs = totalOf(programsRes);
+  const galleryAlbums = totalOf(galleryRes);
+  const facultyMembers = totalOf(facultyRes);
+  const staffMembers = totalOf(staffRes);
 
   const admissionStatus = {
     pending: pendingRes.meta?.total ?? 0,
@@ -75,9 +84,13 @@ export async function fetchDashboardStats() {
     rejected: rejectedRes.meta?.total ?? 0,
   };
 
+  // Count unread contacts from the fetched page (limit 100 should cover most cases)
+  const unreadContacts = contactsRes.data?.filter((c) => !c.isRead)?.length
+    ?? contactsRes.meta?.total ?? 0;
+
   return {
     pendingAdmissions: admissionStatus.pending,
-    unreadContacts: contactsRes.data.filter((c) => !c.isRead).length,
+    unreadContacts,
     publishedNotices,
     programs,
     galleryAlbums,
