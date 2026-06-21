@@ -8,6 +8,7 @@ import { staffPublicRoutes, staffAdminRoutes } from "../modules/staff/staff.rout
 import { facultyPublicRoutes, facultyAdminRoutes } from "../modules/faculty/faculty.routes";
 import { categoriesPublicRoutes, categoriesAdminRoutes } from "../modules/categories/categories.routes";
 import { programsPublicRoutes, programsAdminRoutes } from "../modules/programs/programs.routes";
+import { notificationsAdminRoutes } from "../modules/notifications/notifications.routes";
 import { sendSuccess } from "../utils/apiResponse";
 
 const router = Router();
@@ -34,5 +35,6 @@ router.use("/admin/staff", staffAdminRoutes);
 router.use("/admin/faculty", facultyAdminRoutes);
 router.use("/admin/categories", categoriesAdminRoutes);
 router.use("/admin/programs", programsAdminRoutes);
+router.use("/admin/notifications", notificationsAdminRoutes);
 
 export default router;

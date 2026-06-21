@@ -4,10 +4,13 @@ export interface NoticeApiDto {
   title: string;
   description: string;
   publishedDate: string;
+  category: string;
+  slug: string;
   author: string | null;
   audience: string | null;
   tags: string[];
   featured: boolean;
+  published: boolean;
   pdfUrl: string;
   imageUrl: string;
 }

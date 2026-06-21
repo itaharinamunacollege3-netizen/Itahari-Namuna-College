@@ -17,11 +17,17 @@ export default function Navbar() {
   ];
 
   return (
-
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-linear-to-tr from-emerald-900 via-emerald-950 to-stone-950/90  px-8 py-2 flex justify-between items-center transition-all duration-300">      
-    {/* Logo */}
-      <Link to="/" className="w-18">
-        <img src={logo} alt="Itahari Namuna College" className="w-full h-auto" />
+    
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-br from-emerald-900/57 via-emerald-950/60 to-stone-950/70 border-brand-gray/50 px-8 py-2 flex justify-between items-center transition-all duration-300">
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-3">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/95 p-1.5 shadow-md ring-1 ring-white/30">
+          <img src={logo} alt="Itahari Namuna College" className="h-full w-full object-contain" />
+        </div>
+        <div className="hidden sm:block">
+          <p className="font-heading text-sm font-bold leading-tight text-brand-white">Itahari Namuna</p>
+          <p className="text-[11px] text-brand-white/70">College</p>
+        </div>
       </Link>
 
       {/* Desktop Links */}

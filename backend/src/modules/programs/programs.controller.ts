@@ -161,3 +161,25 @@ export async function removeCover(req: Request, res: Response, next: NextFunctio
     next(err);
   }
 }
+
+export async function uploadSemesterSyllabus(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const semester = String(req.params.semester);
+    const file = getUploadedFile(req, "pdf");
+    if (!file) throw new AppError(400, "PDF file is required");
+
+    const data = await programsService.uploadProgramSemesterSyllabus(id, semester, file);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "UPLOAD_PROGRAM_SEMESTER_SYLLABUS",
+      resource: "programs",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}

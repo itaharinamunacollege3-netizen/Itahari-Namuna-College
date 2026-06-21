@@ -20,12 +20,12 @@ const FacilitiesPage = () => {
         <div className="max-w-7xl mx-auto px-6 py-12">
             {/* Tab Filter - Responsive Grid */}
             <div className="flex justify-center lg:justify-start">          
-            <div className="grid grid-cols-2 lg:flex gap-2 p-4 bg-stone-200/60 rounded-full w-full lg:w-fit">
+            <div className="grid grid-cols-1 lg:flex gap-2 p-2 bg-stone-200/60 rounded-xl w-full md:flex lg:w-fit">
                 {filters.map((filter) => (
                 <button
                     key={filter}
                     onClick={() => setActiveFilter(filter)}
-                    className={`px-4 py-3 rounded-full cursor-pointer font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                    className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-xs sm:text-sm transition-all ease-in-out  whitespace-nowrap ${
                     activeFilter === filter 
                     ? "bg-[#006A38] text-white shadow-md" 
                     : "text-stone-600 hover:text-stone-800 bg-white/50 lg:bg-transparent"

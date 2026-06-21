@@ -1,5 +1,12 @@
 import type { Program } from "../../generated/prisma/client";
 
+export interface SemesterCurriculum {
+  subjects: string[];
+  syllabusPdf?: string;
+}
+
+export type ProgramCurriculum = Record<string, SemesterCurriculum>;
+
 /** Public shape matching `courseMatrix.json` / frontend program pages. */
 export interface ProgramPublicDto {
   id: string;
@@ -14,7 +21,7 @@ export interface ProgramPublicDto {
   careerPathways: string[];
   eligibility: string[];
   highlights: string[];
-  curriculum: Record<string, string[]>;
+  curriculum: ProgramCurriculum;
   seats: number | null;
   isFeatured: boolean;
   sortOrder: number;
@@ -41,7 +48,7 @@ export interface ProgramWriteInput {
   careerPathways: string[];
   eligibility: string[];
   highlights: string[];
-  curriculum: Record<string, string[]>;
+  curriculum: ProgramCurriculum;
   seats?: number | null;
   isFeatured?: boolean;
   sortOrder?: number;

@@ -1,8 +1,9 @@
 /// <reference path="./types/express.d.ts" />
-import type { Server } from "http";
+import { createServer, type Server } from "http";
 import { createApp } from "./app/createApp";
 import { env } from "./config/env";
 import { connectDatabase, disconnectDatabase } from "./config";
+import { initSocket, closeSocket } from "./config/socket";
 
 let httpServer: Server | null = null;
 
@@ -10,10 +11,13 @@ export async function startServer(): Promise<Server> {
   await connectDatabase();
 
   const app = createApp();
+  httpServer = createServer(app);
+  initSocket(httpServer);
 
-  httpServer = app.listen(env.PORT, () => {
+  httpServer.listen(env.PORT, () => {
     console.log(`[server] INC API running on http://localhost:${env.PORT}/api`);
     console.log(`[server] Health check: http://localhost:${env.PORT}/api/health`);
+    console.log(`[server] Socket.IO: http://localhost:${env.PORT}/socket.io`);
     console.log(`[server] Environment: ${env.NODE_ENV}`);
   });
 
@@ -25,6 +29,8 @@ export async function startServer(): Promise<Server> {
 function registerShutdownHandlers(): void {
   const shutdown = async (signal: string) => {
     console.log(`[server] Received ${signal}. Shutting down gracefully...`);
+
+    await closeSocket();
 
     if (httpServer) {
       await new Promise<void>((resolve, reject) => {

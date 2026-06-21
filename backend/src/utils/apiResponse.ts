@@ -5,6 +5,7 @@ export interface ApiMeta {
   limit?: number;
   total?: number;
   totalPages?: number;
+  unreadCount?: number;
 }
 
 export function sendSuccess<T>(res: Response, data: T, meta?: ApiMeta, status = 200) {

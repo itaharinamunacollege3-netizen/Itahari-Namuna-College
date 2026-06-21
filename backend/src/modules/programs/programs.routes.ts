@@ -5,6 +5,7 @@ import {
   createProgramSchema,
   listProgramsQuerySchema,
   programIdParamSchema,
+  programSemesterParamSchema,
   programSlugParamSchema,
   publicListProgramsQuerySchema,
   reorderProgramsSchema,
@@ -12,7 +13,7 @@ import {
 } from "./programs.schema";
 import { authenticate } from "../../middleware/authenticate";
 import { requireAdmin } from "../../middleware/adminGuard";
-import { runSingleNoticeImageUpload } from "../../middleware/upload";
+import { runSingleNoticeImageUpload, runSinglePdfUpload } from "../../middleware/upload";
 import { uploadLimiter } from "../../middleware/rateLimiter";
 
 const publicRouter = Router();
@@ -38,5 +39,12 @@ adminRouter.post(
   programsController.uploadCover
 );
 adminRouter.delete("/:id/image", validateParams(programIdParamSchema), programsController.removeCover);
+adminRouter.post(
+  "/:id/syllabus/:semester/pdf",
+  uploadLimiter,
+  validateParams(programSemesterParamSchema),
+  runSinglePdfUpload("pdf"),
+  programsController.uploadSemesterSyllabus
+);
 
 export { publicRouter as programsPublicRoutes, adminRouter as programsAdminRoutes };

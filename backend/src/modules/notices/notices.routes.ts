@@ -25,6 +25,7 @@ publicRouter.get("/:id", validateParams(noticeIdParamSchema), noticesController.
 const adminRouter = Router();
 adminRouter.use(authenticate, requireAdmin);
 adminRouter.get("/", validateQuery(listNoticesQuerySchema), noticesController.listAdmin);
+adminRouter.get("/:id", validateParams(noticeIdParamSchema), noticesController.getAdminById);
 adminRouter.post(
   "/",
   uploadLimiter,
