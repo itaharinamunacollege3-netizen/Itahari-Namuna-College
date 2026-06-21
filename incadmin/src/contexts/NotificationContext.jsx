@@ -10,6 +10,7 @@ import {
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import { getAccessToken } from "@/services/apiClient";
+import { API_BASE } from "@/config/env";
 import {
   getUnreadCount,
   listNotifications,
@@ -27,6 +28,18 @@ const SOCKET_EVENTS = {
   MARKED_READ: "notification:marked_read",
   ALL_READ: "notification:all_read",
 };
+
+function resolveSocketUrl() {
+  const explicit = import.meta.env.VITE_SOCKET_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  if (/^https?:\/\//.test(API_BASE)) {
+    return API_BASE.replace(/\/api$/, "");
+  }
+
+  // Dev fallback: hit backend directly and avoid Vite WS proxy noise.
+  return "http://localhost:5000";
+}
 
 export function NotificationProvider({ children }) {
   const { isAuthenticated } = useAuth();
@@ -66,7 +79,7 @@ export function NotificationProvider({ children }) {
     const token = getAccessToken();
     if (!token) return;
 
-    const socket = io("/", {
+    const socket = io(resolveSocketUrl(), {
       path: "/socket.io",
       transports: ["websocket", "polling"],
       auth: { token },
