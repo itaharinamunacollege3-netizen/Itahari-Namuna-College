@@ -96,7 +96,7 @@ function SemesterItem({ semester, subjects, isOpen, onToggle }) {
         <div className="overflow-hidden">
           <div className="px-5 pb-6 pt-2">
             {/* Divider */}
-            <div className="mb-4 h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
+            <div className="mb-4 h-px bg-linear-to-r from-transparent via-stone-200 to-transparent" />
 
             {/* Subjects grid */}
             {subjectCount > 0 ? (

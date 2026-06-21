@@ -1,6 +1,6 @@
 import courseData from "../data/courseMatrix.json";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 function normalizeCurriculum(curriculum) {
   if (!curriculum || typeof curriculum !== "object" || Array.isArray(curriculum)) return {};
