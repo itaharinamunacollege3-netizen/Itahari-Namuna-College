@@ -1,4 +1,4 @@
-import { apiClient } from '../../../api/apiClientgen';
+import { apiClient } from '../../../api/apiClient';
 
 function buildPayload(form) {
   const payload = {
