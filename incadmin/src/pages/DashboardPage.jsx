@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Briefcase,
   ClipboardList,
   GraduationCap,
   Images,
@@ -24,6 +25,7 @@ const statCards = [
   { key: "programs", label: "Programs", icon: GraduationCap, color: "text-violet-600" },
   { key: "galleryAlbums", label: "Gallery Albums", icon: Images, color: "text-orange-600" },
   { key: "facultyMembers", label: "Faculty", icon: Users, color: "text-rose-600" },
+  { key: "staffMembers", label: "Staff", icon: Briefcase, color: "text-teal-600" },
 ];
 
 export default function DashboardPage() {
@@ -80,7 +82,11 @@ export default function DashboardPage() {
                 Monthly applications over the last 6 months
               </p>
               <div className="mt-4">
-                <AdmissionsBarChart data={stats.charts.admissionsTrend} isDark={isDark} />
+                {stats?.charts?.admissionsTrend ? (
+                  <AdmissionsBarChart data={stats.charts.admissionsTrend} isDark={isDark} />
+                ) : (
+                  <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
+                )}
               </div>
             </section>
 
@@ -92,7 +98,11 @@ export default function DashboardPage() {
                 Breakdown by review status
               </p>
               <div className="mt-4">
-                <AdmissionStatusPie data={stats.charts.admissionStatus} isDark={isDark} />
+                {stats?.charts?.admissionStatus ? (
+                  <AdmissionStatusPie data={stats.charts.admissionStatus} isDark={isDark} />
+                ) : (
+                  <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
+                )}
               </div>
             </section>
 
@@ -104,7 +114,11 @@ export default function DashboardPage() {
                 Published items across CMS modules
               </p>
               <div className="mx-auto mt-4 max-w-xl">
-                <ContentDistributionPie data={stats.charts.contentDistribution} isDark={isDark} />
+                {stats?.charts?.contentDistribution ? (
+                  <ContentDistributionPie data={stats.charts.contentDistribution} isDark={isDark} />
+                ) : (
+                  <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
+                )}
               </div>
             </section>
           </div>
