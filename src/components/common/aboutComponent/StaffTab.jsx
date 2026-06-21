@@ -8,12 +8,19 @@ const StaffTab = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getStaffPublic().then((data) => {
-      setStaffData(data || {});
-      const keys = Object.keys(data || {});
-      if (keys.length > 0) setActiveCategory(keys[0]);
-      setLoading(false);
-    });
+    getStaffPublic()
+      .then((data) => {
+        setStaffData(data || {});
+        const keys = Object.keys(data || {});
+        if (keys.length > 0) setActiveCategory(keys[0]);
+      })
+      .catch((err) => {
+        console.error("Error fetching staff:", err);
+        setStaffData({});
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const currentStaff = staffData[activeCategory] || [];
@@ -39,7 +46,7 @@ const StaffTab = () => {
                   : "bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200"
               }`}
             >
-              {categoryName}
+              {String(categoryName).replace(/[-_]+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
             </button>
           ))}
         </div>
@@ -56,7 +63,7 @@ const StaffTab = () => {
                   <img
                     loading="lazy"
                     decoding="async"
-                    src={staff.photo ? `${import.meta.env.VITE_API_BASE_URL}/${staff.photo}` : "/placeholder.png"}
+                    src={staff.image || "/placeholder.png"}
                     alt={staff.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

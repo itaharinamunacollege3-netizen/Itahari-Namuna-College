@@ -41,7 +41,6 @@ const RequirementsChecklist = ({ eligibility }) => {
             </h4>
             <ol className="space-y-2 text-xs text-stone-600 list-decimal pl-4">
               <li>Fill online application form.</li>
-              <li>Pay application fee via eSewa/Khalti.</li>
               <li>Attend written entrance examination.</li>
               <li>Merit-list published within 3 working days.</li>
             </ol>
