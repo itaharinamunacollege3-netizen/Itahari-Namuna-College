@@ -97,7 +97,7 @@ export function Navbar({ onMenuClick }) {
   }
 
   return (
-    <header className="admin-navbar shrink-0">
+    <header className="admin-navbar shrink-0 z-50">
       <div className="flex min-w-0 flex-1 items-center gap-5">
         <button
           type="button"
@@ -116,7 +116,7 @@ export function Navbar({ onMenuClick }) {
           <span className="font-semibold text-[var(--color-brand-dark)]">{pageLabel}</span>
         </nav>
 
-        <label className="relative hidden min-w-0 flex-1 max-w-xl sm:block">
+        {/* <label className="relative hidden min-w-0 flex-1 max-w-xl sm:block">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             type="search"
@@ -124,7 +124,7 @@ export function Navbar({ onMenuClick }) {
             placeholder="Search anything..."
             aria-label="Search"
           />
-        </label>
+        </label> */}
       </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
@@ -245,6 +245,7 @@ export function Navbar({ onMenuClick }) {
           onClick={() => void logout()}
           className="admin-icon-btn"
           aria-label="Logout"
+          title="Logout"
         >
           <LogOut className="h-[18px] w-[18px]" />
         </button>

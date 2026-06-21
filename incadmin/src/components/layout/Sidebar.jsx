@@ -20,7 +20,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
   const formatCountLabel = (count) => {
     if (count <= 0) return "";
     if (count > 99) return "99+ notifications";
-    return `${count} notification${count > 1 ? "s" : ""}`;
+    return `${count}`;
   };
 
   const badgeClassByPath = (path, compact = false) => {

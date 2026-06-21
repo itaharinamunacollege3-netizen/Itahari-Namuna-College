@@ -9,12 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const REMEMBER_KEY = "inc_admin_remember_email";
 
-const STATS = [
-  { v: "245", l: "Applications" },
-  { v: "38", l: "Faculty" },
-  { v: "5", l: "Programs" },
-];
-
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth();
   const location = useLocation();
@@ -60,7 +54,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="login-page min-h-screen overflow-hidden bg-[var(--color-brand-gray)] lg:grid lg:grid-cols-2">
+    <div className="login-page min-h-screen overflow-hidden bg-(--color-brand-white) lg:grid lg:grid-cols-2">
       {/* Visual side */}
       <div className="gradient-hero relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex">
         <motion.div
@@ -87,19 +81,7 @@ export default function LoginPage() {
             everything in between.
           </p>
 
-          <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
-            {STATS.map((s) => (
-              <div
-                key={s.l}
-                className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm"
-              >
-                <div className="font-[family-name:var(--font-heading)] text-2xl font-bold">
-                  {s.v}
-                </div>
-                <div className="text-xs text-white/70">{s.l}</div>
-              </div>
-            ))}
-          </div>
+          
         </div>
 
         <p className="relative z-10 text-xs text-white/60">
@@ -140,7 +122,7 @@ export default function LoginPage() {
                   placeholder="Enter your email"
                   autoComplete="email"
                   required
-                  className="login-field h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-primary)]/20"
+                  className="login-field h-12 w-full text-black rounded-xl border border-slate-200 bg-white pl-10 pr-3 outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-primary)]/20"
                 />
               </div>
             </div>
@@ -152,7 +134,7 @@ export default function LoginPage() {
                 </label>
                 <button
                   type="button"
-                  className="text-xs text-[var(--color-brand-primary)] hover:underline"
+                  className="text-xs text-green-400 hover:text-green-400/80 transition-all duration-100 ease-in-out cursor-pointer hover:underline"
                   onClick={() =>
                     toast("Contact the system administrator to reset your password.")
                   }
@@ -169,12 +151,12 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   required
-                  className="login-field h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-10 outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-primary)]/20"
+                  className="login-field h-12 w-full rounded-xl border text-black border-slate-200 bg-white pl-10 pr-10 outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-primary)]/20"
                 />
                 <button
                   type="button"
                   onClick={() => setShow(!show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[var(--color-brand-dark)]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-black/80 cursor-pointer transition-all duration-100 "
                   aria-label={show ? "Hide password" : "Show password"}
                 >
                   {show ? (
@@ -211,7 +193,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-xs text-slate-500">
-            Secure admin portal · Connected to Itahari Namuna College backend
+            Secure admin portal · Connected to Itahari Namuna College Dashboard
           </p>
         </motion.div>
       </div>
