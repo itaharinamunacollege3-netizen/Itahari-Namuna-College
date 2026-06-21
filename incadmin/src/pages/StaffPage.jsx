@@ -1,9 +1,21 @@
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
-import { Pencil, Plus, Search, Trash2, Upload, UserCircle } from "lucide-react";
+import { Pencil, Plus, Trash2, Upload, UserCircle } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { Pagination } from "@/components/ui/Pagination";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { FilterSelect, SearchInput } from "@/components/ui/Filters";
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmpty,
+  DataTableHead,
+  DataTableHeaderCell,
+  DataTableRow,
+} from "@/components/ui/DataTable";
 import {
   Modal,
   FormField,
@@ -134,28 +146,24 @@ export default function StaffPage() {
         title="Staff"
         subtitle="Administrative and support staff members"
         actions={
-          <button type="button" className="btn btn-sm bg-[var(--color-brand-primary)] text-white" onClick={openCreate}>
+          <Button type="button" size="sm" variant="primary" onClick={openCreate}>
             <Plus className="h-4 w-4" />
             Add Staff
-          </button>
+          </Button>
         }
       />
 
-      <div className="card-surface mb-4 flex flex-wrap items-center gap-3 p-4">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
-          <input
-            type="text"
-            placeholder="Search by name, role, or department..."
-            value={search}
-            onChange={handleSearch}
-            className="input input-bordered input-sm w-full rounded-xl border-[var(--border-subtle)] bg-[var(--color-surface)] pl-9"
-          />
-        </div>
-        <select
+      <Card className="mb-4 flex flex-wrap items-center gap-3 p-4">
+        <SearchInput
+          value={search}
+          onChange={handleSearch}
+          placeholder="Search by name, role, or department..."
+          className="min-w-[200px] flex-1"
+        />
+        <FilterSelect
           value={categoryFilter}
           onChange={handleCategoryFilter}
-          className="select select-bordered select-sm w-auto rounded-xl border-[var(--border-subtle)] bg-[var(--color-surface)]"
+          className="w-auto"
         >
           <option value="">All Categories</option>
           {categories.data?.map((c) => (
@@ -163,39 +171,38 @@ export default function StaffPage() {
               {c.name}
             </option>
           ))}
-        </select>
+        </FilterSelect>
         {meta?.total != null && (
           <span className="text-sm text-[var(--text-muted)]">
             {meta.total} staff member{meta.total !== 1 ? "s" : ""}
           </span>
         )}
-      </div>
+      </Card>
 
-      <div className="card-surface p-4">
+      <Card className="p-4">
         {error ? (
           <div className="alert alert-error">{error}</div>
         ) : loading ? (
           <TableSkeleton />
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="table">
-                <thead>
-                  <tr className="text-xs uppercase text-[var(--text-muted)]">
-                    <th className="w-[56px]">Photo</th>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Category</th>
-                    <th>Department</th>
-                    <th>Status</th>
-                    <th className="w-[100px]" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {data?.length ? (
-                    data.map((row) => (
-                      <tr key={row.id} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
-                        <td>
+            <DataTable>
+              <DataTableHead>
+                <DataTableRow className="text-xs uppercase text-[var(--text-muted)]">
+                  <DataTableHeaderCell className="w-[56px]">Photo</DataTableHeaderCell>
+                  <DataTableHeaderCell>Name</DataTableHeaderCell>
+                  <DataTableHeaderCell>Role</DataTableHeaderCell>
+                  <DataTableHeaderCell>Category</DataTableHeaderCell>
+                  <DataTableHeaderCell>Department</DataTableHeaderCell>
+                  <DataTableHeaderCell>Status</DataTableHeaderCell>
+                  <DataTableHeaderCell className="w-[100px]" />
+                </DataTableRow>
+              </DataTableHead>
+              <DataTableBody>
+                {data?.length ? (
+                  data.map((row) => (
+                    <DataTableRow key={row.id} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
+                      <DataTableCell>
                           {row.image ? (
                             <img
                               src={row.image}
@@ -207,23 +214,23 @@ export default function StaffPage() {
                               <UserCircle className="h-5 w-5 text-[var(--text-muted)]" />
                             </div>
                           )}
-                        </td>
-                        <td>
+                      </DataTableCell>
+                      <DataTableCell>
                           <div>
                             <p className="font-semibold">{row.name}</p>
                             <p className="text-xs text-[var(--text-muted)]">#{row.id}</p>
                           </div>
-                        </td>
-                        <td>{row.role}</td>
-                        <td>
+                      </DataTableCell>
+                      <DataTableCell>{row.role}</DataTableCell>
+                      <DataTableCell>
                           {row.category?.name ? (
                             <span className="badge badge-sm badge-ghost">{row.category.name}</span>
                           ) : (
                             <span className="text-[var(--text-muted)]">—</span>
                           )}
-                        </td>
-                        <td>{row.department ?? "—"}</td>
-                        <td>
+                      </DataTableCell>
+                      <DataTableCell>{row.department ?? "—"}</DataTableCell>
+                      <DataTableCell>
                           {row.published ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -235,33 +242,30 @@ export default function StaffPage() {
                               Draft
                             </span>
                           )}
-                        </td>
-                        <td>
+                      </DataTableCell>
+                      <DataTableCell>
                           <div className="flex gap-1">
-                            <button type="button" className="btn btn-ghost btn-xs" onClick={() => openEdit(row)}>
+                            <Button type="button" size="xs" variant="ghost" onClick={() => openEdit(row)}>
                               <Pencil className="h-3.5 w-3.5" />
-                            </button>
-                            <button type="button" className="btn btn-ghost btn-xs text-rose-600" onClick={() => handleDelete(row.id)}>
+                            </Button>
+                            <Button type="button" size="xs" variant="danger" onClick={() => handleDelete(row.id)}>
                               <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                           </div>
-                        </td>
-                      </tr>
+                      </DataTableCell>
+                    </DataTableRow>
                     ))
-                  ) : (
-                    <tr>
-                      <td colSpan={7} className="py-14 text-center text-[var(--text-muted)]">
-                        {search || categoryFilter ? "No staff match your filters" : "No staff members yet"}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ) : (
+                  <DataTableEmpty colSpan={7} className="py-14">
+                    {search || categoryFilter ? "No staff match your filters" : "No staff members yet"}
+                  </DataTableEmpty>
+                )}
+              </DataTableBody>
+            </DataTable>
             <Pagination meta={meta} onPageChange={setPage} />
           </>
         )}
-      </div>
+      </Card>
 
       <Modal open={open} title={editId ? "Edit Staff" : "Add Staff"} onClose={() => setOpen(false)} wide>
         <form onSubmit={handleSubmit} className="space-y-4">
