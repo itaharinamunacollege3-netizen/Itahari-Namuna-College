@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { X, ArrowRight } from 'lucide-react';
 import { getFeaturedNotice } from '../services/noticesService';
 
+let shownThisLoad = false;
+
 export default function NoticePopup() {
   const [notice, setNotice] = useState(null);
   const [open, setOpen] = useState(false);
@@ -19,9 +21,11 @@ export default function NoticePopup() {
   };
 
   useEffect(() => {
+    if (shownThisLoad) return;
     let active = true;
     getFeaturedNotice().then((featured) => {
       if (!active || !featured) return;
+      shownThisLoad = true;
       setNotice(featured);
       setOpen(true);
     });
