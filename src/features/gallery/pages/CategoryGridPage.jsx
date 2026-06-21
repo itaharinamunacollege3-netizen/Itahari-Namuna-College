@@ -1,15 +1,39 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { galleryData } from '../gallery-data/galleryData';
+import { galleryService } from '../services/galleryService'; // Ensure this points to your new gallery service
 import PhotoGridTile from '../components/PhotoGridTile';
 import CategoryBanner from '../components/CategoryBanner';
 import LightboxModal from '../components/LightboxModal';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
-import { useState } from 'react';
+
 export default function CategoryGridPage() {
   const { category } = useParams(); // Matches route path 'gallery/:category'
+  const [album, setAlbum] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
-  
-  const album = galleryData.find((a) => a.id.toLowerCase() === category?.toLowerCase());
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+
+    galleryService.getPublicAlbumBySlug(category)
+      .then((data) => {
+        if (isMounted) {
+          setAlbum(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch album details:", err);
+        if (isMounted) setLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [category]);
+
+  if (loading) {
+    return <div className="text-center py-20 text-stone-600">Loading album...</div>;
+  }
 
   if (!album) {
     return <div className="text-center py-20 text-stone-600">Album not found.</div>;
