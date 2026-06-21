@@ -1,43 +1,58 @@
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
 
-export const globalLimiter = rateLimit({ // global rate limiter
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // 1000 requests per 15 minutes
-  standardHeaders: true, // return the headers
-  legacyHeaders: false, // return the headers
-  message: { success: false, message: "Too many requests. Please try again later." }, // return the message
+const defaultRateLimitMessage = {
+  success: false,
+  message: "Too many requests. Please try again later.",
+};
+
+const skipHealthCheck = (req: { path: string }) => req.path === "/api/health";
+
+export const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipHealthCheck,
+  message: defaultRateLimitMessage,
 });
 
-export const loginLimiter = rateLimit({ // login rate limiter
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // 10 requests per 15 minutes
-  standardHeaders: true, // return the headers
-  legacyHeaders: false, // return the headers
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipHealthCheck,
   message: { success: false, message: "Too many login attempts. Please try again later." }, // return the message
 });
 
-export const refreshLimiter = rateLimit({ // refresh rate limiter
+export const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 30, // 30 requests per 15 minutes
-  standardHeaders: true, // return the headers
-  legacyHeaders: false, // return the headers
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipHealthCheck,
+  message: defaultRateLimitMessage,
 });
 
-export const contactLimiter = rateLimit({ // contact rate limiter
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // 5 requests per hour
-  standardHeaders: true, // return the headers
-  legacyHeaders: false, // return the headers
+export const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipHealthCheck,
+  message: defaultRateLimitMessage,
 });
 
 const isDev = process.env.NODE_ENV !== "production";
 
-export const admissionLimiter = rateLimit({ // admission rate limiter
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: isDev ? 100 : 3, // 100/hr in dev, 3/hr in production
-  standardHeaders: true, // return the headers
-  legacyHeaders: false, // return the headers
+export const admissionLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: isDev ? 100 : 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipHealthCheck,
+  message: defaultRateLimitMessage,
 });
 
 export const uploadLimiter = rateLimit({
@@ -45,11 +60,12 @@ export const uploadLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipHealthCheck,
   message: { success: false, message: "Too many uploads. Please try again later." },
 });
 
-export const loginSlowDown = slowDown({ // login slow down
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  delayAfter: 3, // delay after 3 requests
-  delayMs: () => 1000, // delay by 1 second
+export const loginSlowDown = slowDown({
+  windowMs: 15 * 60 * 1000,
+  delayAfter: 3,
+  delayMs: () => 1000,
 });

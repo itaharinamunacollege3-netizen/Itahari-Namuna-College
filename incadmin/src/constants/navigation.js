@@ -8,6 +8,7 @@ import {
   Tags,
   GraduationCap,
   Mail,
+  Settings,
   LogOut,
 } from "lucide-react";
 
@@ -38,6 +39,10 @@ export const NAV_SECTIONS = [
       { label: "Admissions", path: "/admissions", icon: GraduationCap },
       { label: "Contacts", path: "/contacts", icon: Mail },
     ],
+  },
+  {
+    title: "ACCOUNT",
+    items: [{ label: "Settings", path: "/settings", icon: Settings }],
   },
 ];
 

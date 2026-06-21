@@ -26,7 +26,14 @@ export default defineConfig({
         configure: (proxy) => {
           proxy.on("error", (err) => {
             // Suppress noisy WS proxy errors when backend is offline
-            if (err.code === "ECONNRESET" || err.code === "ECONNREFUSED" || err.code === "EPIPE") return;
+            if (
+              err.code === "ECONNRESET" ||
+              err.code === "ECONNREFUSED" ||
+              err.code === "ECONNABORTED" ||
+              err.code === "EPIPE"
+            ) {
+              return;
+            }
             console.error("[ws proxy]", err.message);
           });
         },

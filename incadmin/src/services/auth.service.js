@@ -1,4 +1,4 @@
-import { apiRequest, clearTokens, setTokens } from "./apiClient";
+import { apiFormRequest, apiRequest, clearTokens, setTokens } from "./apiClient";
 
 export async function loginRequest(email, password) {
   const { data } = await apiRequest(
@@ -36,4 +36,19 @@ export async function changePasswordRequest(currentPassword, newPassword) {
     body: JSON.stringify({ currentPassword, newPassword }),
   });
   clearTokens();
+}
+
+export async function updateProfileRequest(payload) {
+  const { data } = await apiRequest("/auth/profile", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+  return data.user;
+}
+
+export async function uploadAvatarRequest(file) {
+  const form = new FormData();
+  form.append("avatar", file);
+  const { data } = await apiFormRequest("/auth/avatar", form, "POST");
+  return data.user;
 }

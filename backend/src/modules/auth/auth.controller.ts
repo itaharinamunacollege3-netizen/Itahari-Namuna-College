@@ -60,6 +60,27 @@ export async function me(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function updateProfile(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { name, email } = req.body;
+    const user = await authService.updateProfile(req.user!.id, { name, email }, req);
+    sendSuccess(res, { user });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function uploadAvatar(req: Request, res: Response, next: NextFunction) {
+  try {
+    const file = req.file;
+    if (!file) throw new AppError(400, "Avatar image is required");
+    const user = await authService.uploadAvatar(req.user!.id, file, req);
+    sendSuccess(res, { user });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function changePassword(req: Request, res: Response, next: NextFunction) {
   try {
     const { currentPassword, newPassword } = req.body;
