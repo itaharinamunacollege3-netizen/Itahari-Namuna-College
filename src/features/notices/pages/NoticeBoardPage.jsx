@@ -17,6 +17,9 @@ export default function NoticeBoardPage() {
     const set = new Set();
     allNotices.forEach((n) => {
       if (n.category) set.add(n.category);
+      (Array.isArray(n.tags) ? n.tags : []).forEach((tag) => {
+        if (tag) set.add(tag);
+      });
     });
     return ['All', ...set];
   }, [allNotices]);
@@ -24,8 +27,12 @@ export default function NoticeBoardPage() {
   const notices = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     return allNotices.filter((notice) => {
-      const matchesCategory = activeCategory === 'All' || notice.category === activeCategory;
-      const haystack = [notice.title, notice.description, notice.author]
+      const tags = Array.isArray(notice.tags) ? notice.tags : [];
+      const matchesCategory =
+        activeCategory === 'All' ||
+        notice.category === activeCategory ||
+        tags.includes(activeCategory);
+      const haystack = [notice.title, notice.description, notice.author, notice.category, ...tags]
         .map((field) => String(field ?? '').toLowerCase());
       const matchesSearch = !query || haystack.some((field) => field.includes(query));
       return matchesCategory && matchesSearch;
@@ -58,7 +65,7 @@ export default function NoticeBoardPage() {
             setActiveCategory={setActiveCategory}
           />
 
-          <AnimatedSection className="space-y-3">
+          <div className="space-y-3">
             {notices.length > 0 ? (
               notices.map((notice) => (
                 <NoticeRowCard
@@ -71,7 +78,7 @@ export default function NoticeBoardPage() {
             ) : (
               <p className="text-center py-10 text-brand-dark/40 italic">No notices found.</p>
             )}
-          </AnimatedSection>
+          </div>
         </div>
 
         <div className="lg:w-2/3 hidden lg:block">

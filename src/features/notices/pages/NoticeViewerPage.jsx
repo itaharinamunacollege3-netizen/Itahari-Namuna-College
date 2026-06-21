@@ -24,7 +24,7 @@ export default function NoticeViewerPage() {
   return (
     <div className="w-full bg-stone-50 min-h-screen pb-20">
       <PageBanner title={notice.title} subtitle={`${notice.author} • ${notice.publishedDate}`} />
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 py-8 sm:py-12">
         <Link
           to="/notices"
           className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary/80 transition mb-6"

@@ -6,38 +6,38 @@ export default function NoticeDetailView({ notice }) {
   const pdfUrl = notice.pdfUrl && notice.pdfUrl !== '#' ? notice.pdfUrl : '';
 
   return (
-    <div className="bg-brand-white p-8 rounded-2xl shadow-sm border border-brand-gray/20">
+    <div className="bg-brand-white p-5 sm:p-8 rounded-2xl shadow-sm border border-brand-gray/20">
       {/* Header Actions */}
-      <div className="flex justify-between items-start mb-6">
-        <div className="space-y-2">
-          <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+        <div className="space-y-2 min-w-0">
+          <div className="flex flex-wrap gap-2">
             {notice.tags.map(tag => (
               <span key={tag} className="text-[10px] font-bold uppercase bg-brand-primary/10 text-brand-primary px-2 py-1 rounded">
                 {tag}
               </span>
             ))}
           </div>
-          <h2 className="text-2xl font-heading font-extrabold text-brand-dark">{notice.title}</h2>
-          <div className="flex gap-6 text-xs text-brand-dark/60">
+          <h2 className="text-xl sm:text-2xl font-heading font-extrabold text-brand-dark break-words">{notice.title}</h2>
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-brand-dark/60">
             <span className="flex items-center gap-1.5"><Calendar size={14} /> {notice.publishedDate}</span>
             <span className="flex items-center gap-1.5"><User size={14} /> {notice.author}</span>
             <span className="flex items-center gap-1.5"><BookOpen size={14} /> {notice.audience}</span>
           </div>
         </div>
-        
-        <div className="flex gap-2">
+
+        <div className="flex gap-2 shrink-0">
           {pdfUrl && (
             <a
               href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
               download
-              className="flex items-center gap-2 bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-primary/90 transition"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-primary/90 transition"
             >
               <Download size={14} /> Download
             </a>
           )}
-          <button onClick={() => window.print()} className="flex items-center gap-2 bg-brand-gray/10 text-brand-dark text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-gray/20 transition">
+          <button onClick={() => window.print()} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brand-gray/10 text-brand-dark text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-gray/20 transition">
             <Printer size={14} /> Print
           </button>
         </div>
