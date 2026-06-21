@@ -13,6 +13,7 @@ adminRouter.use(authenticate, requireAdmin);
 
 adminRouter.get("/", validateQuery(listNotificationsQuerySchema), notificationsController.list);
 adminRouter.get("/unread-count", notificationsController.unreadCount);
+adminRouter.get("/unread-breakdown", notificationsController.unreadBreakdown);
 adminRouter.patch("/read-all", notificationsController.markAllRead);
 adminRouter.patch(
   "/:id/read",
