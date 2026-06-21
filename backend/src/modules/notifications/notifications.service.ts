@@ -34,6 +34,35 @@ export async function getUnreadCount(userId: number): Promise<number> {
   });
 }
 
+export async function getUnreadBreakdown(userId: number): Promise<{
+  total: number;
+  admissions: number;
+  contacts: number;
+}> {
+  const [total, grouped] = await Promise.all([
+    getUnreadCount(userId),
+    prisma.notification.groupBy({
+      by: ["type"],
+      where: { userId, isRead: false },
+      _count: { _all: true },
+    }),
+  ]);
+
+  let admissions = 0;
+  let contacts = 0;
+
+  for (const row of grouped) {
+    const count = row._count._all;
+    if (row.type === "ADMISSION_NEW" || row.type === "ADMISSION_STATUS") {
+      admissions += count;
+    } else if (row.type === "CONTACT_NEW") {
+      contacts += count;
+    }
+  }
+
+  return { total, admissions, contacts };
+}
+
 async function pushRealtime(userId: number, notificationId?: number): Promise<void> {
   const count = await getUnreadCount(userId);
   emitUnreadCountToUser(userId, count);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  ArrowRight,
   Briefcase,
   BookOpen,
   ClipboardList,
@@ -78,6 +79,12 @@ export default function DashboardPage() {
     const days = Math.floor(hours / 24);
     if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
     return date.toLocaleDateString();
+  };
+
+  const truncateMessage = (value, max = 64) => {
+    const text = String(value ?? "");
+    if (text.length <= max) return text;
+    return `${text.slice(0, max - 1)}…`;
   };
 
   return (
@@ -208,18 +215,102 @@ export default function DashboardPage() {
             </section>
 
             <section className="card-surface p-5 xl:col-span-2">
-              <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">
-                Contact Trends
-              </h2>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Inquiry messages by week
-              </p>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">
+                    Contact Trends
+                  </h2>
+                  <p className="mt-1 text-sm text-[var(--text-muted)]">
+                    Inquiry messages by week
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link to="/contacts" className="btn btn-sm">
+                    Open Contacts
+                  </Link>
+                  <Link to="/contacts" className="btn btn-sm btn-ghost text-[var(--color-brand-primary)]">
+                    {stats?.unreadContacts ?? 0} unread
+                  </Link>
+                </div>
+              </div>
               <div className="mt-4">
                 {stats?.charts?.contactTrends ? (
                   <ContactTrendsArea data={stats.charts.contactTrends} isDark={isDark} />
                 ) : (
                   <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
                 )}
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--color-surface-muted)] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--color-brand-dark)]">Contact Actions</p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Review unread inquiries and respond quickly.
+                    </p>
+                  </div>
+                  <Link
+                    to="/contacts"
+                    className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-brand-primary)]"
+                  >
+                    Manage
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              <div className="mt-4 overflow-hidden rounded-2xl border border-[var(--border-subtle)]">
+                <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--color-surface-muted)] px-4 py-3">
+                  <p className="text-sm font-semibold text-[var(--color-brand-dark)]">
+                    Contact Sidebar Table
+                  </p>
+                  <Link to="/contacts" className="text-xs font-semibold text-[var(--color-brand-primary)]">
+                    Open full table
+                  </Link>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="table table-sm">
+                    <thead>
+                      <tr className="text-[11px] uppercase text-[var(--text-muted)]">
+                        <th>Name</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th className="text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(stats?.recentContacts ?? []).length ? (
+                        stats.recentContacts.map((contact) => (
+                          <tr key={contact.id}>
+                            <td className="font-medium">{contact.fullName ?? "Visitor"}</td>
+                            <td className="max-w-[280px] truncate text-xs text-[var(--text-muted)]">
+                              {truncateMessage(contact.message)}
+                            </td>
+                            <td>
+                              {contact.isRead ? (
+                                <span className="badge badge-ghost badge-xs">Read</span>
+                              ) : (
+                                <span className="badge badge-warning badge-xs">Unread</span>
+                              )}
+                            </td>
+                            <td className="text-right">
+                              <Link to="/contacts" className="btn btn-ghost btn-xs text-[var(--color-brand-primary)]">
+                                {contact.isRead ? "View" : "Review"}
+                              </Link>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="py-6 text-center text-xs text-[var(--text-muted)]">
+                            No recent contact inquiries.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </section>
 

@@ -1,23 +1,41 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Logo, LogoMark } from "@/components/cms/Logo";
 import { LOGOUT_ITEM, NAV_SECTIONS } from "@/constants/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { cn } from "@/utils/cn";
-
-const STORAGE_KEY = "inc_admin_sidebar_collapsed";
 
 export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
   const { logout } = useAuth();
-  const [collapsed, setCollapsed] = useState(() => {
-    return localStorage.getItem(STORAGE_KEY) === "true";
-  });
+  const { unreadBreakdown } = useNotifications();
+  const [collapsed, setCollapsed] = useState(false);
   const effectiveCollapsed = collapsed && !mobileOpen;
+  const pathCountMap = {
+    "/admissions": unreadBreakdown?.admissions ?? 0,
+    "/contacts": unreadBreakdown?.contacts ?? 0,
+  };
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, String(collapsed));
-  }, [collapsed]);
+  const formatCountLabel = (count) => {
+    if (count <= 0) return "";
+    if (count > 99) return "99+ notifications";
+    return `${count} notification${count > 1 ? "s" : ""}`;
+  };
+
+  const badgeClassByPath = (path, compact = false) => {
+    if (path === "/admissions") {
+      return compact
+        ? "bg-emerald-500 text-white"
+        : "bg-emerald-500 text-white";
+    }
+    if (path === "/contacts") {
+      return compact
+        ? "bg-sky-500 text-white"
+        : "bg-sky-500 text-white";
+    }
+    return compact ? "bg-rose-500 text-white" : "bg-rose-500 text-white";
+  };
 
   return (
     <>
@@ -84,7 +102,10 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
               </p>
             ) : null}
             <ul className="space-y-1">
-              {section.items.map(({ label, path, icon: Icon }) => (
+              {section.items.map(({ label, path, icon: Icon }) => {
+                const itemCount = pathCountMap[path] ?? 0;
+
+                return (
                 <li key={path}>
                   <NavLink
                     to={path}
@@ -94,7 +115,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
                     }}
                     className={({ isActive }) =>
                       cn(
-                        "flex items-center rounded-xl text-[15px] font-medium transition-all duration-150",
+                        "relative flex items-center rounded-xl text-[15px] font-medium transition-all duration-150",
                         effectiveCollapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5",
                         isActive
                           ? "bg-[var(--color-brand-primary)] text-white shadow-sm"
@@ -103,10 +124,34 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
                     }
                   >
                     <Icon className="h-[18px] w-[18px] shrink-0 stroke-[1.75]" />
-                    {!effectiveCollapsed ? label : null}
+                    {!effectiveCollapsed ? (
+                      <>
+                        <span className="truncate">{label}</span>
+                        {itemCount > 0 ? (
+                          <span
+                            className={cn(
+                              "ml-auto inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none",
+                              badgeClassByPath(path)
+                            )}
+                          >
+                            {formatCountLabel(itemCount)}
+                          </span>
+                        ) : null}
+                      </>
+                    ) : null}
+                    {effectiveCollapsed && itemCount > 0 ? (
+                      <span
+                        className={cn(
+                          "absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold",
+                          badgeClassByPath(path, true)
+                        )}
+                      >
+                        {itemCount > 9 ? "9+" : itemCount}
+                      </span>
+                    ) : null}
                   </NavLink>
                 </li>
-              ))}
+              )})}
             </ul>
           </div>
         ))}

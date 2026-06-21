@@ -9,6 +9,15 @@ export async function getUnreadCount() {
   return data.count;
 }
 
+export async function getUnreadBreakdown() {
+  const { data } = await apiRequest("/admin/notifications/unread-breakdown");
+  return {
+    total: data?.total ?? 0,
+    admissions: data?.admissions ?? 0,
+    contacts: data?.contacts ?? 0,
+  };
+}
+
 export async function markNotificationRead(id) {
   return apiRequest(`/admin/notifications/${id}/read`, { method: "PATCH" });
 }

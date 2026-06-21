@@ -33,6 +33,15 @@ export async function unreadCount(req: Request, res: Response, next: NextFunctio
   }
 }
 
+export async function unreadBreakdown(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await notificationsService.getUnreadBreakdown(req.user!.id);
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function markRead(req: Request, res: Response, next: NextFunction) {
   try {
     const data = await notificationsService.markNotificationRead(

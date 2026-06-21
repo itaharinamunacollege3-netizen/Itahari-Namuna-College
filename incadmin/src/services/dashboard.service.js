@@ -285,6 +285,7 @@ export async function fetchDashboardStats() {
     staffMembers,
     categories,
     unreadNotifications,
+    recentContacts: (contactsRes.data ?? []).slice(0, 6),
     metricTrends,
     recentActivities: buildRecentActivities({
       admissions: recentAdmissionsRes.data ?? [],
