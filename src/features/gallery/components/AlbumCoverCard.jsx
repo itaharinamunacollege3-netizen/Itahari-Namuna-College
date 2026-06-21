@@ -20,6 +20,9 @@ export default function AlbumCoverCard({ data }) {
         <h3 className="text-xl font-heading font-bold text-white mb-1">{data.title}</h3>
         <p className="text-white/70 text-xs font-medium">{data.description}</p>
       </div>
+      <div className="absolute top-4 right-4 bg-white/90 text-sm font-medium px-3 py-1 rounded-full">
+        <p> <span>{data.imageCount}</span> Images</p>
+      </div>
     </div>
   );
 }
