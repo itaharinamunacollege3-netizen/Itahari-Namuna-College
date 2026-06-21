@@ -3,6 +3,17 @@ import toast from "react-hot-toast";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TableSkeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmpty,
+  DataTableHead,
+  DataTableHeaderCell,
+  DataTableRow,
+} from "@/components/ui/DataTable";
 import {
   Modal,
   FormField,
@@ -215,36 +226,35 @@ export default function NoticesPage() {
         title="Notices"
         subtitle="College notices and announcements"
         actions={
-          <button type="button" className="btn btn-sm bg-[var(--color-brand-primary)] text-white" onClick={openCreate}>
+          <Button type="button" size="sm" variant="primary" onClick={openCreate}>
             <Plus className="h-4 w-4" />
             Add Notice
-          </button>
+          </Button>
         }
       />
 
-      <div className="card-surface p-4">
+      <Card className="p-4">
         {error ? (
           <div className="alert alert-error">{error}</div>
         ) : loading ? (
           <TableSkeleton />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="table">
-              <thead>
-                <tr className="text-xs uppercase text-[var(--text-muted)]">
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Audience</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {data?.length ? (
-                  data.map((row) => (
-                    <tr key={row.id}>
-                      <td>
+          <DataTable>
+            <DataTableHead>
+              <DataTableRow className="text-xs uppercase text-[var(--text-muted)]">
+                <DataTableHeaderCell>Title</DataTableHeaderCell>
+                <DataTableHeaderCell>Category</DataTableHeaderCell>
+                <DataTableHeaderCell>Audience</DataTableHeaderCell>
+                <DataTableHeaderCell>Date</DataTableHeaderCell>
+                <DataTableHeaderCell>Status</DataTableHeaderCell>
+                <DataTableHeaderCell />
+              </DataTableRow>
+            </DataTableHead>
+            <DataTableBody>
+              {data?.length ? (
+                data.map((row) => (
+                  <DataTableRow key={row.id}>
+                    <DataTableCell>
                         <p className="font-medium">{row.title}</p>
                         <p className="text-xs text-[var(--text-muted)] line-clamp-1">{row.description}</p>
                         {row.tags?.length ? (
@@ -254,11 +264,11 @@ export default function NoticesPage() {
                             ))}
                           </div>
                         ) : null}
-                      </td>
-                      <td>{row.category ?? "—"}</td>
-                      <td>{row.audience ?? "—"}</td>
-                      <td>{formatDate(row.publishedDate)}</td>
-                      <td>
+                    </DataTableCell>
+                    <DataTableCell>{row.category ?? "—"}</DataTableCell>
+                    <DataTableCell>{row.audience ?? "—"}</DataTableCell>
+                    <DataTableCell>{formatDate(row.publishedDate)}</DataTableCell>
+                    <DataTableCell>
                         <div className="flex flex-wrap gap-1">
                           {row.published ? (
                             <span className="badge badge-success badge-sm">Live</span>
@@ -269,29 +279,26 @@ export default function NoticesPage() {
                             <span className="badge badge-warning badge-sm">Featured</span>
                           ) : null}
                         </div>
-                      </td>
-                      <td>
+                    </DataTableCell>
+                    <DataTableCell>
                         <div className="flex gap-1">
-                          <button type="button" className="btn btn-ghost btn-xs" onClick={() => openEdit(row.id)}>
+                          <Button type="button" size="xs" variant="ghost" onClick={() => openEdit(row.id)}>
                             <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button type="button" className="btn btn-ghost btn-xs text-rose-600" onClick={() => handleDelete(row.id)}>
+                          </Button>
+                          <Button type="button" size="xs" variant="danger" onClick={() => handleDelete(row.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          </Button>
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="py-10 text-center text-[var(--text-muted)]">No notices found</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                    </DataTableCell>
+                  </DataTableRow>
+                ))
+              ) : (
+                <DataTableEmpty colSpan={6}>No notices found</DataTableEmpty>
+              )}
+            </DataTableBody>
+          </DataTable>
         )}
-      </div>
+      </Card>
 
       <Modal open={open} title={editId ? "Edit Notice" : "Create Notice"} onClose={() => setOpen(false)} wide="xl">
         <form onSubmit={handleSubmit} className="space-y-4">

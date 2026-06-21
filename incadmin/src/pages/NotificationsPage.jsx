@@ -4,6 +4,8 @@ import { Bell, CheckCheck, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Pagination } from "@/components/ui/Pagination";
 import { TableSkeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { formatDate } from "@/utils/format";
 import { useNotifications } from "@/contexts/NotificationContext";
@@ -59,14 +61,14 @@ export default function NotificationsPage() {
         title="Notifications"
         subtitle="Real-time admin alerts from admissions and contacts"
         actions={
-          <button type="button" className="btn btn-sm" onClick={handleMarkAll}>
+          <Button size="sm" onClick={handleMarkAll}>
             <CheckCheck className="h-4 w-4" />
             Mark all read
-          </button>
+          </Button>
         }
       />
 
-      <div className="card-surface p-4">
+      <Card className="p-4">
         {error ? (
           <div className="alert alert-error">{error}</div>
         ) : loading ? (
@@ -97,22 +99,21 @@ export default function NotificationsPage() {
                       </div>
                       <div className="mt-3 flex gap-2">
                         {!n.isRead ? (
-                          <button
-                            type="button"
-                            className="btn btn-xs"
+                          <Button
+                            size="xs"
                             onClick={() => handleMarkRead(n.id)}
                           >
                             Mark read
-                          </button>
+                          </Button>
                         ) : null}
-                        <button
-                          type="button"
-                          className="btn btn-xs btn-ghost text-rose-600"
+                        <Button
+                          size="xs"
+                          variant="danger"
                           onClick={() => handleDelete(n.id)}
                         >
                           <Trash2 className="h-3 w-3" />
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -124,7 +125,7 @@ export default function NotificationsPage() {
             <Pagination meta={meta} onPageChange={setPage} />
           </>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

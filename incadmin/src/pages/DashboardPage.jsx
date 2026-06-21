@@ -16,6 +16,22 @@ import {
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmpty,
+  DataTableHead,
+  DataTableHeaderCell,
+  DataTableRow,
+} from "@/components/ui/DataTable";
+import {
   AdmissionStatusPie,
   AdmissionsLineChart,
   ContactTrendsArea,
@@ -130,7 +146,7 @@ export default function DashboardPage() {
 
           <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {statCards.map(({ key, label, icon: Icon, chip }) => (
-              <div key={key} className="card-surface rounded-2xl p-4">
+              <Card key={key} className="p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-medium text-[var(--text-muted)]">{label}</p>
@@ -161,68 +177,52 @@ export default function DashboardPage() {
                     </div>
                   );
                 })()}
-              </div>
+              </Card>
             ))}
           </section>
 
           <div className="grid gap-6 xl:grid-cols-3">
-            <section className="card-surface p-5 xl:col-span-2">
-              <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">
-                Monthly Admissions
-              </h2>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Applications received over the last year
-              </p>
-              <div className="mt-4">
+            <Card className="p-5 xl:col-span-2">
+              <CardTitle>Monthly Admissions</CardTitle>
+              <CardDescription>Applications received over the last year</CardDescription>
+              <CardContent>
                 {stats?.charts?.admissionsTrend ? (
                   <AdmissionsLineChart data={stats.charts.admissionsTrend} isDark={isDark} />
                 ) : (
                   <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
                 )}
-              </div>
-            </section>
+              </CardContent>
+            </Card>
 
-            <section className="card-surface p-5 xl:col-span-1">
-              <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">
-                Admission Status
-              </h2>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Current breakdown
-              </p>
-              <div className="mt-4">
+            <Card className="p-5 xl:col-span-1">
+              <CardTitle>Admission Status</CardTitle>
+              <CardDescription>Current breakdown</CardDescription>
+              <CardContent>
                 {stats?.charts?.admissionStatus ? (
                   <AdmissionStatusPie data={stats.charts.admissionStatus} isDark={isDark} />
                 ) : (
                   <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
                 )}
-              </div>
-            </section>
+              </CardContent>
+            </Card>
 
-            <section className="card-surface p-5 xl:col-span-1">
-              <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">
-                Programs Distribution
-              </h2>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Active application count by program
-              </p>
-              <div className="mt-4">
+            <Card className="p-5 xl:col-span-1">
+              <CardTitle>Programs Distribution</CardTitle>
+              <CardDescription>Active application count by program</CardDescription>
+              <CardContent>
                 {stats?.charts?.programsDistribution ? (
                   <ProgramsDistributionBar data={stats.charts.programsDistribution} isDark={isDark} />
                 ) : (
                   <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
                 )}
-              </div>
-            </section>
+              </CardContent>
+            </Card>
 
-            <section className="card-surface p-5 xl:col-span-2">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+            <Card className="p-5 xl:col-span-2">
+              <CardHeader className="flex-wrap">
                 <div>
-                  <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">
-                    Contact Trends
-                  </h2>
-                  <p className="mt-1 text-sm text-[var(--text-muted)]">
-                    Inquiry messages by week
-                  </p>
+                  <CardTitle>Contact Trends</CardTitle>
+                  <CardDescription>Inquiry messages by week</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
                   <Link to="/contacts" className="btn btn-sm">
@@ -232,14 +232,14 @@ export default function DashboardPage() {
                     {stats?.unreadContacts ?? 0} unread
                   </Link>
                 </div>
-              </div>
-              <div className="mt-4">
+              </CardHeader>
+              <CardContent>
                 {stats?.charts?.contactTrends ? (
                   <ContactTrendsArea data={stats.charts.contactTrends} isDark={isDark} />
                 ) : (
                   <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">No data</p>
                 )}
-              </div>
+              </CardContent>
 
               <div className="mt-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--color-surface-muted)] p-4">
                 <div className="flex items-center justify-between gap-3">
@@ -269,54 +269,50 @@ export default function DashboardPage() {
                   </Link>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="table table-sm">
-                    <thead>
-                      <tr className="text-[11px] uppercase text-[var(--text-muted)]">
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Status</th>
-                        <th className="text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(stats?.recentContacts ?? []).length ? (
-                        stats.recentContacts.map((contact) => (
-                          <tr key={contact.id}>
-                            <td className="font-medium">{contact.fullName ?? "Visitor"}</td>
-                            <td className="max-w-[280px] truncate text-xs text-[var(--text-muted)]">
-                              {truncateMessage(contact.message)}
-                            </td>
-                            <td>
-                              {contact.isRead ? (
-                                <span className="badge badge-ghost badge-xs">Read</span>
-                              ) : (
-                                <span className="badge badge-warning badge-xs">Unread</span>
-                              )}
-                            </td>
-                            <td className="text-right">
-                              <Link to="/contacts" className="btn btn-ghost btn-xs text-[var(--color-brand-primary)]">
-                                {contact.isRead ? "View" : "Review"}
-                              </Link>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={4} className="py-6 text-center text-xs text-[var(--text-muted)]">
-                            No recent contact inquiries.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                <DataTable tableClassName="table table-sm">
+                  <DataTableHead>
+                    <DataTableRow className="text-[11px] uppercase text-[var(--text-muted)]">
+                      <DataTableHeaderCell>Name</DataTableHeaderCell>
+                      <DataTableHeaderCell>Message</DataTableHeaderCell>
+                      <DataTableHeaderCell>Status</DataTableHeaderCell>
+                      <DataTableHeaderCell className="text-right">Action</DataTableHeaderCell>
+                    </DataTableRow>
+                  </DataTableHead>
+                  <DataTableBody>
+                    {(stats?.recentContacts ?? []).length ? (
+                      stats.recentContacts.map((contact) => (
+                        <DataTableRow key={contact.id}>
+                          <DataTableCell className="font-medium">{contact.fullName ?? "Visitor"}</DataTableCell>
+                          <DataTableCell className="max-w-[280px] truncate text-xs text-[var(--text-muted)]">
+                            {truncateMessage(contact.message)}
+                          </DataTableCell>
+                          <DataTableCell>
+                            {contact.isRead ? (
+                              <span className="badge badge-ghost badge-xs">Read</span>
+                            ) : (
+                              <span className="badge badge-warning badge-xs">Unread</span>
+                            )}
+                          </DataTableCell>
+                          <DataTableCell className="text-right">
+                            <Link to="/contacts" className="btn btn-ghost btn-xs text-[var(--color-brand-primary)]">
+                              {contact.isRead ? "View" : "Review"}
+                            </Link>
+                          </DataTableCell>
+                        </DataTableRow>
+                      ))
+                    ) : (
+                      <DataTableEmpty colSpan={4} className="py-6 text-xs">
+                        No recent contact inquiries.
+                      </DataTableEmpty>
+                    )}
+                  </DataTableBody>
+                </DataTable>
               </div>
-            </section>
+            </Card>
 
-            <section className="card-surface p-5 xl:col-span-3">
+            <Card className="p-5 xl:col-span-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-[var(--color-brand-dark)]">Recent Activity</h2>
+                <CardTitle>Recent Activity</CardTitle>
                 <Link to="/notifications" className="text-sm font-semibold text-[var(--color-brand-primary)]">
                   View all
                 </Link>
@@ -347,7 +343,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-[var(--text-muted)]">No recent activities yet.</p>
                 )}
               </div>
-            </section>
+            </Card>
           </div>
         </div>
       )}

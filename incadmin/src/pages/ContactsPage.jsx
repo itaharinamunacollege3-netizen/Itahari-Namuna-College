@@ -4,6 +4,17 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Pagination } from "@/components/ui/Pagination";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmpty,
+  DataTableHead,
+  DataTableHeaderCell,
+  DataTableRow,
+} from "@/components/ui/DataTable";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { listContacts, markContactRead } from "@/services/contacts.service";
 import { formatDate } from "@/utils/format";
@@ -32,80 +43,76 @@ export default function ContactsPage() {
     <div>
       <PageHeader title="Contacts" subtitle="Incoming contact form messages" />
 
-      <div className="card-surface p-4">
+      <Card className="p-4">
         {error ? (
           <div className="alert alert-error">{error}</div>
         ) : loading ? (
           <TableSkeleton />
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="table">
-                <thead>
-                  <tr className="text-xs uppercase text-slate-500">
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Message</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {data?.length ? (
-                    data.map((row) => (
-                      <tr key={row.id}>
-                        <td>
+            <DataTable>
+              <DataTableHead>
+                <DataTableRow className="text-xs uppercase text-slate-500">
+                  <DataTableHeaderCell>Name</DataTableHeaderCell>
+                  <DataTableHeaderCell>Department</DataTableHeaderCell>
+                  <DataTableHeaderCell>Message</DataTableHeaderCell>
+                  <DataTableHeaderCell>Date</DataTableHeaderCell>
+                  <DataTableHeaderCell>Status</DataTableHeaderCell>
+                  <DataTableHeaderCell />
+                </DataTableRow>
+              </DataTableHead>
+              <DataTableBody>
+                {data?.length ? (
+                  data.map((row) => (
+                    <DataTableRow key={row.id}>
+                      <DataTableCell>
                           <p className="font-medium">{row.fullName}</p>
                           <p className="text-xs text-slate-500">{row.email}</p>
-                        </td>
-                        <td className="capitalize">{row.department}</td>
-                        <td className="max-w-xs truncate">{row.message}</td>
-                        <td>{formatDate(row.createdAt)}</td>
-                        <td>
+                      </DataTableCell>
+                      <DataTableCell className="capitalize">{row.department}</DataTableCell>
+                      <DataTableCell className="max-w-xs truncate">{row.message}</DataTableCell>
+                      <DataTableCell>{formatDate(row.createdAt)}</DataTableCell>
+                      <DataTableCell>
                           {row.isRead ? (
                             <span className="badge badge-ghost">Read</span>
                           ) : (
                             <span className="badge badge-warning">Unread</span>
                           )}
-                        </td>
-                        <td>
+                      </DataTableCell>
+                      <DataTableCell>
                           <div className="flex items-center justify-end gap-2">
-                            <button
-                              type="button"
-                              className="btn btn-ghost btn-xs"
+                            <Button
+                              size="xs"
+                              variant="ghost"
                               onClick={() => setSelectedContact(row)}
                             >
                               <Eye className="h-3.5 w-3.5" />
                               View
-                            </button>
+                            </Button>
                             {!row.isRead ? (
-                              <button
-                                type="button"
-                                className="btn btn-xs"
+                              <Button
+                                size="xs"
+                                variant="neutral"
                                 onClick={() => handleMarkRead(row.id)}
                               >
                                 Mark read
-                              </button>
+                              </Button>
                             ) : null}
                           </div>
-                        </td>
-                      </tr>
+                      </DataTableCell>
+                    </DataTableRow>
                     ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="py-10 text-center text-slate-500">
-                        No contacts yet
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ) : (
+                  <DataTableEmpty colSpan={6} className="text-slate-500">
+                    No contacts yet
+                  </DataTableEmpty>
+                )}
+              </DataTableBody>
+            </DataTable>
             <Pagination meta={meta} onPageChange={setPage} />
           </>
         )}
-      </div>
+      </Card>
 
       <Modal
         open={Boolean(selectedContact)}
@@ -145,20 +152,19 @@ export default function ContactsPage() {
 
             <div className="flex justify-end gap-2">
               {!selectedContact.isRead ? (
-                <button
-                  type="button"
-                  className="btn btn-sm"
+                <Button
+                  size="sm"
                   onClick={async () => {
                     await handleMarkRead(selectedContact.id);
                     setSelectedContact((prev) => (prev ? { ...prev, isRead: true } : prev));
                   }}
                 >
                   Mark read
-                </button>
+                </Button>
               ) : null}
-              <button type="button" className="btn btn-sm btn-ghost" onClick={() => setSelectedContact(null)}>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedContact(null)}>
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         ) : null}

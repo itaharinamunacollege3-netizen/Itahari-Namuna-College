@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Logo } from "@/components/cms/Logo";
+import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const REMEMBER_KEY = "inc_admin_remember_email";
@@ -136,7 +137,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@namunacollege.edu.np"
+                  placeholder="Enter your email"
                   autoComplete="email"
                   required
                   className="login-field h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-primary)]/20"
@@ -195,21 +196,18 @@ export default function LoginPage() {
               Remember me for 30 days
             </label>
 
-            <motion.button
+            <motion.div
               whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={loading}
-              className="login-submit-btn flex h-12 w-full items-center justify-center gap-2 rounded-xl font-medium text-white transition disabled:opacity-70"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Authenticating…
-                </>
-              ) : (
-                "Sign in to dashboard"
-              )}
-            </motion.button>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                className="login-submit-btn h-12 w-full rounded-xl font-medium"
+              >
+                {loading ? "Authenticating..." : "Sign in to dashboard"}
+              </Button>
+            </motion.div>
           </form>
 
           <p className="mt-6 text-center text-xs text-slate-500">
