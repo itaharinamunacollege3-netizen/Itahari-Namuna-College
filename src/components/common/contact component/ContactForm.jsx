@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { apiClient } from '../../../api/apiClient';
+
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -55,24 +57,13 @@ export default function ContactForm() {
     setIsSubmitting(true); // Start loading
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        toast.success('Message sent! We will be in touch.');
-        setFormData({ fullName: '', email: '', phone: '', department: '', message: '' });
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
+      await apiClient.post('/contacts', formData);
+      toast.success('Message sent! We will be in touch.');
+      setFormData({ fullName: '', email: '', phone: '', department: '', message: '' });
+    } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
-      setIsSubmitting(false); // Always stop loading, whether success or fail
+      setIsSubmitting(false);
     }
   };
   return (
@@ -133,13 +124,11 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        disabled={status === 'submitting'}
-        className={`w-full py-4 rounded-xl cursor-pointer font-bold text-white transition-colors ${status === 'submitting' ? 'bg-stone-400 cursor-not-allowed' : 'bg-[#E67E22] hover:bg-[#d35400]'}`}
+        disabled={isSubmitting}
+        className={`w-full py-4 rounded-xl cursor-pointer font-bold text-white transition-colors ${isSubmitting ? 'bg-stone-400 cursor-not-allowed' : 'bg-[#E67E22] hover:bg-[#d35400]'}`}
       >
-        Send Message →
+        {isSubmitting ? 'Sending…' : 'Send Message →'}
       </button>
-      {status === 'success' && <p className="text-green-600 text-sm mt-2">Message sent successfully!</p>}
-      {status === 'error' && <p className="text-red-600 text-sm mt-2">Failed to send. Please try again.</p>}
     </form>
   );
 }

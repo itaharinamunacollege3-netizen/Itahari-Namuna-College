@@ -1,6 +1,5 @@
 import courseData from "../data/courseMatrix.json";
-
-const BASE_URL = import.meta.env.VITE_API_URL;
+import { apiClient } from "../../../api/apiClient";
 
 function normalizeCurriculum(curriculum) {
   if (!curriculum || typeof curriculum !== "object" || Array.isArray(curriculum)) return {};
@@ -35,22 +34,14 @@ function getFallbackPrograms() {
   return (courseData?.programs ?? []).map((program) => adaptProgram(program));
 }
 
-async function fetchJson(path) {
-  const response = await fetch(`${BASE_URL}${path}`);
-  const body = await response.json();
-
-  if (!response.ok || !body?.success) {
-    throw new Error(body?.message ?? `Request failed: ${path}`);
-  }
-
-  return body.data;
+async function fetchData(path) {
+  const body = await apiClient.get(path);
+  return body?.data;
 }
 
 export async function getPrograms() {
-  if (!BASE_URL) return getFallbackPrograms();
-
   try {
-    const data = await fetchJson("/programs");
+    const data = await fetchData("/programs");
     const programs = Array.isArray(data?.programs) ? data.programs : [];
     return programs.map(adaptProgram);
   } catch {
@@ -59,12 +50,8 @@ export async function getPrograms() {
 }
 
 export async function getProgramBySlug(slug) {
-  if (!BASE_URL) {
-    return getFallbackPrograms().find((program) => program.id === String(slug)) ?? null;
-  }
-
   try {
-    const data = await fetchJson(`/programs/${slug}`);
+    const data = await fetchData(`/programs/${slug}`);
     return data ? adaptProgram(data) : null;
   } catch {
     return getFallbackPrograms().find((program) => program.id === String(slug)) ?? null;

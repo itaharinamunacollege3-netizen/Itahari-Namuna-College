@@ -1,11 +1,10 @@
+import { apiClient } from '../../../api/apiClient';
 import { mockNotices } from '../data/mockNotices';
 
-// Single integration point for the notices backend. When VITE_API_BASE_URL is
-// set, these functions hit the public notices API and adapt each record to the
-// shape the components consume. With no API configured (or on any network
-// error) they fall back to the bundled mock data so the UI still renders.
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Single integration point for the notices backend. These functions hit the
+// public notices API through apiClient and adapt each record to the shape the
+// components consume. On any network error they fall back to the bundled mock
+// data so the UI still renders.
 
 const MONTHS = [
   'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
@@ -36,13 +35,9 @@ function adaptNotice(dto) {
   };
 }
 
-async function fetchJson(path) {
-  const res = await fetch(`${BASE_URL}${path}`);
-  const body = await res.json();
-  if (!res.ok || !body?.success) {
-    throw new Error(body?.message ?? `Request failed: ${path}`);
-  }
-  return body.data;
+async function fetchData(path) {
+  const body = await apiClient.get(path);
+  return body?.data;
 }
 
 // Applies the same search/tag rules the backend uses, for the mock fallback.
@@ -58,15 +53,12 @@ function matchesFilters(notice, search, tag) {
 export async function getNotices(params = {}) {
   const search = params.search?.trim() ?? '';
   const tag = params.tag?.trim() ?? '';
-  if (!BASE_URL) {
-    return sortByNewest(mockNotices.filter((n) => matchesFilters(n, search, tag)));
-  }
   try {
     const query = new URLSearchParams();
     if (search) query.set('search', search);
     if (tag) query.set('tag', tag);
     const qs = query.toString();
-    const data = await fetchJson(`/notices${qs ? `?${qs}` : ''}`);
+    const data = await fetchData(`/notices${qs ? `?${qs}` : ''}`);
     return sortByNewest((data ?? []).map(adaptNotice));
   } catch {
     return sortByNewest(mockNotices.filter((n) => matchesFilters(n, search, tag)));
@@ -74,11 +66,8 @@ export async function getNotices(params = {}) {
 }
 
 export async function getNoticeById(id) {
-  if (!BASE_URL) {
-    return mockNotices.find((n) => String(n.id) === String(id)) ?? null;
-  }
   try {
-    const data = await fetchJson(`/notices/${id}`);
+    const data = await fetchData(`/notices/${id}`);
     return data ? adaptNotice(data) : null;
   } catch {
     return mockNotices.find((n) => String(n.id) === String(id)) ?? null;
@@ -86,13 +75,11 @@ export async function getNoticeById(id) {
 }
 
 export async function getFeaturedNotice() {
-  if (BASE_URL) {
-    try {
-      const data = await fetchJson('/notices/featured');
-      if (data) return adaptNotice(data);
-    } catch {
-      // fall through to mock data below
-    }
+  try {
+    const data = await fetchData('/notices/featured');
+    if (data) return adaptNotice(data);
+  } catch {
+    // fall through to mock data below
   }
   const featured = mockNotices.find((n) => n.featured);
   if (featured) return featured;

@@ -3,25 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { X, ArrowRight } from 'lucide-react';
 import { getFeaturedNotice } from '../services/noticesService';
 
-const DISMISS_KEY = 'dismissedNotice';
-
 export default function NoticePopup() {
   const [notice, setNotice] = useState(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const closeButtonRef = useRef(null);
 
-  const dismiss = () => {
-    if (notice) localStorage.setItem(DISMISS_KEY, String(notice.id));
-  };
-
   const handleClose = () => {
-    dismiss();
     setOpen(false);
   };
 
   const handleRead = () => {
-    dismiss();
     setOpen(false);
     navigate(`/notices/${notice.id}`);
   };
@@ -30,8 +22,6 @@ export default function NoticePopup() {
     let active = true;
     getFeaturedNotice().then((featured) => {
       if (!active || !featured) return;
-      const dismissed = localStorage.getItem(DISMISS_KEY);
-      if (String(dismissed) === String(featured.id)) return;
       setNotice(featured);
       setOpen(true);
     });
@@ -44,7 +34,6 @@ export default function NoticePopup() {
     if (!open) return;
     const onKey = (e) => {
       if (e.key !== 'Escape') return;
-      if (notice) localStorage.setItem(DISMISS_KEY, String(notice.id));
       setOpen(false);
     };
     window.addEventListener('keydown', onKey);
