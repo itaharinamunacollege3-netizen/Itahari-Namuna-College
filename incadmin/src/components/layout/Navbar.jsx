@@ -208,11 +208,19 @@ export function Navbar() {
         <div className="hidden h-8 w-px bg-[var(--sidebar-border)] md:block" />
 
         <div className="hidden items-center gap-3 md:flex">
-          <div className="avatar placeholder">
-            <div className="w-10 rounded-full bg-[var(--color-brand-primary)] text-white">
-              <span className="text-sm">{user?.name?.charAt(0) ?? "A"}</span>
+          {user?.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user?.name ?? "Administrator"}
+              className="h-10 w-10 rounded-full border border-[var(--sidebar-border)] object-cover"
+            />
+          ) : (
+            <div className="avatar placeholder">
+              <div className="w-10 rounded-full bg-[var(--color-brand-primary)] text-white">
+                <span className="text-sm">{user?.name?.charAt(0) ?? "A"}</span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="hidden text-left lg:block">
             <p className="text-sm font-semibold leading-tight text-[var(--color-brand-dark)]">
               {user?.name ?? "Administrator"}

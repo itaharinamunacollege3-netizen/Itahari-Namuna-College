@@ -11,6 +11,8 @@ import {
   fetchMe,
   loginRequest,
   logoutRequest,
+  updateProfileRequest,
+  uploadAvatarRequest,
 } from "@/services/auth.service";
 
 const AuthContext = createContext(null);
@@ -44,6 +46,24 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const refreshMe = useCallback(async () => {
+    const me = await fetchMe();
+    setUser(me);
+    return me;
+  }, []);
+
+  const updateProfile = useCallback(async (payload) => {
+    const updated = await updateProfileRequest(payload);
+    setUser(updated);
+    return updated;
+  }, []);
+
+  const uploadAvatar = useCallback(async (file) => {
+    const updated = await uploadAvatarRequest(file);
+    setUser(updated);
+    return updated;
+  }, []);
+
   const completeBoot = useCallback(() => setIsBootLoading(false), []);
 
   const value = useMemo(
@@ -54,9 +74,22 @@ export function AuthProvider({ children }) {
       isInitializing,
       login,
       logout,
+      refreshMe,
+      updateProfile,
+      uploadAvatar,
       completeBoot,
     }),
-    [user, isBootLoading, isInitializing, login, logout, completeBoot]
+    [
+      user,
+      isBootLoading,
+      isInitializing,
+      login,
+      logout,
+      refreshMe,
+      updateProfile,
+      uploadAvatar,
+      completeBoot,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -143,9 +143,12 @@ const ProgramDetailPage = () => {
               <p className="text-sm text-stone-500 leading-relaxed">
                 Enrollment pathways are active under TU guidelines. Apply now to secure your seat.
               </p>
-              <button className="w-full bg-[#006A38] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#00522b] transition-colors shadow-sm">
+              <Link
+                to={`/admissions?program=${id}`}
+                className="block text-center w-full bg-[#006A38] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#00522b] transition-colors shadow-sm"
+              >
                 Apply For Admission
-              </button>
+              </Link>
             </div>
 
             {/* Quick facts */}

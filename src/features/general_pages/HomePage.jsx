@@ -60,40 +60,44 @@ export default function HomePage() {
     };
   }, []);
 
+
   // 1. Separate the Marquee logic into its own useEffect
+  // Change your marquee useEffect dependency array
+  // changed the marquee useEffect to check if the notices are loaded in the DOM then only run the animation. 
+  // so added a delay 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 2500); // Swipes every 2.5 seconds
-    return () => clearInterval(timer);
-  }, [carouselImages.length]);
+    // Only run if there are notices
+    if (notices.length === 0) return;
 
-  useEffect(() => {
     const marqueeTrack = marqueeRef.current;
-    if (!marqueeTrack || notices.length === 0) return;
+    if (!marqueeTrack) return;
 
-    const trackWidth = marqueeTrack.scrollWidth / 2;
+    // Small delay to ensure the DOM has rendered the new content
+    const timeout = setTimeout(() => {
+      const trackWidth = marqueeTrack.scrollWidth / 2;
 
-    const tickerAnimation = gsap.to(marqueeTrack, {
-      x: -trackWidth,
-      duration: 30,
-      ease: "none",
-      repeat: -1,
-    });
+      const tickerAnimation = gsap.to(marqueeTrack, {
+        x: -trackWidth,
+        duration: 30,
+        ease: "none",
+        repeat: -1,
+      });
 
-    // UX Touch: Pause notice crawl when a user hovers mouse over it to easily read it
-    const handleMouseEnter = () => tickerAnimation.pause();
-    const handleMouseLeave = () => tickerAnimation.play();
+      const handleMouseEnter = () => tickerAnimation.pause();
+      const handleMouseLeave = () => tickerAnimation.play();
 
-    marqueeTrack.addEventListener("mouseenter", handleMouseEnter);
-    marqueeTrack.addEventListener("mouseleave", handleMouseLeave);
+      marqueeTrack.addEventListener("mouseenter", handleMouseEnter);
+      marqueeTrack.addEventListener("mouseleave", handleMouseLeave);
 
-    return () => {
-      tickerAnimation.kill();
-      marqueeTrack.removeEventListener("mouseenter", handleMouseEnter);
-      marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []); // Empty dependency array ensures this runs once
+      return () => {
+        tickerAnimation.kill();
+        marqueeTrack.removeEventListener("mouseenter", handleMouseEnter);
+        marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
+      };
+    }, 100); // 100ms delay to allow DOM paint
+
+    return () => clearTimeout(timeout);
+  }, [notices]); // <--- Added 'notices' here
 
   // 2. Keep the Carousel timer in a separate useEffect
   useEffect(() => {
@@ -109,7 +113,7 @@ export default function HomePage() {
       {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
       {/* ========================================================================= */}
       <AnimatedSection>
-        <section className="relative w-full h-[82vh] min-h-137.5 flex items-center justify-center bg-brand-dark overflow-hidden">
+        <section className="relative w-full h-[calc(100vh-64px-41.6px)] min-h-137.5 flex items-center justify-center bg-brand-dark overflow-hidden">
           {/* 1. College Background Image Media Layer */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <AnimatePresence> {/* Removed mode='wait' */}
@@ -161,7 +165,7 @@ export default function HomePage() {
                 Explore Academics
               </Link>
               <Link
-                to="/contact"
+                to="/admissions"
                 className="w-full sm:w-auto bg-brand-white/10 backdrop-blur-xs text-brand-white border border-brand-white/30 font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-white/20 hover:scale-103 active:scale-97 transition-all duration-300 text-center"
               >
                 Admissions

@@ -1,49 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AnimatedSection from "../../animations/AnimatedSection";
-import { staffData } from "../../common/aboutComponent/staffData"; // Adjust path as needed
+import { getStaffPublic } from "../../common/aboutComponent/services/staffService"; // Ensure this service is created
 
 const StaffTab = () => {
-  const [activeCategory, setActiveCategory] = useState("admin");
+  const [staffData, setStaffData] = useState({});
+  const [activeCategory, setActiveCategory] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // Define categories for the filter row
-  const categories = [
-    { id: "admin", label: "Administration" },
-    { id: "bus", label: "Bus Staff" },
-    { id: "canteen", label: "Canteen" },
-    { id: "security", label: "Security" },
-  ];
+  useEffect(() => {
+    getStaffPublic().then((data) => {
+      setStaffData(data || {});
+      const keys = Object.keys(data || {});
+      if (keys.length > 0) setActiveCategory(keys[0]);
+      setLoading(false);
+    });
+  }, []);
+
+  const currentStaff = staffData[activeCategory] || [];
+
+  if (loading) return <div className="text-center py-10">Loading Staff...</div>;
+
+  if (Object.keys(staffData).length === 0) {
+    return <div className="text-center py-20 text-stone-500">No staff data available.</div>;
+  }
 
   return (
     <AnimatedSection>
       <div className="w-full space-y-8 relative z-10">
         {/* SUB-CATEGORY FILTER ROW */}
         <div className="flex items-center flex-wrap pb-2 gap-2 scrollbar-hide">
-          {categories.map((cat) => (
+          {Object.keys(staffData).map((categoryName) => (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2  cursor-pointer rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap border ${
-                activeCategory === cat.id
+              key={categoryName}
+              onClick={() => setActiveCategory(categoryName)}
+              className={`px-5 py-2 cursor-pointer rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap border ${
+                activeCategory === categoryName
                   ? "bg-[#006A38] text-white border-[#006A38]"
                   : "bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200"
               }`}
             >
-              {cat.label}
+              {categoryName}
             </button>
           ))}
         </div>
 
         {/* STAFF GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {staffData[activeCategory].map((staff, idx) => (
+          {currentStaff.map((staff) => (
             <div
-              key={idx}
+              key={staff.id}
               className="group relative bg-white border border-stone-200 rounded-2xl p-5 flex flex-col items-center justify-between shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="w-full flex flex-col items-center">
                 <div className="w-24 h-24 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200/50 mb-4 flex items-center justify-center">
-                  <img loading="lazy" decoding="async"
-                    src={staff.image}
+                  <img
+                    loading="lazy"
+                    decoding="async"
+                    src={staff.photo ? `${import.meta.env.VITE_API_BASE_URL}/${staff.photo}` : "/placeholder.png"}
                     alt={staff.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

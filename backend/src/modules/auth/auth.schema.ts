@@ -19,3 +19,8 @@ export const changePasswordSchema = z.object({
 export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1).optional(),
 });
+
+export const updateProfileSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email(),
+});

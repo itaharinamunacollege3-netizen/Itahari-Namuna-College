@@ -78,7 +78,7 @@ export async function listFacultyAdmin(params: {
   };
 }
 
-export async function getFacultyById(id: number, publishedOnly = true) {
+export async function getFacultyById(id: number, publishedOnly = true) { 
   const faculty = await prisma.faculty.findFirst({
     where: { id, ...(publishedOnly ? { published: true } : {}) },
     include: FACULTY_INCLUDE,

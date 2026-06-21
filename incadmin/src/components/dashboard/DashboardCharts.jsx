@@ -59,71 +59,82 @@ export function AdmissionStatusPie({ data, isDark }) {
   );
 }
 
-export function ContentDistributionPie({ data, isDark }) {
+export function ProgramsDistributionBar({ data, isDark }) {
   const theme = getChartTheme(isDark);
-  const entries = Object.entries(data).filter(([, value]) => value > 0);
-  const labels = entries.map(([key]) => key);
-  const series = entries.map(([, value]) => value);
-  const total = series.reduce((sum, n) => sum + n, 0);
+  const categories = data?.categories ?? [];
+  const series = data?.series ?? [];
 
-  if (total === 0) {
+  if (!series.length || series.every((value) => value === 0)) {
     return (
       <p className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">
-        No content published yet
+        No program distribution yet
       </p>
     );
   }
 
   return (
     <Chart
-      type="pie"
+      type="bar"
       height={280}
-      series={series}
+      series={[{ name: "Applications", data: series }]}
       options={{
-        labels,
-        colors: CHART_COLORS,
+        colors: ["#3BA4D8"],
         chart: { background: "transparent", fontFamily: "Inter, sans-serif" },
-        legend: {
-          position: "bottom",
-          labels: { colors: theme.legendColor },
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            columnWidth: "60%",
+          },
         },
-        dataLabels: {
-          enabled: true,
-          formatter: (val) => `${Math.round(val)}%`,
-          style: { fontSize: "11px", fontWeight: 600 },
+        dataLabels: { enabled: false },
+        xaxis: {
+          categories,
+          labels: { style: { colors: theme.foreColor } },
+          axisBorder: { show: false },
+          axisTicks: { show: false },
         },
-        stroke: { width: 2, colors: isDark ? ["#1a2332"] : ["#ffffff"] },
+        yaxis: {
+          labels: { style: { colors: theme.foreColor } },
+          min: 0,
+        },
+        grid: {
+          borderColor: theme.gridColor,
+          strokeDashArray: 4,
+        },
         tooltip: { theme: theme.tooltipTheme },
       }}
     />
   );
 }
 
-export function AdmissionsBarChart({ data, isDark }) {
+export function AdmissionsLineChart({ data, isDark }) {
   const theme = getChartTheme(isDark);
-  const max = Math.max(...data.series, 1);
+  const max = Math.max(...(data?.series ?? [1]), 1);
 
   return (
     <Chart
-      type="bar"
+      type="line"
       height={280}
-      series={[{ name: "Applications", data: data.series }]}
+      series={[{ name: "Applications", data: data?.series ?? [] }]}
       options={{
         chart: {
           background: "transparent",
           fontFamily: "Inter, sans-serif",
           toolbar: { show: false },
         },
-        colors: ["#045d30"],
-        plotOptions: {
-          bar: {
-            borderRadius: 8,
-            columnWidth: "48%",
-          },
+        colors: ["#05692E"],
+        stroke: {
+          curve: "smooth",
+          width: 3,
         },
-        dataLabels: { enabled: false },
+        markers: {
+          size: 4,
+          strokeWidth: 0,
+          hover: { size: 5 },
+        },
+        dataLabels: { enabled: false },        
         xaxis: {
-          categories: data.categories,
+          categories: data?.categories ?? [],
           labels: { style: { colors: theme.foreColor } },
           axisBorder: { show: false },
           axisTicks: { show: false },
@@ -138,7 +149,60 @@ export function AdmissionsBarChart({ data, isDark }) {
           borderColor: theme.gridColor,
           strokeDashArray: 4,
           yaxis: { lines: { show: true } },
-          xaxis: { lines: { show: false } },
+          xaxis: { lines: { show: true } },
+        },
+        tooltip: { theme: theme.tooltipTheme },
+      }}
+    />
+  );
+}
+
+export function ContactTrendsArea({ data, isDark }) {
+  const theme = getChartTheme(isDark);
+  const max = Math.max(...(data?.series ?? [1]), 1);
+
+  return (
+    <Chart
+      type="area"
+      height={280}
+      series={[{ name: "Contacts", data: data?.series ?? [] }]}
+      options={{
+        chart: {
+          background: "transparent",
+          fontFamily: "Inter, sans-serif",
+          toolbar: { show: false },
+        },
+        colors: ["#F97316"],
+        stroke: {
+          curve: "smooth",
+          width: 2.5,
+        },
+        markers: { size: 0 },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.3,
+            opacityTo: 0.05,
+            stops: [0, 100],
+          },
+        },
+        dataLabels: { enabled: false },
+        xaxis: {
+          categories: data?.categories ?? [],
+          labels: { style: { colors: theme.foreColor } },
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+        },
+        yaxis: {
+          min: 0,
+          max: max < 5 ? 5 : undefined,
+          tickAmount: 4,
+          labels: { style: { colors: theme.foreColor } },
+        },
+        grid: {
+          borderColor: theme.gridColor,
+          strokeDashArray: 4,
         },
         tooltip: { theme: theme.tooltipTheme },
       }}
