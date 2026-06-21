@@ -8,20 +8,22 @@ const FacultyStaff = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getFacultyPublic().then((data) => {
-            setFacultyData(data);
-            const keys = Object.keys(data || {});
-            if (keys.length > 0) setActiveFaculty(keys[0]);
-            setLoading(false);
-        }).catch(err => {
-            console.error("Error fetching faculty:", err);
-            setLoading(false);
-        });
+        getFacultyPublic()
+            .then((data) => {
+                setFacultyData(data || {});
+                const keys = Object.keys(data || {});
+                if (keys.length > 0) setActiveFaculty(keys[0]);
+            })
+            .catch((err) => {
+                console.error("Error fetching faculty:", err);
+                setFacultyData({});
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     }, []);
 
     const data = facultyData[activeFaculty] || [];
-    console.log(data)
-    
 
     if (loading) return <div className="text-center py-10">Loading Faculty...</div>;
 
@@ -44,7 +46,7 @@ const FacultyStaff = () => {
                                 : "bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200"
                                 }`}
                         >
-                            {key} Faculty
+                            {String(key).replace(/[-_]+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())} Faculty
                         </button>
                     ))}
                 </div>
@@ -52,13 +54,13 @@ const FacultyStaff = () => {
                 {/* UNIFORM GRID */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {data.map((m, i) => (
-                        <div key={i} className="group relative bg-white border border-stone-200 rounded-2xl p-5 flex flex-col items-center justify-between shadow-sm hover:shadow-md transition-all duration-300">
+                        <div key={m.id ?? i} className="group relative bg-white border border-stone-200 rounded-2xl p-5 flex flex-col items-center justify-between shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="w-full flex flex-col items-center">
                                 <div className="w-24 h-24 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200/50 mb-4 flex items-center justify-center">
                                     <img
                                         loading="lazy"
                                         decoding="async"
-                                        src={m.image ? `${import.meta.env.VITE_API_URL}${m.image}` : "/placeholder.png"}
+                                        src={m.image || "/placeholder.png"}
                                         alt={m.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
