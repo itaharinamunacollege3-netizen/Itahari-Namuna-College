@@ -1,13 +1,12 @@
 // src/features/notices/components/NoticeFilterTabs.jsx
 import { Search } from 'lucide-react';
 
-const categories = ["All", "TU Exams", "Admissions", "Holidays"];
-
-export default function NoticeFilterTabs({ 
-  searchTerm, 
-  setSearchTerm, 
-  activeCategory, 
-  setActiveCategory 
+export default function NoticeFilterTabs({
+  categories = ['All'],
+  searchTerm,
+  setSearchTerm,
+  activeCategory,
+  setActiveCategory
 }) {
   return (
     <div className="space-y-4 mb-6">

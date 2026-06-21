@@ -1,39 +1,47 @@
-import { useState, useEffect } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import NoticeRowCard from '../components/NoticeRowCard';
 import NoticeDetailView from '../components/NoticeDetailView';
 import AnimatedSection from '../../../components/animations/AnimatedSection';
 import NoticeFilterTabs from '../components/NoticeFilterTabs';
 import PageBanner from '../../../components/common/PageBanner';
-import { getNotices } from '../services/noticesService';
 
 export default function NoticeBoardPage() {
-  const initialNotices = useLoaderData();
-  const [notices, setNotices] = useState(initialNotices);
+  const allNotices = useLoaderData();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
-  const [selectedId, setSelectedId] = useState(initialNotices[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState(allNotices[0]?.id ?? null);
 
-  // Fetch filtered notices from the backend whenever the search or category
-  // changes. Search is debounced so we don't fire a request per keystroke.
-  useEffect(() => {
-    let active = true;
-    const handler = setTimeout(() => {
-      getNotices({
-        search: searchTerm,
-        tag: activeCategory === 'All' ? '' : activeCategory,
-      }).then((data) => {
-        if (active) setNotices(data);
-      });
-    }, 300);
-    return () => {
-      active = false;
-      clearTimeout(handler);
-    };
-  }, [searchTerm, activeCategory]);
+  const categories = useMemo(() => {
+    const set = new Set();
+    allNotices.forEach((n) => {
+      if (n.category) set.add(n.category);
+    });
+    return ['All', ...set];
+  }, [allNotices]);
+
+  const notices = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    return allNotices.filter((notice) => {
+      const matchesCategory = activeCategory === 'All' || notice.category === activeCategory;
+      const haystack = [notice.title, notice.description, notice.author]
+        .map((field) => String(field ?? '').toLowerCase());
+      const matchesSearch = !query || haystack.some((field) => field.includes(query));
+      return matchesCategory && matchesSearch;
+    });
+  }, [allNotices, searchTerm, activeCategory]);
 
   const selectedNotice =
     notices.find((n) => n.id === selectedId) ?? notices[0] ?? null;
+
+  const handleSelect = (id) => {
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      setSelectedId(id);
+    } else {
+      navigate(`/notices/${id}`);
+    }
+  };
 
   return (
     <div className="w-full bg-stone-50 min-h-screen pb-20">
@@ -43,6 +51,7 @@ export default function NoticeBoardPage() {
           <h2 className="text-2xl font-heading font-bold text-brand-dark mb-4">Notices</h2>
 
           <NoticeFilterTabs
+            categories={categories}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             activeCategory={activeCategory}
@@ -55,7 +64,7 @@ export default function NoticeBoardPage() {
                 <NoticeRowCard
                   key={notice.id}
                   data={notice}
-                  onClick={() => setSelectedId(notice.id)}
+                  onClick={() => handleSelect(notice.id)}
                   isActive={selectedNotice?.id === notice.id}
                 />
               ))
@@ -65,7 +74,7 @@ export default function NoticeBoardPage() {
           </AnimatedSection>
         </div>
 
-        <div className="lg:w-2/3">
+        <div className="lg:w-2/3 hidden lg:block">
           <AnimatedSection>
             <NoticeDetailView notice={selectedNotice} />
           </AnimatedSection>
