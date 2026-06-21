@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bell, CheckCheck, LogOut, Moon, Search, Sun } from "lucide-react";
+import { Bell, LogOut, Menu, Moon, Search, Sun } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -55,7 +55,7 @@ function NotificationItem({ notification, onMarkRead }) {
   );
 }
 
-export function Navbar() {
+export function Navbar({ onMenuClick }) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { pathname } = useLocation();
@@ -99,6 +99,15 @@ export function Navbar() {
   return (
     <header className="admin-navbar shrink-0">
       <div className="flex min-w-0 flex-1 items-center gap-5">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="admin-icon-btn lg:hidden"
+          aria-label="Toggle sidebar menu"
+        >
+          <Menu className="h-[18px] w-[18px]" />
+        </button>
+
         <nav className="hidden shrink-0 items-center gap-2 text-sm sm:flex">
           <Link to="/dashboard" className="text-[var(--text-muted)] transition-colors hover:text-[var(--color-brand-dark)]">
             Home
@@ -107,7 +116,7 @@ export function Navbar() {
           <span className="font-semibold text-[var(--color-brand-dark)]">{pageLabel}</span>
         </nav>
 
-        <label className="relative min-w-0 flex-1 max-w-xl">
+        <label className="relative hidden min-w-0 flex-1 max-w-xl sm:block">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             type="search"
@@ -118,7 +127,7 @@ export function Navbar() {
         </label>
       </div>
 
-      <div className="flex shrink-0 items-center gap-3 md:gap-4">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
         <p className="hidden text-sm text-[var(--text-muted)] xl:block">{formatToday()}</p>
 
         <button

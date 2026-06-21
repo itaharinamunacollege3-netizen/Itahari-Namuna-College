@@ -8,40 +8,53 @@ import { cn } from "@/utils/cn";
 
 const STORAGE_KEY = "inc_admin_sidebar_collapsed";
 
-export function Sidebar() {
+export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
   const { logout } = useAuth();
   const [collapsed, setCollapsed] = useState(() => {
     return localStorage.getItem(STORAGE_KEY) === "true";
   });
+  const effectiveCollapsed = collapsed && !mobileOpen;
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, String(collapsed));
   }, [collapsed]);
 
   return (
-    <aside
-      className={cn(
-        "admin-sidebar sticky top-0 flex h-screen shrink-0 flex-col self-start border-r border-[var(--sidebar-border)] transition-[width] duration-300 ease-in-out",
-        collapsed ? "w-[76px]" : "w-[260px]"
-      )}
-    >
+    <>
+      <button
+        type="button"
+        className={cn(
+          "fixed inset-0 z-40 bg-black/45 transition-opacity lg:hidden",
+          mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        )}
+        onClick={onMobileClose}
+        aria-label="Close sidebar"
+      />
+
+      <aside
+        className={cn(
+          "admin-sidebar fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col border-r border-[var(--sidebar-border)] transition-all duration-300 ease-in-out lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shrink-0 lg:self-start",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          effectiveCollapsed ? "lg:w-[76px]" : "lg:w-[260px]"
+        )}
+      >
       <div
         className={cn(
           "flex shrink-0 items-center border-b border-[var(--sidebar-border)] py-5",
-          collapsed ? "justify-center px-2" : "justify-between px-4"
+          effectiveCollapsed ? "justify-center px-2" : "justify-between px-4"
         )}
       >
-        {collapsed ? (
+        {effectiveCollapsed ? (
           <LogoMark size="md" />
         ) : (
           <Logo size="md" compact showText />
         )}
 
-        {!collapsed ? (
+        {!effectiveCollapsed ? (
           <button
             type="button"
             onClick={() => setCollapsed(true)}
-            className="btn btn-ghost btn-xs btn-circle shrink-0 text-[var(--text-muted)] hover:text-[var(--color-brand-dark)]"
+            className="btn btn-ghost btn-xs btn-circle hidden shrink-0 text-[var(--text-muted)] hover:text-[var(--color-brand-dark)] lg:inline-flex"
             aria-label="Collapse sidebar"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -49,12 +62,12 @@ export function Sidebar() {
         ) : null}
       </div>
 
-      {collapsed ? (
+      {effectiveCollapsed ? (
         <div className="flex justify-center border-b border-[var(--sidebar-border)] py-2">
           <button
             type="button"
             onClick={() => setCollapsed(false)}
-            className="btn btn-ghost btn-xs btn-circle text-[var(--text-muted)] hover:text-[var(--color-brand-dark)]"
+            className="btn btn-ghost btn-xs btn-circle hidden text-[var(--text-muted)] hover:text-[var(--color-brand-dark)] lg:inline-flex"
             aria-label="Expand sidebar"
           >
             <ChevronRight className="h-4 w-4" />
@@ -65,7 +78,7 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-5">
         {NAV_SECTIONS.map((section) => (
           <div key={section.title} className="mb-5">
-            {!collapsed ? (
+            {!effectiveCollapsed ? (
               <p className="mb-2 px-3 text-[11px] font-semibold tracking-[0.12em] text-[var(--sidebar-section)]">
                 {section.title}
               </p>
@@ -75,11 +88,14 @@ export function Sidebar() {
                 <li key={path}>
                   <NavLink
                     to={path}
-                    title={collapsed ? label : undefined}
+                    title={effectiveCollapsed ? label : undefined}
+                    onClick={() => {
+                      if (mobileOpen) onMobileClose();
+                    }}
                     className={({ isActive }) =>
                       cn(
                         "flex items-center rounded-xl text-[15px] font-medium transition-all duration-150",
-                        collapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5",
+                        effectiveCollapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5",
                         isActive
                           ? "bg-[var(--color-brand-primary)] text-white shadow-sm"
                           : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)]"
@@ -87,7 +103,7 @@ export function Sidebar() {
                     }
                   >
                     <Icon className="h-[18px] w-[18px] shrink-0 stroke-[1.75]" />
-                    {!collapsed ? label : null}
+                    {!effectiveCollapsed ? label : null}
                   </NavLink>
                 </li>
               ))}
@@ -99,17 +115,21 @@ export function Sidebar() {
       <div className="border-t border-[var(--sidebar-border)] px-3 py-4">
         <button
           type="button"
-          onClick={() => void logout()}
-          title={collapsed ? LOGOUT_ITEM.label : undefined}
+          onClick={() => {
+            if (mobileOpen) onMobileClose();
+            void logout();
+          }}
+          title={effectiveCollapsed ? LOGOUT_ITEM.label : undefined}
           className={cn(
             "flex w-full items-center rounded-xl text-[15px] font-medium text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30",
-            collapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5"
+            effectiveCollapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5"
           )}
         >
           <LOGOUT_ITEM.icon className="h-[18px] w-[18px] shrink-0 stroke-[1.75]" />
-          {!collapsed ? LOGOUT_ITEM.label : null}
+          {!effectiveCollapsed ? LOGOUT_ITEM.label : null}
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
