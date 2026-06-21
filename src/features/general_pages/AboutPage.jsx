@@ -9,8 +9,8 @@ const AboutPage = () => {
   const [activeTab, setActiveTab] = useState("leadership");
 
   // Array of options to cleanly map out the tabs and handle shifting positioning
-  const tabsConfig = [
-    { id: "leadership", label: "Leadership & Governance" },
+  const tabsConfig = [  
+    { id: "leadership", label: "Leadership" },
     { id: "vision", label: "Vision & Mission" },
     { id: "facultyStaff", label: "Faculty Staff" },
     { id: "staff", label: "Administrative Staff" },
@@ -41,7 +41,7 @@ const AboutPage = () => {
               <div
                 className="absolute top-0 bottom-0 bg-white shadow-md shadow-stone-300/60 rounded-xl transition-all duration-300 ease-out pointer-events-none hidden sm:block"
                 style={{
-                  width: `calc(25% - 0.375rem)`,
+                  width: `calc(25%)`,
                   transform: `translateX(${getActiveIndex() * 100}%)`,
                 }}
               />

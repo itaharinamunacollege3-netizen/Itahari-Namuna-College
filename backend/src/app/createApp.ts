@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, RequestHandler } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";

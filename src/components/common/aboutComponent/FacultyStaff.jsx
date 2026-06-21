@@ -20,6 +20,8 @@ const FacultyStaff = () => {
     }, []);
 
     const data = facultyData[activeFaculty] || [];
+    console.log(data)
+    
 
     if (loading) return <div className="text-center py-10">Loading Faculty...</div>;
 
@@ -56,14 +58,14 @@ const FacultyStaff = () => {
                                     <img
                                         loading="lazy"
                                         decoding="async"
-                                        src={m.photo ? `${import.meta.env.VITE_API_BASE_URL}/${m.photo}` : "/placeholder.png"}
+                                        src={m.image ? `${import.meta.env.VITE_API_URL}${m.image}` : "/placeholder.png"}
                                         alt={m.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                 </div>
                                 <div className="text-center px-1">
                                     <h4 className="font-bold text-stone-800 text-sm leading-snug">{m.name}</h4>
-                                    <p className="text-xs font-medium text-[#006A38] uppercase mt-1">{m.designation}</p>
+                                    <p className="text-xs font-medium text-[#006A38] uppercase mt-1">{m.role}</p>
                                 </div>
                             </div>
                         </div>

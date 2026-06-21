@@ -10,16 +10,14 @@ export function AdminLayout() {
   const { pathname } = useLocation();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  if (isBootLoading) {
-    return <DashboardLoader />;
-  }
-
   useEffect(() => {
+    if (isBootLoading) return;
     setMobileSidebarOpen(false);
-  }, [pathname]);
+  }, [isBootLoading, pathname]);
+
 
   return (
-    <div className="admin-shell flex h-screen overflow-hidden bg-[var(--color-bg)] text-[var(--color-brand-dark)]">
+    <div className="admin-shell flex h-screen overflow-hidden bg-(--color-bg) text-(--color-brand-dark)">
       <Sidebar
         mobileOpen={mobileSidebarOpen}
         onMobileClose={() => setMobileSidebarOpen(false)}
