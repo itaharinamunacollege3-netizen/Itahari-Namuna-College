@@ -1,6 +1,7 @@
 import type {
   AdmissionApplication,
   ContactInquiry,
+  NotificationType,
   Prisma,
 } from "../../generated/prisma/client";
 import { prisma } from "../../config/prisma";
@@ -30,7 +31,13 @@ async function getActiveAdminIds(): Promise<number[]> {
 
 export async function getUnreadCount(userId: number): Promise<number> {
   return prisma.notification.count({
-    where: { userId, isRead: false },
+    where: {
+      userId,
+      isRead: false,
+      type: {
+        in: ["ADMISSION_NEW", "CONTACT_NEW"] as NotificationType[],
+      },
+    },
   });
 }
 
@@ -43,7 +50,13 @@ export async function getUnreadBreakdown(userId: number): Promise<{
     getUnreadCount(userId),
     prisma.notification.groupBy({
       by: ["type"],
-      where: { userId, isRead: false },
+      where: {
+        userId,
+        isRead: false,
+        type: {
+          in: ["ADMISSION_NEW", "CONTACT_NEW"] as NotificationType[],
+        },
+      },
       _count: { _all: true },
     }),
   ]);
@@ -53,7 +66,7 @@ export async function getUnreadBreakdown(userId: number): Promise<{
 
   for (const row of grouped) {
     const count = row._count._all;
-    if (row.type === "ADMISSION_NEW" || row.type === "ADMISSION_STATUS") {
+    if (row.type === "ADMISSION_NEW") {
       admissions += count;
     } else if (row.type === "CONTACT_NEW") {
       contacts += count;
@@ -155,7 +168,14 @@ export async function listNotifications(userId: number, params: ListNotification
   const limit = params.limit ?? 20;
   const where = {
     userId,
-    ...(params.unreadOnly ? { isRead: false } : {}),
+    ...(params.unreadOnly
+      ? {
+          isRead: false,
+          type: {
+            in: ["ADMISSION_NEW", "CONTACT_NEW"] as NotificationType[],
+          },
+        }
+      : {}),
   };
 
   const [items, total, unreadCount] = await Promise.all([
