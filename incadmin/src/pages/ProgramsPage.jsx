@@ -419,7 +419,14 @@ export default function ProgramsPage() {
             <FormField label="Cover image">
               <input type="file" accept="image/*" className="file-input file-input-bordered w-full" onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] ?? null })} />
             </FormField>
-            {existingImage ? (
+            {form.cover ? (
+              <div className="flex items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-white/5">
+                <img src={URL.createObjectURL(form.cover)} alt="Preview" className="h-16 w-24 rounded object-cover" />
+                <button type="button" className="btn btn-xs btn-ghost text-rose-600" onClick={() => setForm({ ...form, cover: null })}>
+                  Clear upload
+                </button>
+              </div>
+            ) : existingImage ? (
               <div className="flex items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-white/5">
                 <img src={existingImage} alt="" className="h-16 w-24 rounded object-cover" />
                 <button type="button" className="btn btn-xs btn-ghost text-rose-600" onClick={handleRemoveCover}>

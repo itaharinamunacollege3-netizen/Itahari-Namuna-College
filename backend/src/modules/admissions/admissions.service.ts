@@ -25,6 +25,7 @@ import {
   notifyNewAdmission,
 } from "../notifications/notifications.service";
 import { z } from "zod";
+import { sendEmail } from "../../services/mail.service";
 
 const EDITABLE_STATUSES = new Set(["PENDING", "UNDER_REVIEW"]);
 
@@ -188,6 +189,35 @@ export async function updateAdmissionStatus(
   });
 
   dispatchNotification(() => notifyAdmissionStatusChange(application, existing.status));
+
+  if (adminNotes || existing.status !== application.status) {
+    let emailHtml = `
+      <div style="font-family: sans-serif; color: #333;">
+        <h2>Admission Status Update</h2>
+        <p>Dear ${application.fullName},</p>
+        <p>Your admission application status has been updated to: <strong>${application.status}</strong></p>
+    `;
+
+    if (adminNotes) {
+      emailHtml += `
+        <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #0056b3; background: #f9f9f9;">
+          <h3 style="margin-top: 0; color: #0056b3;">Message from Administration:</h3>
+          <p style="white-space: pre-wrap;">${adminNotes}</p>
+        </div>
+      `;
+    }
+
+    emailHtml += `
+        <p style="margin-top: 20px;">Thank you for applying to Itahari Namuna College.</p>
+      </div>
+    `;
+
+    sendEmail({
+      to: application.email,
+      subject: "Admission Update - Itahari Namuna College",
+      html: emailHtml,
+    }).catch(console.error);
+  }
 
   return formatAdmissionForApi(application);
 }
