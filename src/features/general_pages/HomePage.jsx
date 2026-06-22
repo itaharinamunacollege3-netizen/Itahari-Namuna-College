@@ -141,7 +141,7 @@ export default function HomePage() {
               <span className="text-brand-blue font-body font-semibold text-xs tracking-wide">
                 Admissions Open 2083/84
               </span>
-            </div> */}
+            </div> */}  
 
             {/* Core Master Punchlines (Inspired by typography hierarchy in image_3a8ca1.png) */}
             <h1 className="font-heading font-black text-5xl sm:text-7xl tracking-tighter uppercase leading-none">
