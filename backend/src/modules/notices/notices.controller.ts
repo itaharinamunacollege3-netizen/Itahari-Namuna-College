@@ -50,7 +50,7 @@ export async function getAdminById(req: Request, res: Response, next: NextFuncti
 
 export async function getFeatured(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await noticesService.getFeaturedNotice();
+    const data = await noticesService.getFeaturedNotices();
     sendSuccess(res, data);
   } catch (err) {
     next(err);

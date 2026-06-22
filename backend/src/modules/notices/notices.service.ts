@@ -50,16 +50,7 @@ function filterByTag<T extends { tags: unknown }>(items: T[], tag?: string) {
   });
 }
 
-/** Ensures at most one notice is featured at any time. */
-async function clearOtherFeatured(
-  tx: Pick<typeof prisma, "notice">,
-  noticeId: number
-) {
-  await tx.notice.updateMany({
-    where: { featured: true, id: { not: noticeId } },
-    data: { featured: false, showInPopup: false },
-  });
-}
+
 
 async function deleteNoticeAssets(notice: {
   attachmentCloudinaryId: string | null;
@@ -189,13 +180,13 @@ export async function getNoticeById(id: number, publishedOnly = true) {
   return formatNoticeForApi(notice);
 }
 
-export async function getFeaturedNotice() {
-  const featured = await prisma.notice.findFirst({
+export async function getFeaturedNotices() {
+  const featured = await prisma.notice.findMany({
     where: { published: true, featured: true },
     orderBy: [{ publishedDate: "desc" }, { id: "desc" }],
   });
 
-  if (featured) return formatNoticeForApi(featured);
+  if (featured.length > 0) return featured.map(formatNoticeForApi);
 
   const newest = await prisma.notice.findFirst({
     where: { published: true },
@@ -203,7 +194,7 @@ export async function getFeaturedNotice() {
   });
 
   if (!newest) throw new AppError(404, "No notices available");
-  return formatNoticeForApi(newest);
+  return [formatNoticeForApi(newest)];
 }
 
 export async function createNotice(data: NoticeWriteInput, files?: NoticeUploadFiles) {
@@ -218,10 +209,6 @@ export async function createNotice(data: NoticeWriteInput, files?: NoticeUploadF
     const created = await tx.notice.create({
       data: { ...dbData, slug },
     });
-
-    if (created.featured) {
-      await clearOtherFeatured(tx, created.id);
-    }
 
     return created;
   });
@@ -277,10 +264,6 @@ export async function updateNotice(
 
   const notice = await prisma.$transaction(async (tx) => {
     const updated = await tx.notice.update({ where: { id }, data: updateData });
-
-    if (data.featured === true) {
-      await clearOtherFeatured(tx, updated.id);
-    }
 
     return tx.notice.findUniqueOrThrow({ where: { id } });
   });

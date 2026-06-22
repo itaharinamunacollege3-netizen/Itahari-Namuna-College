@@ -69,6 +69,9 @@ export function NotificationProvider({ children }) {
   const decrementFromNotification = useCallback((notification) => {
     if (!notification || notification.isRead) return;
 
+    const isPublic = notification.type === "admission_new" || notification.type === "contact_new";
+    if (!isPublic) return;
+
     setUnreadCount((count) => Math.max(0, (count ?? 0) - 1));
     setUnreadBreakdown((prev) => {
       const next = {
@@ -77,7 +80,7 @@ export function NotificationProvider({ children }) {
         contacts: prev?.contacts ?? 0,
       };
 
-      if (notification.type === "admission_new" || notification.type === "admission_status") {
+      if (notification.type === "admission_new") {
         next.admissions = Math.max(0, next.admissions - 1);
       } else if (notification.type === "contact_new") {
         next.contacts = Math.max(0, next.contacts - 1);
@@ -141,21 +144,24 @@ export function NotificationProvider({ children }) {
     socket.on("disconnect", () => setConnected(false));
 
     socket.on(SOCKET_EVENTS.NEW, (notification) => {
-      setUnreadCount((c) => c + 1);
-      setUnreadBreakdown((prev) => {
-        const next = {
-          ...prev,
-          total: (prev.total ?? 0) + 1,
-        };
+      const isPublic = notification?.type === "admission_new" || notification?.type === "contact_new";
+      if (isPublic) {
+        setUnreadCount((c) => c + 1);
+        setUnreadBreakdown((prev) => {
+          const next = {
+            ...prev,
+            total: (prev.total ?? 0) + 1,
+          };
 
-        if (notification?.type === "admission_new" || notification?.type === "admission_status") {
-          next.admissions = (prev.admissions ?? 0) + 1;
-        } else if (notification?.type === "contact_new") {
-          next.contacts = (prev.contacts ?? 0) + 1;
-        }
+          if (notification?.type === "admission_new") {
+            next.admissions = (prev.admissions ?? 0) + 1;
+          } else if (notification?.type === "contact_new") {
+            next.contacts = (prev.contacts ?? 0) + 1;
+          }
 
-        return next;
-      });
+          return next;
+        });
+      }
       setRecent((prev) => [notification, ...prev].slice(0, 10));
     });
 

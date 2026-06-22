@@ -84,7 +84,6 @@ const emptyForm = {
   highlights: "",
   seats: "",
   isFeatured: true,
-  sortOrder: 0,
   published: true,
   cover: null,
 };
@@ -104,7 +103,6 @@ function toForm(program) {
     highlights: Array.isArray(program.highlights) ? program.highlights.join(", ") : "",
     seats: program.seats ?? "",
     isFeatured: program.isFeatured !== false,
-    sortOrder: program.sortOrder ?? 0,
     published: program.published !== false,
     cover: null,
   };
@@ -126,7 +124,6 @@ function toPayload(form, curriculum) {
     curriculum: curriculumToPayload(curriculum),
     seats: nullableNumber(form.seats),
     isFeatured: form.isFeatured,
-    sortOrder: Number(form.sortOrder) || 0,
     published: form.published,
   };
 }
@@ -431,14 +428,9 @@ export default function ProgramsPage() {
                 </button>
               </div>
             ) : null}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Sort order">
-                <FormInput type="number" min="0" value={form.sortOrder} onChange={(e) => setForm({ ...form, sortOrder: e.target.value })} />
-              </FormField>
-              <div className="flex flex-col justify-end gap-3 pb-1">
-                <FormCheckbox label="Featured on homepage" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} />
-                <FormCheckbox label="Published" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
-              </div>
+            <div className="flex flex-col gap-3 pb-1">
+              <FormCheckbox label="Featured on homepage" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} />
+              <FormCheckbox label="Published" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
             </div>
           </FormSection>
 
