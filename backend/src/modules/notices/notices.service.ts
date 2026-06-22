@@ -206,6 +206,13 @@ export async function createNotice(data: NoticeWriteInput, files?: NoticeUploadF
   const dbData = mapWriteInputToDb(data, attachmentFields);
 
   const notice = await prisma.$transaction(async (tx) => {
+    if (dbData.featured) {
+      await tx.notice.updateMany({
+        where: { featured: true },
+        data: { featured: false, showInPopup: false },
+      });
+    }
+
     const created = await tx.notice.create({
       data: { ...dbData, slug },
     });
@@ -263,6 +270,13 @@ export async function updateNotice(
   );
 
   const notice = await prisma.$transaction(async (tx) => {
+    if (updateData.featured) {
+      await tx.notice.updateMany({
+        where: { featured: true, id: { not: id } },
+        data: { featured: false, showInPopup: false },
+      });
+    }
+
     const updated = await tx.notice.update({ where: { id }, data: updateData });
 
     return tx.notice.findUniqueOrThrow({ where: { id } });
