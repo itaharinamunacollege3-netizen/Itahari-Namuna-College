@@ -59,7 +59,7 @@ const StaffTab = () => {
               className="group relative bg-white border border-stone-200 rounded-2xl p-5 flex flex-col items-center justify-between shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="w-full flex flex-col items-center">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200/50 mb-4 flex items-center justify-center">
+                <div className="w-52 h-52 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200/50 mb-4 flex items-center justify-center">
                   <img
                     loading="lazy"
                     decoding="async"

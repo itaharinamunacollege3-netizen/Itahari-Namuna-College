@@ -3,6 +3,14 @@ import { Link } from "react-router-dom";
 import MetricCard from "../../components/common/homeComponent/MetricCard";
 import gsap from "gsap";
 import { motion, AnimatePresence } from 'framer-motion';
+import inc from "../../assets/home hero section/incCollege.jpg"
+import pic1 from "../../assets/home hero section/bhm.png"
+import pic2 from "../../assets/home hero section/graduation.jpg"
+import pic3 from "../../assets/home hero section/group1.jpg"
+import pic4 from "../../assets/home hero section/group2.jpg"
+import pic5 from "../../assets/home hero section/hall4.jpg"
+import pic6 from "../../assets/home hero section/hall5.jpg"
+import pic7 from "../../assets/home hero section/hallgroup.png"
 import {
   Calendar,
   Award,
@@ -29,25 +37,14 @@ export default function HomePage() {
   const [index, setIndex] = useState(0);
   const [notices, setNotices] = useState([]);
   const carouselImages = [
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0013.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/05/431483808_795662615915204_394360178496327343_n.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0001.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDATC5mhy8ITyuVqM_tGYJlQSkZTug5mmpOu3xHpXDse8LTOWagfNgB9z8&s=10",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0001.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0046.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0035.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0008.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0023.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0032.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8Al9YKLxUiu56-gggo1i7bF0LXktwA0KIiaRvWJ6ycerUoTxGn3q47t8&s=10",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0032.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0036.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq2MjMjPa-QAKZstcozBLbq8rrVbMsKZcIkP7-mod2OQ&s",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0042.jpg",
-    "https://namunacollege.edu.np/wp-content/uploads/2024/06/IMG-20240503-WA0059.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR3WMqM_LwyPxCbZQFIAr8KFnJhVDKqax0ErLRsuuDZydnNgvHMRFnFQk&s=10",
+    inc,
+    pic1,
+    pic2,
+    pic3,
+    pic4,
+    pic5,
+    pic6,
+    pic7
   ];
 
   useEffect(() => {
