@@ -136,25 +136,26 @@ export default function HomePage() {
           {/* 2. Content Canvas: Deeply Centered Layout Shell */}
           <div className="relative z-10 max-w-4xl mx-auto px-6 flex flex-col items-center text-center space-y-6">
             {/* Top Pill Status Badge (Inspired by image_3a8ca1.png) */}
-            <div className="inline-flex items-center space-x-2 bg-brand-blue/15 backdrop-blur-md border border-brand-blue/30 px-4 py-1.5 rounded-full shadow-xs animate-fade-in">
+            {/* <div className="inline-flex items-center space-x-2 bg-brand-blue/15 backdrop-blur-md border border-brand-blue/30 px-4 py-1.5 rounded-full shadow-xs animate-fade-in">
               <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
               <span className="text-brand-blue font-body font-semibold text-xs tracking-wide">
                 Admissions Open 2083/84
               </span>
-            </div>
+            </div> */}
 
             {/* Core Master Punchlines (Inspired by typography hierarchy in image_3a8ca1.png) */}
-            <h1 className="font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl text-brand-white tracking-tight leading-[1.1] max-w-3xl">
-              Shaping <span className="text-brand-gold">Future Leaders</span>{" "}
-              Through Excellence in Education
-            </h1>
+            <h1 className="font-heading font-black text-5xl sm:text-7xl tracking-tighter uppercase leading-none">
+  <span className="block text-brand-white">Itahari</span>
+  <span className="block bg-linear-to-r from-brand-primary via-[#00a354] to-brand-blue bg-clip-text text-transparent">
+    Namuna College
+  </span>
+</h1>
 
-            {/* Subtext Paragraph Box with Constrained Paragraph Width */}
-            <p className="font-body text-sm sm:text-base md:text-lg text-brand-gray/90 max-w-2xl leading-relaxed font-normal">
-              Offering TU-affiliated undergraduate programs designed to develop
-              analytical thinking, professional competency, and ethical leadership
-              in every graduate.
-            </p>
+{/* Subtext Paragraph */}
+<p className="font-body text-sm sm:text-base md:text-lg text-brand-gray/90 max-w-2xl leading-relaxed font-normal mt-6 border-l-2 border-brand-blue pl-4">
+  Excellence in undergraduate education through analytical thinking, 
+  professional competency, and ethical leadership. Affiliated with Tribhuvan University.
+</p>
 
             {/* Dual Action CTA Buttons (Inspired by image_3a8ca1.png alignment design) */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto">

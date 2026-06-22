@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const PageBanner = ({ title, subtitle }) => {
   return (
-    <div className="relative w-full bg-linear-to-br from-emerald-900 via-emerald-950 to-stone-950/90 py-16 md:py-20 overflow-hidden border-b border-emerald-800/20">
+    <div className="relative w-full bg-linear-to-br  from-emerald-900 via-emerald-950 to-stone-950/90 py-16 md:py-20 overflow-hidden border-b border-emerald-800/20">
 
       {/* Abstract Architectural Geometric Accents */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">

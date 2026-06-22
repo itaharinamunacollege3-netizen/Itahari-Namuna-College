@@ -40,10 +40,10 @@ export default function MetricCard() {
   }, []);
 
   const metricStats = [
-    { icon: BookOpen, value: 4, suffix: '', label: 'TU Programs' },
+    { icon: BookOpen, value: 3, suffix: '', label: 'TU Programs' },
     { icon: Users, value: 1800, suffix: '+', label: 'Enrolled Students' },
     { icon: Award, value: 98, suffix: '%', label: 'Pass Rate' },
-    { icon: TrendingUp, value: 15, suffix: '+', label: 'Years of Excellence' }
+    { icon: TrendingUp, value: 13, suffix: '+', label: 'Years of Excellence' }
   ];
 
   return (

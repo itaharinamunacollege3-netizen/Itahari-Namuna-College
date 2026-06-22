@@ -81,7 +81,7 @@ export default function NoticeBoardPage() {
           </div>
         </div>
 
-        <div className="lg:w-2/3 hidden lg:block">
+        <div className="lg:w-2/3 hidden lg:block h-screen md:sticky top-15">
           <AnimatedSection>
             <NoticeDetailView notice={selectedNotice} />
           </AnimatedSection>

@@ -125,7 +125,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`w-full py-4 rounded-xl cursor-pointer font-bold text-white transition-colors ${isSubmitting ? 'bg-stone-400 cursor-not-allowed' : 'bg-[#E67E22] hover:bg-[#d35400]'}`}
+        className={`w-full py-4 rounded-xl cursor-pointer font-bold text-white transition-all duration-400 ease-in-out ${isSubmitting ? 'bg-stone-400 cursor-not-allowed' : 'bg-linear-to-tr from-emerald-900 via-emerald-950 to-stone-950/90 hover:scale-101'}`}
       >
         {isSubmitting ? 'Sending…' : 'Send Message →'}
       </button>
