@@ -1,32 +1,46 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowRight } from 'lucide-react';
-import { getFeaturedNotice } from '../services/noticesService';
+import { X, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getFeaturedNotices } from '../services/noticesService';
 
 let shownThisLoad = false;
 
 export default function NoticePopup() {
-  const [notice, setNotice] = useState(null);
+  const [notices, setNotices] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const closeButtonRef = useRef(null);
+
+  const notice = notices[currentIndex] ?? null;
+  const total = notices.length;
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const handleRead = () => {
+    if (!notice) return;
     setOpen(false);
     navigate(`/notices/${notice.id}`);
   };
 
+  const goToPrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + total) % total);
+  }, [total]);
+
+  const goToNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % total);
+  }, [total]);
+
   useEffect(() => {
     if (shownThisLoad) return;
     let active = true;
-    getFeaturedNotice().then((featured) => {
-      if (!active || !featured) return;
+    getFeaturedNotices().then((featured) => {
+      if (!active || !featured || featured.length === 0) return;
       shownThisLoad = true;
-      setNotice(featured);
+      setNotices(featured);
+      setCurrentIndex(0);
       setOpen(true);
     });
     return () => {
@@ -37,13 +51,14 @@ export default function NoticePopup() {
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
-      if (e.key !== 'Escape') return;
-      setOpen(false);
+      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'ArrowLeft' && total > 1) goToPrev();
+      if (e.key === 'ArrowRight' && total > 1) goToNext();
     };
     window.addEventListener('keydown', onKey);
     closeButtonRef.current?.focus();
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, notice]);
+  }, [open, total, goToPrev, goToNext]);
 
   if (!open || !notice) return null;
 
@@ -83,8 +98,32 @@ export default function NoticePopup() {
         )}
 
         <div className="p-7">
+          {total > 1 && (
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wide text-brand-dark/50">
+                {currentIndex + 1} / {total} notices
+              </span>
+              <div className="flex gap-1">
+                <button
+                  onClick={goToPrev}
+                  aria-label="Previous notice"
+                  className="p-1 rounded-full hover:bg-brand-gray/20 transition"
+                >
+                  <ChevronLeft size={16} className="text-brand-dark/60" />
+                </button>
+                <button
+                  onClick={goToNext}
+                  aria-label="Next notice"
+                  className="p-1 rounded-full hover:bg-brand-gray/20 transition"
+                >
+                  <ChevronRight size={16} className="text-brand-dark/60" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2 mb-3">
-            {notice.tags.map((tag) => (
+            {(notice.tags ?? []).map((tag) => (
               <span
                 key={tag}
                 className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
@@ -113,6 +152,23 @@ export default function NoticePopup() {
           >
             Read more <ArrowRight size={16} />
           </button>
+
+          {total > 1 && (
+            <div className="flex justify-center gap-1.5 mt-4">
+              {notices.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  aria-label={`Go to notice ${idx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === currentIndex
+                      ? 'w-6 bg-brand-primary'
+                      : 'w-2 bg-brand-gray/40 hover:bg-brand-gray/60'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

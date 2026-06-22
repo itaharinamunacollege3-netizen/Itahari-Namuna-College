@@ -26,14 +26,12 @@ import {
   FormActions,
 } from "@/components/ui/Modal";
 import { useAsyncData } from "@/hooks/useAsyncData";
-import { listStaffCategories, listFacultyDepartments } from "@/services/categories.service";
+import { listStaffCategories } from "@/services/categories.service";
 import { createStaff, deleteStaff, listStaff, updateStaff } from "@/services/staff.service";
-import { optionalString } from "@/utils/formHelpers";
 
 const emptyForm = {
   name: "",
   role: "",
-  department: "",
   categoryId: "",
   sortOrder: 0,
   published: true,
@@ -44,7 +42,6 @@ function toForm(row) {
   return {
     name: row.name ?? "",
     role: row.role ?? "",
-    department: row.department ?? "",
     categoryId: String(row.category?.id ?? row.categoryId ?? ""),
     sortOrder: row.sortOrder ?? 0,
     published: row.published !== false,
@@ -56,7 +53,6 @@ function toPayload(form) {
   return {
     name: form.name.trim(),
     role: form.role.trim(),
-    department: optionalString(form.department),
     categoryId: Number(form.categoryId),
     sortOrder: Number(form.sortOrder) || 0,
     published: form.published,
@@ -79,7 +75,7 @@ export default function StaffPage() {
     [page, search, categoryFilter]
   );
   const categories = useAsyncData(() => listStaffCategories(), []);
-  const departments = useAsyncData(() => listFacultyDepartments(), []);
+
 
   function openCreate() {
     setEditId(null);
@@ -157,7 +153,7 @@ export default function StaffPage() {
         <SearchInput
           value={search}
           onChange={handleSearch}
-          placeholder="Search by name, role, or department..."
+          placeholder="Search by name or role..."
           className="min-w-[200px] flex-1"
         />
         <FilterSelect
@@ -193,7 +189,7 @@ export default function StaffPage() {
                   <DataTableHeaderCell>Name</DataTableHeaderCell>
                   <DataTableHeaderCell>Role</DataTableHeaderCell>
                   <DataTableHeaderCell>Category</DataTableHeaderCell>
-                  <DataTableHeaderCell>Department</DataTableHeaderCell>
+
                   <DataTableHeaderCell>Status</DataTableHeaderCell>
                   <DataTableHeaderCell className="w-[100px]" />
                 </DataTableRow>
@@ -229,7 +225,7 @@ export default function StaffPage() {
                             <span className="text-[var(--text-muted)]">—</span>
                           )}
                       </DataTableCell>
-                      <DataTableCell>{row.department ?? "—"}</DataTableCell>
+
                       <DataTableCell>
                           {row.published ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
@@ -256,7 +252,7 @@ export default function StaffPage() {
                     </DataTableRow>
                     ))
                 ) : (
-                  <DataTableEmpty colSpan={7} className="py-14">
+                  <DataTableEmpty colSpan={6} className="py-14">
                     {search || categoryFilter ? "No staff match your filters" : "No staff members yet"}
                   </DataTableEmpty>
                 )}
@@ -319,28 +315,16 @@ export default function StaffPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category *">
-                <FormSelect value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
-                  <option value="">Select category</option>
-                  {categories.data?.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </FormSelect>
-              </FormField>
-              <FormField label="Department">
-                <FormSelect value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}>
-                  <option value="">Select department</option>
-                  {departments.data?.map((d) => (
-                    <option key={d.id} value={d.name}>
-                      {d.name}
-                    </option>
-                  ))}
-                </FormSelect>
-              </FormField>
-            </div>
+            <FormField label="Category *">
+              <FormSelect value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
+                <option value="">Select category</option>
+                {categories.data?.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </FormSelect>
+            </FormField>
           </FormSection>
 
           <FormSection title="Display settings">

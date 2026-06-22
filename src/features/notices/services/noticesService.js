@@ -74,14 +74,16 @@ export async function getNoticeById(id) {
   }
 }
 
-export async function getFeaturedNotice() {
+export async function getFeaturedNotices() {
   try {
     const data = await fetchData('/notices/featured');
-    if (data) return adaptNotice(data);
+    if (Array.isArray(data) && data.length > 0) return data.map(adaptNotice);
+    if (data) return [adaptNotice(data)];
   } catch {
     // fall through to mock data below
   }
-  const featured = mockNotices.find((n) => n.featured);
-  if (featured) return featured;
-  return sortByNewest(mockNotices)[0] ?? null;
+  const featured = mockNotices.filter((n) => n.featured);
+  if (featured.length > 0) return featured;
+  const newest = sortByNewest(mockNotices)[0];
+  return newest ? [newest] : [];
 }
