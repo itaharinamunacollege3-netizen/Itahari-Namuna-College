@@ -65,6 +65,8 @@ export default function GalleryPage() {
   const [form, setForm] = useState(emptyForm);
   const [album, setAlbum] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [coverFile, setCoverFile] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
 
@@ -136,22 +138,23 @@ export default function GalleryPage() {
 
   async function handleUploadCover() {
     if (!manageId || !coverFile) return;
-    setSaving(true);
+    setUploadingCover(true);
     try {
       await uploadAlbumCover(manageId, coverFile);
       toast.success("Cover uploaded");
+      setCoverFile(null);
       await openManage(manageId);
       reload();
     } catch (err) {
       toast.error(err.message);
     } finally {
-      setSaving(false);
+      setUploadingCover(false);
     }
   }
 
   async function handleUploadImages() {
     if (!manageId || !imageFiles.length) return;
-    setSaving(true);
+    setUploadingImages(true);
     try {
       await uploadAlbumImages(manageId, imageFiles);
       toast.success("Images uploaded");
@@ -161,7 +164,7 @@ export default function GalleryPage() {
     } catch (err) {
       toast.error(err.message);
     } finally {
-      setSaving(false);
+      setUploadingImages(false);
     }
   }
 
@@ -343,8 +346,8 @@ export default function GalleryPage() {
                     onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
                   />
                 </label>
-                <button type="button" className="btn btn-sm bg-[var(--color-brand-primary)] text-white" disabled={!coverFile || saving} onClick={handleUploadCover}>
-                  {saving ? <span className="loading loading-spinner loading-xs" /> : null}
+                <button type="button" className="btn btn-sm bg-[var(--color-brand-primary)] text-white" disabled={!coverFile || uploadingCover} onClick={handleUploadCover}>
+                  {uploadingCover ? <span className="loading loading-spinner loading-xs" /> : null}
                   Upload cover
                 </button>
               </div>
@@ -367,8 +370,8 @@ export default function GalleryPage() {
                     onChange={(e) => setImageFiles(Array.from(e.target.files ?? []))}
                   />
                 </label>
-                <button type="button" className="btn btn-sm bg-[var(--color-brand-primary)] text-white" disabled={!imageFiles.length || saving} onClick={handleUploadImages}>
-                  {saving ? <span className="loading loading-spinner loading-xs" /> : null}
+                <button type="button" className="btn btn-sm bg-[var(--color-brand-primary)] text-white" disabled={!imageFiles.length || uploadingImages} onClick={handleUploadImages}>
+                  {uploadingImages ? <span className="loading loading-spinner loading-xs" /> : null}
                   Upload {imageFiles.length ? `${imageFiles.length} image(s)` : "images"}
                 </button>
               </div>
