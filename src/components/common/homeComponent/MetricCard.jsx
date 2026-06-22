@@ -47,7 +47,7 @@ export default function MetricCard() {
   ];
 
   return (
-    <section className="w-full bg-brand-white border-b border-brand-gray/60 py-10 shadow-xs">
+    <section className="w-full bg-brand-white  py-10 shadow-xs">
       <div ref={containerRef} className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center justify-center text-center">
         {metricStats.map((stat, idx) => {
           const IconComponent = stat.icon;

@@ -46,6 +46,26 @@ export default function HomePage() {
     pic6,
     pic7
   ];
+  const carouselContent = [
+    {
+      title: "Itahari Namuna College",
+      subtitle: "Excellence in undergraduate education through analytical thinking, professional competency, and ethical leadership.",
+      cta: "Explore Academics",
+      link: "/academic"
+    },
+    {
+      title: "Your Future, Our Priority",
+      subtitle: "Join a vibrant community of innovators. Build your career with our industry-aligned programs and expert guidance.",
+      cta: "Apply Now",
+      link: "/admissions"
+    },
+    {
+      title: "Innovation Meets Tradition",
+      subtitle: "Experience a campus built for growth, featuring modern infrastructure, dedicated faculty, and global learning opportunities.",
+      cta: null, // No CTA for the third slide
+      link: null
+    }
+  ];
 
   useEffect(() => {
     let active = true;
@@ -100,7 +120,7 @@ export default function HomePage() {
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 2000);
+    }, 7000);
     return () => clearInterval(timer);
   }, [carouselImages.length]);
   return (
@@ -110,10 +130,10 @@ export default function HomePage() {
       {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
       {/* ========================================================================= */}
       <AnimatedSection>
-        <section className="relative w-full h-[calc(100vh-64px-41.6px)] min-h-137.5 flex items-center justify-center bg-brand-dark overflow-hidden">
+        <section className="relative w-full h-[calc(100vh-64px-41.6px)] min-h-137.5 flex items-center justify-center bg-brand-dark/70 overflow-hidden">
           {/* 1. College Background Image Media Layer */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
-            <AnimatePresence> {/* Removed mode='wait' */}
+            <AnimatePresence>
               <motion.img
                 key={index}
                 src={carouselImages[index]}
@@ -131,49 +151,60 @@ export default function HomePage() {
           </div>
 
           {/* 2. Content Canvas: Deeply Centered Layout Shell */}
-          <div className="relative z-10 max-w-4xl mx-auto px-6 flex flex-col items-center text-center space-y-6">
-            {/* Top Pill Status Badge (Inspired by image_3a8ca1.png) */}
-            {/* <div className="inline-flex items-center space-x-2 bg-brand-blue/15 backdrop-blur-md border border-brand-blue/30 px-4 py-1.5 rounded-full shadow-xs animate-fade-in">
-              <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
-              <span className="text-brand-blue font-body font-semibold text-xs tracking-wide">
-                Admissions Open 2083/84
-              </span>
-            </div> */}  
-
-            {/* Core Master Punchlines (Inspired by typography hierarchy in image_3a8ca1.png) */}
-            <h1 className="font-heading font-black text-5xl sm:text-7xl tracking-tighter uppercase leading-none">
-  <span className="block text-brand-white">Itahari</span>
-  <span className="block bg-linear-to-r from-brand-primary via-[#00a354] to-brand-blue bg-clip-text text-transparent">
-    Namuna College
-  </span>
-</h1>
-
-{/* Subtext Paragraph */}
-<p className="font-body text-sm sm:text-base md:text-lg text-brand-gray/90 max-w-2xl leading-relaxed font-normal mt-6 border-l-2 border-brand-blue pl-4">
-  Excellence in undergraduate education through analytical thinking, 
-  professional competency, and ethical leadership. Affiliated with Tribhuvan University.
-</p>
-
-            {/* Dual Action CTA Buttons (Inspired by image_3a8ca1.png alignment design) */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto">
-              <Link
-                to="/academic"
-                className="w-full sm:w-auto bg-brand-primary text-brand-white font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-primary/90 hover:scale-103 active:scale-97 shadow-md shadow-brand-primary/20 transition-all duration-300 text-center"
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+              className="relative z-10 max-w-4xl mx-auto px-6 flex flex-col items-center text-center space-y-6"
+            >
+              {/* Heading: Slides up slightly with a fade */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+                className="font-serif font-black text-5xl sm:text-7xl tracking-tighter uppercase leading-none"
               >
-                Explore Academics
-              </Link>
-              <Link
-                to="/admissions"
-                className="w-full sm:w-auto bg-brand-white/10 backdrop-blur-xs text-brand-white border border-brand-white/30 font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-white/20 hover:scale-103 active:scale-97 transition-all duration-300 text-center"
+                <span className="block text-brand-white">{carouselContent[index % carouselContent.length].title.split(' ')[0]}</span>
+                <span className="block text-brand-white">
+                  {carouselContent[index % carouselContent.length].title.split(' ').slice(1).join(' ')}
+                </span>
+              </motion.h1>
+
+              {/* Paragraph: Slides in from the left */}
+              <motion.p
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 1.1, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+                className="font-heading text-sm sm:text-base md:text-lg text-brand-gray/90 max-w-2xl leading-relaxed font-normal mt-6 border-l-2 border-brand-blue pl-4"
               >
-                Admissions
-              </Link>
-            </div>
-          </div>
+                {carouselContent[index % carouselContent.length].subtitle}
+              </motion.p>
+
+              {/* CTA: Fades in last */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto"
+              >
+                {carouselContent[index % carouselContent.length].cta && (
+                  <Link
+                    to={carouselContent[index % carouselContent.length].link}
+                    className="w-full sm:w-auto bg-brand-primary text-brand-white font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-primary/90 hover:scale-103 active:scale-97 shadow-md transition-all duration-300 text-center"
+                  >
+                    {carouselContent[index % carouselContent.length].cta}
+                  </Link>
+                )}
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
         </section>
       </AnimatedSection>
       {/* marquee */}
-      <div className="w-full bg-[#f1b24a] border-y border-[#dca03b] overflow-hidden py-3 flex items-center select-none cursor-pointer shadow-xs">
+      <div className="w-full bg-brand-primary overflow-hidden py-3 flex items-center select-none cursor-pointer shadow-xs">
         {/* The Track element contains two sets of the data to stitch the loop perfectly */}
         <div
           ref={marqueeRef}
@@ -186,11 +217,11 @@ export default function HomePage() {
               <Link
                 to={`/notices/${notice.id}`}
                 key={idx}
-                className="flex items-center space-x-3 text-brand-dark font-heading font-bold text-xs sm:text-sm tracking-wide hover:text-brand-primary transition-colors"
+                className="flex items-center space-x-3 text-brand-white font-heading font-bold text-xs sm:text-sm tracking-wide hover:text-brand-white/60 transition-colors"
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span>{notice.title}</span>
-                <span className="text-brand-dark/40 font-normal px-2">•</span>
+                <span className="text-brand-white/40 font-normal px-2">•</span>
               </Link>
             );
           })}
