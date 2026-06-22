@@ -67,18 +67,18 @@ export default function NoticePopup() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="notice-popup-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/0 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/10 backdrop-blur-[1.5px] animate-fade-in"
       onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-md bg-brand-white rounded-2xl shadow-2xl border border-brand-gray/20 overflow-hidden"
+        className="relative w-full max-w-md bg-brand-white rounded-2xl shadow-2xl border border-brand-gray/5 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           ref={closeButtonRef}
           onClick={handleClose}
           aria-label="Close notice"
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition"
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-full cursor-pointer bg-black/40 text-white hover:bg-black/60 transition"
         >
           <X size={18} />
         </button>

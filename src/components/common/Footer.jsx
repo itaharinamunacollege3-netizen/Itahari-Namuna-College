@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPrograms } from '../../features/academics/services/programsService';
+import { Dot } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [programs, setPrograms] = useState([]);
+
+    const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+    { name: 'Academics', path: '/academic' },
+    { name: 'Notices', path: '/notices' },
+    { name: 'Gallery', path: '/gallery' },
+    { name: 'Facilities', path: '/facilities' },
+    { name: 'Contact', path: '/contact' },
+  ];
 
   useEffect(() => {
     getPrograms().then(setPrograms);
@@ -12,7 +23,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-linear-to-b from-emerald-900 via-emerald-950 to-stone-950/85 text-stone-300 pt-16 pb-8 border-t border-stone-800 font-body">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 border-b border-stone-800 pb-12">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-4 gap-12 border-b border-stone-800 pb-12">
         
         {/* Branding Panel */}
         <div className="space-y-4">
@@ -22,6 +33,17 @@ export default function Footer() {
           <p className="text-sm leading-relaxed text-stone-400 max-w-sm">
             Empowering academic growth and excellence through modern technical programs and a supportive structural community learning framework.
           </p>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="font-heading font-bold text-xs uppercase tracking-widest text-emerald-400">Quick Links</h4>
+          <div className="flex flex-col space-y-3 text-sm ">
+            {navItems.map((item) => (
+              <Link className="hover:text-emerald-400 flex items-center" key={item.name} to={item.path}>
+                <Dot className="text-brand-gray/50" /> {item.name}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Dynamic Program Links */}
@@ -49,7 +71,7 @@ export default function Footer() {
             Contact Channels
           </h4>
           <div className="flex flex-col space-y-3 text-sm text-stone-400">
-            <p>Itahari, Sunsari, Nepal</p>
+            <p className="hover:text-white transition-colors">Itahari, Sunsari, Nepal</p>
             <p className="hover:text-white transition-colors">Tel: 025-586701/585701</p>
             <p className="hover:text-white transition-colors">Email: contact@namunacollege.edu.np</p>
           </div>
