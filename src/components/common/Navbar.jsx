@@ -4,19 +4,29 @@ import { Menu, X } from 'lucide-react';
 import logo from "../../assets/others/onlylogo.webp"
 
 export default function Navbar() {
+  const BaseURL = import.meta.env.VITE_API_URL;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  
+
+  const [programs, setPrograms] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
-    { name: 'Academics', path: '/academic' },
+    { name: 'Programs', path: '/academic' },
     { name: 'Notices', path: '/notices' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Facilities', path: '/facilities' },
     { name: 'Contact', path: '/contact' },
   ];
 
+  useEffect(() => {
+    // Replace with your actual service call
+    fetch(`${BaseURL}/programs`)
+      .then(res => res.json())
+      .then(res => setPrograms(res.data.programs))
+      .catch(err => console.error("Failed to fetch programs", err));
+  }, []);
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) setIsScrolled(true);
@@ -27,12 +37,11 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 px-8 py-2 flex justify-between items-center transition-all duration-500 border-brand-gray/50 ${
-        isScrolled 
-          ? 'bg-brand-white/70 backdrop-blur-md shadow-md border-b' 
-          : 'bg-brand-white'
+    <header className={`sticky top-0 z-50 px-8 py-2 flex justify-between items-center transition-all duration-500 border-brand-gray/50 ${isScrolled
+        ? 'bg-brand-white/70 backdrop-blur-md shadow-md border-b'
+        : 'bg-brand-white'
       }`}>
-      
+
       {/* Logo */}
       <Link to="/" className="flex items-center gap-3">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/95 p-1.5 shadow-md">
@@ -47,18 +56,36 @@ export default function Navbar() {
       {/* Desktop Links */}
       <nav className="hidden xl:flex items-center space-x-8 font-medium text-sm tracking-wide">
         {navItems.map((item) => (
-          <NavLink
+          <div
             key={item.name}
-            to={item.path}
-            className={({ isActive }) =>
-              `font-body transition-all duration-300 relative pb-1 hover:text-brand-primary cursor-pointer ${isActive
-                ? 'text-brand-primary font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-brand-primary after:rounded-full'
-                : 'text-brand-dark/80'
-              }`
-            }
+            className="relative"
+            onMouseEnter={() => item.name === 'Programs' && setIsDropdownOpen(true)}
+            onMouseLeave={() => item.name === 'Programs' && setIsDropdownOpen(false)}
           >
-            {item.name}
-          </NavLink>
+            <NavLink
+              to={item.path}
+              className={({ isActive }) =>
+                `...existing classes... ${isActive ? 'text-brand-primary' : ''}`
+              }
+            >
+              {item.name}
+            </NavLink>
+
+            {/* Dropdown for Programs */}
+            {item.name === 'Programs' && isDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-brand-gray/20 rounded-lg shadow-xl py-2 z-50">
+                {programs.map((prog) => (
+  <Link
+    key={prog.id}
+    to={`/academic/${prog.id}`}
+    className="block px-4 py-2 text-brand-dark hover:bg-brand-blue/5 hover:text-brand-primary transition"
+  >
+    {prog.code} {/* This will render "BBS", "BCA", etc. */}
+  </Link>
+))}
+              </div>
+            )}
+          </div>
         ))}
         <Link to="/admissions" className="ml-4 px-4 py-2 bg-brand-primary text-white rounded-md font-medium hover:opacity-90 transition-all duration-300 shadow-md">
           <span>Apply Now</span>
@@ -74,10 +101,9 @@ export default function Navbar() {
       </button>
 
       {/* Mobile Menu - Smooth Transition */}
-      <div 
-        className={`xl:hidden absolute top-full left-0 w-full overflow-hidden bg-brand-white transition-all duration-500 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-125 opacity-100 border-b border-brand-dark drop-shadow-brand-dark' : 'max-h-0 opacity-0'
-        }`}
+      <div
+        className={`xl:hidden absolute top-full left-0 w-full overflow-hidden bg-brand-white transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-125 opacity-100 border-b border-brand-dark drop-shadow-brand-dark' : 'max-h-0 opacity-0'
+          }`}
       >
         <nav className="p-6 flex flex-col items-center space-y-4">
           {navItems.map((item) => (
@@ -90,8 +116,8 @@ export default function Navbar() {
               {item.name}
             </NavLink>
           ))}
-          <Link 
-            to="/admissions" 
+          <Link
+            to="/admissions"
             onClick={() => setIsMobileMenuOpen(false)}
             className="mt-4 w-full text-center bg-linear-to-r from-brand-blue to-emerald-600 text-white px-4 py-3 rounded-md font-medium shadow-lg hover:opacity-90 transition-all"
           >
