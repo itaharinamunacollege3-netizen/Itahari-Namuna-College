@@ -8,6 +8,7 @@ import { staffPublicRoutes, staffAdminRoutes } from "../modules/staff/staff.rout
 import { facultyPublicRoutes, facultyAdminRoutes } from "../modules/faculty/faculty.routes";
 import { categoriesPublicRoutes, categoriesAdminRoutes } from "../modules/categories/categories.routes";
 import { programsPublicRoutes, programsAdminRoutes } from "../modules/programs/programs.routes";
+import { blogsPublicRoutes, blogsAdminRoutes } from "../modules/blogs/blogs.routes";
 import { notificationsAdminRoutes } from "../modules/notifications/notifications.routes";
 import { sendSuccess } from "../utils/apiResponse";
 
@@ -26,6 +27,7 @@ router.use("/staff", staffPublicRoutes);
 router.use("/faculty", facultyPublicRoutes);
 router.use("/categories", categoriesPublicRoutes);
 router.use("/programs", programsPublicRoutes);
+router.use("/blogs", blogsPublicRoutes);
 
 router.use("/admin/notices", noticesAdminRoutes);
 router.use("/admin/contacts", contactsAdminRoutes);
@@ -35,6 +37,7 @@ router.use("/admin/staff", staffAdminRoutes);
 router.use("/admin/faculty", facultyAdminRoutes);
 router.use("/admin/categories", categoriesAdminRoutes);
 router.use("/admin/programs", programsAdminRoutes);
+router.use("/admin/blogs", blogsAdminRoutes);
 router.use("/admin/notifications", notificationsAdminRoutes);
 
 export default router;

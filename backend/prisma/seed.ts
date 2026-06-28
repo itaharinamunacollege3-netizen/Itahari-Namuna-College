@@ -333,6 +333,145 @@ async function main() {
     });
   }
 
+  const blogPosts = [
+    {
+      slug: "experiential-learning-higher-education",
+      title: "How Experiential Learning is Reshaping Higher Education",
+      excerpt:
+        "Classrooms are no longer the only place where learning happens. Discover how hands-on projects and industry partnerships are transforming what it means to study at Itahari Namuna College.",
+      intro:
+        "The traditional lecture hall is evolving. As industries demand more adaptable graduates, educational institutions across Nepal and the world are fundamentally rethinking how knowledge is delivered and absorbed.",
+      category: "Education",
+      author: "Dr. Ramesh Sharma",
+      authorRole: "Head of Academic Affairs",
+      readTime: "5 min read",
+      accentColor: "#045d30",
+      featured: true,
+      isPopular: true,
+      publishedAt: new Date("2025-06-15"),
+      tags: ["Education", "Experiential Learning", "Career Readiness", "College Life"],
+      sections: [
+        {
+          heading: "Why the Old Model is No Longer Enough",
+          body: "For decades, higher education operated on a simple model: lecture, note-take, examine, repeat. It worked well in an era when information was scarce and expert transmission was the primary goal. Today, information is abundant — the challenge is no longer access, it is application.",
+          bullets: [
+            "Employers consistently cite inability to apply knowledge as a top graduate shortcoming.",
+            "Critical thinking and problem-solving now rank above technical knowledge in most hiring rubrics.",
+            "Industries evolve faster than curricula — real-world exposure closes that gap.",
+          ],
+        },
+        {
+          heading: "What Experiential Learning Actually Looks Like",
+          body: "At Itahari Namuna College, experiential learning is embedded into how students spend their time. Projects are built for real clients. Fieldwork is graded alongside written reports.",
+          bullets: [
+            "Live project briefs issued by partner businesses each semester.",
+            "Structured internship weeks woven into the academic calendar.",
+            "Community outreach assignments in place of conventional research papers.",
+          ],
+        },
+        {
+          heading: "Looking Ahead",
+          body: "Itahari Namuna College is deepening its industry partnerships and creating structured pathways for students to transition seamlessly from campus to career.",
+        },
+      ],
+      callout: {
+        heading: "Key Takeaway",
+        body: "A degree is a credential. Experience is the evidence. The most competitive graduates carry both.",
+      },
+      sortOrder: 1,
+    },
+    {
+      slug: "student-innovation-lab",
+      title: "Student Innovation Lab: Where Ideas Become Reality",
+      excerpt:
+        "Our Innovation Lab has produced over 30 student-led projects this year alone. Here is a look at some of the most exciting ideas that emerged from our campus.",
+      intro:
+        "Our Innovation Lab has produced over 30 student-led projects this year alone. Here is a look at some of the most exciting ideas that emerged from our campus — and what drove the teams behind them.",
+      category: "Innovation",
+      author: "Priya Thapa",
+      authorRole: "Innovation Lab Coordinator",
+      readTime: "4 min read",
+      accentColor: "#e17622",
+      featured: false,
+      isPopular: true,
+      publishedAt: new Date("2025-05-28"),
+      tags: ["Innovation", "Student Projects", "Entrepreneurship", "Lab"],
+      sections: [
+        {
+          heading: "What the Lab Actually Does",
+          body: "The Innovation Lab is a structured environment where student teams move through defined phases: problem identification, research, prototyping, testing, and presentation.",
+          bullets: [
+            "Teams of 3–5 students work across departments.",
+            "Faculty mentors assigned per project domain.",
+            "Monthly demo days open to industry partners.",
+          ],
+        },
+        {
+          heading: "How to Get Involved",
+          body: "Applications for the next Innovation Lab cohort open at the start of each semester. Submit a one-page problem statement to the Lab Coordinator to be considered.",
+        },
+      ],
+      callout: {
+        heading: "Apply for the Next Cohort",
+        body: "Applications for the upcoming semester open in August. All enrolled students are eligible.",
+      },
+      sortOrder: 2,
+    },
+    {
+      slug: "career-fairs-first-year-guide",
+      title: "A Guide to Navigating Career Fairs as a First-Year Student",
+      excerpt:
+        "Walking into a career fair can feel overwhelming. Our career counsellors share their top strategies for making meaningful connections.",
+      intro:
+        "Walking into a career fair can feel overwhelming. Our career counsellors share their top strategies for making meaningful connections and landing internship opportunities.",
+      category: "Career",
+      author: "Sita Karki",
+      authorRole: "Career Counsellor",
+      readTime: "6 min read",
+      accentColor: "#c22368",
+      featured: false,
+      isPopular: true,
+      publishedAt: new Date("2025-05-10"),
+      tags: ["Career", "Internships", "Student Success"],
+      sections: [
+        {
+          heading: "Prepare Before You Arrive",
+          body: "Research participating organizations, refine your introduction, and bring copies of your updated CV.",
+        },
+      ],
+      callout: null,
+      sortOrder: 3,
+    },
+  ];
+
+  for (const post of blogPosts) {
+    await prisma.blogPost.upsert({
+      where: { slug: post.slug },
+      update: {
+        title: post.title,
+        excerpt: post.excerpt,
+        intro: post.intro,
+        category: post.category,
+        author: post.author,
+        authorRole: post.authorRole,
+        readTime: post.readTime,
+        accentColor: post.accentColor,
+        sections: post.sections,
+        callout: post.callout,
+        tags: post.tags,
+        featured: post.featured,
+        isPopular: post.isPopular,
+        published: true,
+        publishedAt: post.publishedAt,
+        sortOrder: post.sortOrder,
+      },
+      create: {
+        ...post,
+        published: true,
+      },
+    });
+  }
+
   console.log("Seed complete.");
   console.log(`Admin: ${adminEmail}`);
 }

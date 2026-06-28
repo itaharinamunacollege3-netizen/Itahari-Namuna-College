@@ -10,6 +10,7 @@ import {
   Mail,
   Settings,
   LogOut,
+  Newspaper,
 } from "lucide-react";
 
 export const NAV_SECTIONS = [
@@ -22,6 +23,7 @@ export const NAV_SECTIONS = [
     items: [
       { label: "Notices", path: "/notices", icon: Megaphone },
       { label: "Programs", path: "/programs", icon: BookOpen },
+      { label: "Blog", path: "/blogs", icon: Newspaper },
       { label: "Gallery", path: "/gallery", icon: Image },
     ],
   },
