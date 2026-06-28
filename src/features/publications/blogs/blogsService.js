@@ -11,11 +11,6 @@ export function getBlogLink(post) {
   return blogPath(post.slug || post.id);
 }
 
-async function fetchData(path) {
-  const body = await apiClient.get(path);
-  return body?.data;
-}
-
 export async function getBlogs(params = {}) {
   if (!HAS_API) {
     return mockBlogPosts;
@@ -27,8 +22,8 @@ export async function getBlogs(params = {}) {
     if (params.search) query.set('search', params.search);
     if (params.tag) query.set('tag', params.tag);
     const qs = query.toString();
-    const data = await fetchData(`/blogs${qs ? `?${qs}` : ''}`);
-    return data ?? [];
+    const res = await apiClient.get(`/blogs${qs ? `?${qs}` : ''}`);
+    return res.data ?? [];
   } catch {
     return mockBlogPosts;
   }
@@ -40,8 +35,8 @@ export async function getFeaturedBlog() {
   }
 
   try {
-    const data = await fetchData('/blogs/featured');
-    return data ?? mockBlogPosts[0] ?? null;
+    const res = await apiClient.get('/blogs/featured');
+    return res.data ?? mockBlogPosts[0] ?? null;
   } catch {
     return mockBlogPosts[0] ?? null;
   }
@@ -53,8 +48,8 @@ export async function getPopularBlogs(limit = 4) {
   }
 
   try {
-    const data = await fetchData(`/blogs/popular?limit=${limit}`);
-    return data ?? mockPopularPosts;
+    const res = await apiClient.get(`/blogs/popular?limit=${limit}`);
+    return res.data ?? mockPopularPosts;
   } catch {
     return mockPopularPosts;
   }
@@ -66,8 +61,8 @@ export async function getBlogCategories() {
   }
 
   try {
-    const data = await fetchData('/blogs/categories');
-    return data ?? [];
+    const res = await apiClient.get('/blogs/categories');
+    return res.data ?? [];
   } catch {
     return [...new Set(mockBlogPosts.map((post) => post.category))];
   }
@@ -83,8 +78,8 @@ export async function getBlogById(idOrSlug) {
   }
 
   try {
-    const data = await fetchData(`/blogs/${encodeURIComponent(idOrSlug)}`);
-    return data ?? null;
+    const res = await apiClient.get(`/blogs/${encodeURIComponent(idOrSlug)}`);
+    return res.data ?? null;
   } catch {
     const match = mockBlogPosts.find(
       (post) => String(post.id) === String(idOrSlug) || post.slug === idOrSlug
@@ -103,8 +98,8 @@ export async function getRelatedBlogs(idOrSlug) {
   }
 
   try {
-    const data = await fetchData(`/blogs/${encodeURIComponent(idOrSlug)}/related`);
-    return data ?? [];
+    const res = await apiClient.get(`/blogs/${encodeURIComponent(idOrSlug)}/related`);
+    return res.data ?? [];
   } catch {
     return [];
   }

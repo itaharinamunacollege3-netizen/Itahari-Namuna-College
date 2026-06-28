@@ -32,6 +32,10 @@ function blogFolder(blogSlug: string) {
   return `${env.CLOUDINARY_FOLDER}/blogs/${blogSlug}`;
 }
 
+function journalFolder(journalSlug: string) {
+  return `${env.CLOUDINARY_FOLDER}/journals/${journalSlug}`;
+}
+
 function programSyllabusFolder(programSlug: string, semester: string) {
   return `${programFolder(programSlug)}/syllabus/semester-${semester}`;
 }
@@ -277,6 +281,79 @@ export async function uploadBlogCoverImage(
     publicId: result.public_id,
     width: result.width,
     height: result.height,
+    bytes: result.bytes,
+  };
+}
+
+export async function uploadJournalCoverImage(
+  file: Express.Multer.File,
+  journalSlug: string
+): Promise<CloudinaryUploadResult> {
+  if (!validateImageBuffer(file.buffer, file.mimetype)) {
+    throw new AppError(400, "File content does not match an allowed image format");
+  }
+
+  const cloudinary = getCloudinary();
+  const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
+
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+      {
+        folder: journalFolder(journalSlug),
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "image",
+        overwrite: false,
+        format: "webp",
+        transformation: [
+          { width: env.CLOUDINARY_MAX_IMAGE_WIDTH, crop: "limit" },
+          { quality: env.CLOUDINARY_WEBP_QUALITY },
+        ],
+      }
+    )
+  );
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+    width: result.width,
+    height: result.height,
+    bytes: result.bytes,
+  };
+}
+
+export async function uploadJournalPdf(
+  file: Express.Multer.File,
+  journalSlug: string
+): Promise<CloudinaryUploadResult> {
+  if (file.mimetype !== "application/pdf") {
+    throw new AppError(400, "Only PDF files are allowed");
+  }
+
+  const pdfCheck = validatePdfBuffer(file.buffer);
+  if (!pdfCheck.valid) {
+    throw new AppError(400, pdfCheck.reason ?? "File is not a valid PDF");
+  }
+
+  const compressedBuffer = await compressPdfBuffer(file.buffer);
+  const cloudinary = getCloudinary();
+  const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
+
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:application/pdf;base64,${compressedBuffer.toString("base64")}`,
+      {
+        folder: `${journalFolder(journalSlug)}/pdf`,
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "raw",
+        overwrite: false,
+      }
+    )
+  );
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
     bytes: result.bytes,
   };
 }

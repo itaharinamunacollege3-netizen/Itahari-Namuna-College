@@ -1,28 +1,28 @@
 import { z } from "zod";
 
-const blogSectionSchema = z.object({
+const journalSectionSchema = z.object({
   heading: z.string().trim().min(1),
   body: z.string().trim().min(1),
   bullets: z.array(z.string().trim().min(1)).optional(),
 });
 
-const blogCalloutSchema = z
+const journalCalloutSchema = z
   .object({
-    heading: z.string().trim().min(1),
+    label: z.string().trim().min(1),
     body: z.string().trim().min(1),
   })
   .nullable()
   .optional();
 
-export const listBlogsQuerySchema = z.object({
+export const listJournalsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(100),
   search: z.string().optional(),
-  category: z.string().optional(),
-  tag: z.string().optional(),
+  field: z.string().optional(),
+  keyword: z.string().optional(),
 });
 
-export const blogIdParamSchema = z.object({
+export const journalIdParamSchema = z.object({
   id: z.string().trim().min(1),
 });
 
@@ -33,9 +33,9 @@ function parseBoolean(value: unknown, fallback = false): boolean {
   return fallback;
 }
 
-function parseTags(value: unknown): string[] {
+function parseStringList(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value.map(String).map((tag) => tag.trim()).filter(Boolean);
+    return value.map(String).map((item) => item.trim()).filter(Boolean);
   }
   if (typeof value === "string") {
     const trimmed = value.trim();
@@ -44,56 +44,53 @@ function parseTags(value: unknown): string[] {
       try {
         const parsed = JSON.parse(trimmed);
         return Array.isArray(parsed)
-          ? parsed.map(String).map((tag) => tag.trim()).filter(Boolean)
+          ? parsed.map(String).map((item) => item.trim()).filter(Boolean)
           : [];
       } catch {
-        return trimmed.split(",").map((tag) => tag.trim()).filter(Boolean);
+        return trimmed.split(",").map((item) => item.trim()).filter(Boolean);
       }
     }
-    return trimmed.split(",").map((tag) => tag.trim()).filter(Boolean);
+    return trimmed.split(",").map((item) => item.trim()).filter(Boolean);
   }
   return [];
 }
 
-function parseSections(value: unknown): z.infer<typeof blogSectionSchema>[] {
+function parseSections(value: unknown): z.infer<typeof journalSectionSchema>[] {
   if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value);
-      return blogSectionSchema.array().min(1).parse(parsed);
-    } catch {
-      throw new Error("sections must be a valid JSON array");
-    }
+    return journalSectionSchema.array().min(1).parse(JSON.parse(value));
   }
-  return blogSectionSchema.array().min(1).parse(value);
+  return journalSectionSchema.array().min(1).parse(value);
 }
 
-function parseCallout(value: unknown): z.infer<typeof blogCalloutSchema> {
+function parseCallout(value: unknown): z.infer<typeof journalCalloutSchema> {
   if (value === undefined) return undefined;
   if (value === null || value === "") return null;
   if (typeof value === "string") {
     const trimmed = value.trim();
     if (!trimmed) return null;
-    return blogCalloutSchema.parse(JSON.parse(trimmed));
+    return journalCalloutSchema.parse(JSON.parse(trimmed));
   }
-  return blogCalloutSchema.parse(value);
+  return journalCalloutSchema.parse(value);
 }
 
-const blogFieldsSchema = z.object({
+const journalFieldsSchema = z.object({
   title: z.string().trim().min(3),
-  excerpt: z.string().trim().min(10),
-  intro: z.string().trim().min(10),
-  category: z.string().trim().min(1),
-  author: z.string().trim().min(1),
-  authorRole: z.string().trim().optional(),
-  readTime: z.string().trim().min(1).default("5 min read"),
+  abstract: z.string().trim().min(20),
+  field: z.string().trim().min(1),
+  authors: z.array(z.string().trim().min(1)).min(1),
+  authorAffiliation: z.string().trim().optional(),
+  volume: z.string().trim().min(1),
+  year: z.string().trim().min(4).max(4),
+  doi: z.string().trim().optional(),
+  keywords: z.array(z.string().trim().min(1)).default([]),
   accentColor: z
     .string()
     .trim()
     .regex(/^#[0-9A-Fa-f]{6}$/, "accentColor must be a hex color like #045d30")
     .default("#045d30"),
-  sections: z.array(blogSectionSchema).min(1),
-  callout: blogCalloutSchema,
-  tags: z.array(z.string().trim().min(1)).default([]),
+  sections: z.array(journalSectionSchema).min(1),
+  callout: journalCalloutSchema,
+  citeSuggestion: z.string().trim().optional(),
   featured: z.boolean().default(false),
   isPopular: z.boolean().default(false),
   published: z.boolean().default(true),
@@ -101,25 +98,27 @@ const blogFieldsSchema = z.object({
   slug: z.string().trim().optional(),
   sortOrder: z.coerce.number().int().min(0).default(0),
   removeCover: z.boolean().default(false),
+  removePdf: z.boolean().default(false),
 });
 
-function normalizeBlogBody(body: unknown): unknown {
+function normalizeJournalBody(body: unknown): unknown {
   if (typeof body !== "object" || body === null) return body;
-
   const input = body as Record<string, unknown>;
 
   return {
     title: input.title,
-    excerpt: input.excerpt,
-    intro: input.intro,
-    category: input.category,
-    author: input.author,
-    authorRole: input.authorRole,
-    readTime: input.readTime,
+    abstract: input.abstract,
+    field: input.field,
+    authors: parseStringList(input.authors),
+    authorAffiliation: input.authorAffiliation,
+    volume: input.volume,
+    year: input.year,
+    doi: input.doi,
+    keywords: parseStringList(input.keywords),
     accentColor: input.accentColor,
     sections: parseSections(input.sections),
     callout: parseCallout(input.callout),
-    tags: parseTags(input.tags),
+    citeSuggestion: input.citeSuggestion,
     featured: parseBoolean(input.featured, false),
     isPopular: parseBoolean(input.isPopular, false),
     published: parseBoolean(input.published, true),
@@ -127,11 +126,12 @@ function normalizeBlogBody(body: unknown): unknown {
     slug: input.slug,
     sortOrder: input.sortOrder,
     removeCover: parseBoolean(input.removeCover, false),
+    removePdf: parseBoolean(input.removePdf, false),
   };
 }
 
-export const createBlogSchema = z.preprocess(normalizeBlogBody, blogFieldsSchema);
-export const updateBlogSchema = z.preprocess(
-  normalizeBlogBody,
-  blogFieldsSchema.partial()
+export const createJournalSchema = z.preprocess(normalizeJournalBody, journalFieldsSchema);
+export const updateJournalSchema = z.preprocess(
+  normalizeJournalBody,
+  journalFieldsSchema.partial()
 );

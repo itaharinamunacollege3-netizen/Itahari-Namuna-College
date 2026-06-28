@@ -110,6 +110,7 @@ function mapWriteInputToDb(data: BlogWriteInput, coverFields: Record<string, unk
     author: data.author.trim(),
     authorRole: data.authorRole?.trim() || null,
     readTime: data.readTime?.trim() || "5 min read",
+    accentColor: data.accentColor ?? "#045d30",
     sections: sanitizeSections(data.sections),
     ...(callout ? { callout } : {}),
     tags: data.tags,
@@ -280,6 +281,7 @@ export async function updateBlog(
   if (data.author !== undefined) updateData.author = data.author.trim();
   if (data.authorRole !== undefined) updateData.authorRole = data.authorRole?.trim() || null;
   if (data.readTime !== undefined) updateData.readTime = data.readTime.trim();
+  if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
   if (data.sections !== undefined) updateData.sections = sanitizeSections(data.sections);
   if (data.callout !== undefined) {
     const callout = sanitizeCallout(data.callout ?? null);

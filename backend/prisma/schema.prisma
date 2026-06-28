@@ -336,6 +336,7 @@ model BlogPost {
   readTime               String   @default("5 min read")
   coverImage             String?
   coverImageCloudinaryId String?
+  accentColor            String   @default("#045d30")
   sections               Json
   callout                Json?
   tags                   Json     @default("[]")
@@ -352,5 +353,41 @@ model BlogPost {
   @@index([published, isPopular])
   @@index([published, publishedAt])
   @@index([category])
+  @@index([slug])
+}
+
+model JournalEntry {
+  id                     Int      @id @default(autoincrement())
+  slug                   String   @unique
+  title                  String
+  abstract               String
+  field                  String
+  authors                Json
+  authorAffiliation      String?
+  volume                 String
+  year                   String
+  doi                    String?
+  keywords               Json     @default("[]")
+  accentColor            String   @default("#045d30")
+  coverImage             String?
+  coverImageCloudinaryId String?
+  pdfUrl                 String?
+  pdfCloudinaryId        String?
+  sections               Json
+  callout                Json?
+  citeSuggestion         String?
+  featured               Boolean  @default(false)
+  isPopular              Boolean  @default(false)
+  published              Boolean  @default(true)
+  publishedAt            DateTime @default(now())
+  sortOrder              Int      @default(0)
+  viewCount              Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([published, featured])
+  @@index([published, isPopular])
+  @@index([published, publishedAt])
+  @@index([field])
   @@index([slug])
 }

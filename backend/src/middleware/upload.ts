@@ -132,3 +132,48 @@ export function getUploadedFile(req: Request, fieldName: string) {
   const files = req.files as Record<string, Express.Multer.File[]> | undefined;
   return files?.[fieldName]?.[0];
 }
+
+function journalFileFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) {
+  if (file.fieldname === "pdf") {
+    if (file.mimetype !== PDF_MIME) {
+      return cb(new AppError(400, "Only PDF files are allowed for the pdf field"));
+    }
+  } else if (file.fieldname === "cover") {
+    if (!isAllowedImageMime(file.mimetype)) {
+      return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for the cover field"));
+    }
+  } else {
+    return cb(new AppError(400, `Unexpected file field: ${file.fieldname}`));
+  }
+  cb(null, true);
+}
+
+export const journalFileUpload = multer({
+  storage,
+  limits: { fileSize: env.maxUploadBytes, files: 2 },
+  fileFilter: journalFileFilter,
+});
+
+export function runJournalFileUpload() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    journalFileUpload.fields([
+      { name: "pdf", maxCount: 1 },
+      { name: "cover", maxCount: 1 },
+    ])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function getJournalUploadFiles(req: Request) {
+  const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  return {
+    pdf: files?.pdf?.[0],
+    cover: files?.cover?.[0],
+  };
+}

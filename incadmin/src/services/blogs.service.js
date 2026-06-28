@@ -10,6 +10,7 @@ function buildBlogFormData(data, files) {
     author: data.author,
     authorRole: data.authorRole ?? "",
     readTime: data.readTime ?? "5 min read",
+    accentColor: data.accentColor ?? "#045d30",
     sections: JSON.stringify(data.sections ?? []),
     callout: data.callout ? JSON.stringify(data.callout) : "",
     tags: JSON.stringify(data.tags ?? []),
