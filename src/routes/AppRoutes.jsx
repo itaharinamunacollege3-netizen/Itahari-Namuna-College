@@ -4,6 +4,10 @@ import PublicLayout from '../layouts/PublicLayout';
 import SmoothScrollProvider from '../components/common/SmoothScrollProvider';
 import FacilitiesPage from '../features/facilities/pages/FacilitiesPage';
 import { getNotices, getNoticeById } from '../features/notices/services/noticesService';
+import BlogList from '../features/publications/blogs/BlogList ';
+import BlogDetail from '../features/publications/blogs/BlogDetail ';
+import JournalList from '../features/publications/journals/JournalList';
+import JournalDetail from '../features/publications/journals/JournalDetail';
 
 const HomePage = lazy(() => import('../features/general_pages/HomePage'));
 const AboutPage = lazy(() => import('../features/general_pages/AboutPage'));
@@ -46,11 +50,18 @@ const router = createBrowserRouter([
       { path: 'contact', element: <ContactPage /> },
       { path: 'admissions', element: <AdmissionWizardPage /> },
 
+      // facilities page
+      { path: 'facilities', element: <FacilitiesPage /> },
+
+      // publications
+      { path: 'publications', element: <Navigate to="/publications/blog" replace /> },
+      { path: 'publications/blog', element: <BlogList /> },
+      { path: 'publications/blog/:id', element: <BlogDetail /> },
+      { path: 'publications/journal', element: <JournalList /> },
+      { path: 'publications/journal/:id', element: <JournalDetail /> },
+
       // Fallback Route: Redirects any typos back to Home
       { path: '*', element: <Navigate to="/" replace /> },
-
-      // facilities page
-      {path:'facilities', element: <FacilitiesPage /> }
     ]
   }
 ]);
