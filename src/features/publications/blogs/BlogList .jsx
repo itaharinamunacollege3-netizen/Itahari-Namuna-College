@@ -11,10 +11,9 @@ import {
 
 
 function CategoryBadge({ category, small = false }) {
-  const c = categoryColors[category] ?? { bg: 'bg-brand-gray', text: 'text-brand-dark/60' };
   return (
     <span
-      className={`inline-flex items-center gap-1 font-body font-semibold rounded-full ${c.bg} ${c.text} ${small ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1'}`}
+      className={`inline-flex items-center gap-1 font-body font-semibold rounded-full bg-brand-gray text-brand-dark/60 ${small ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1'}`}
     >
       <Tag size={small ? 9 : 10} />
       {category}
@@ -70,7 +69,7 @@ export default function BlogList() {
         setPosts(allPosts);
         setFeatured(featuredPost);
         setPopularPosts(popular);
-        setCategories(cats.length ? cats : Object.keys(categoryColors));
+        setCategories(cats);
       } catch (err) {
         if (active) setError(err.message || 'Failed to load blog posts.');
       } finally {

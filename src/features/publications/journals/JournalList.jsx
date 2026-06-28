@@ -10,10 +10,9 @@ import {
 } from './journalsService';
 
 function FieldBadge({ field, small = false }) {
-  const c = fieldColors[field] ?? { bg: 'bg-brand-gray', text: 'text-brand-dark/60' };
   return (
     <span
-      className={`inline-flex items-center gap-1 font-body font-semibold rounded-full ${c.bg} ${c.text} ${small ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1'}`}
+      className={`inline-flex items-center gap-1 font-body font-semibold rounded-full bg-brand-gray text-brand-dark/60 ${small ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1'}`}
     >
       <FlaskConical size={small ? 9 : 10} />
       {field}
@@ -26,7 +25,7 @@ function CoverPanel({ entry, className = 'min-h-64 md:min-h-72' }) {
     return (
 
 
-      
+
       <div className={`relative overflow-hidden ${className}`}>
         <img src={entry.coverImage} alt="" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
@@ -72,7 +71,7 @@ export default function JournalList() {
         setEntries(allEntries);
         setFeatured(featuredEntry);
         setPopularEntries(popular);
-        setFields(researchFields.length ? researchFields : Object.keys(fieldColors));
+        setFields(researchFields);
       } catch (err) {
         if (active) setError(err.message || 'Failed to load journal entries.');
       } finally {
