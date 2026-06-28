@@ -325,29 +325,31 @@ model Download {
 }
 
 model BlogPost {
-  id                     Int      @id @default(autoincrement())
-  slug                   String   @unique
-  title                  String
-  excerpt                String
-  intro                  String
-  category               String
-  author                 String
-  authorRole             String?
-  readTime               String   @default("5 min read")
-  coverImage             String?
-  coverImageCloudinaryId String?
-  accentColor            String   @default("#045d30")
-  sections               Json
-  callout                Json?
-  tags                   Json     @default("[]")
-  featured               Boolean  @default(false)
-  isPopular              Boolean  @default(false)
-  published              Boolean  @default(true)
-  publishedAt            DateTime @default(now())
-  sortOrder              Int      @default(0)
-  viewCount              Int      @default(0)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  id                        Int      @id @default(autoincrement())
+  slug                      String   @unique
+  title                     String
+  excerpt                   String
+  intro                     String
+  category                  String
+  author                    String
+  authorRole                String?
+  readTime                  String   @default("5 min read")
+  coverImage                String?
+  coverImageCloudinaryId    String?
+  attachmentUrl             String?
+  attachmentCloudinaryId    String?
+  accentColor               String   @default("#045d30")
+  sections                  Json
+  callout                   Json?
+  tags                      Json     @default("[]")
+  featured                  Boolean  @default(false)
+  isPopular                 Boolean  @default(false)
+  published                 Boolean  @default(true)
+  publishedAt               DateTime @default(now())
+  sortOrder                 Int      @default(0)
+  viewCount                 Int      @default(0)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
   @@index([published, featured])
   @@index([published, isPopular])

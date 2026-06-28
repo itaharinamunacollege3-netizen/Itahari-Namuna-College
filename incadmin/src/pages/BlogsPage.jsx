@@ -63,7 +63,9 @@ const emptyForm = {
   isPopular: false,
   published: true,
   removeCover: false,
+  removeAttachment: false,
   cover: null,
+  attachment: null,
 };
 
 function sectionsToForm(sections) {
@@ -98,7 +100,9 @@ function toForm(blog) {
     isPopular: Boolean(blog.isPopular),
     published: blog.published !== false,
     removeCover: false,
+    removeAttachment: false,
     cover: null,
+    attachment: null,
   };
 }
 
@@ -144,6 +148,7 @@ function toPayload(form) {
     isPopular: form.isPopular,
     published: form.published,
     removeCover: form.removeCover,
+    removeAttachment: form.removeAttachment,
   };
 }
 
@@ -231,7 +236,7 @@ export default function BlogsPage() {
     }
 
     setSaving(true);
-    const files = { cover: form.cover };
+    const files = { cover: form.cover, attachment: form.attachment };
 
     try {
       if (editId) {
@@ -272,6 +277,24 @@ export default function BlogsPage() {
       const { data: blog } = await getBlog(editId);
       setExisting(blog);
       setForm((prev) => ({ ...prev, removeCover: false }));
+      reload();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }
+
+  async function handleRemoveAttachment() {
+    if (!editId || !confirm("Remove attachment?")) return;
+    try {
+      const response = await fetch(`/api/admin/blogs/${editId}/attachment`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to remove attachment");
+      toast.success("Attachment removed");
+      const { data: blog } = await getBlog(editId);
+      setExisting(blog);
+      setForm((prev) => ({ ...prev, removeAttachment: false }));
       reload();
     } catch (err) {
       toast.error(err.message);
@@ -569,37 +592,76 @@ export default function BlogsPage() {
             </FormField>
           </FormSection>
 
-          <FormSection title="Cover image">
-            <FormField label="Upload cover image">
-              <input
-                type="file"
-                accept="image/*"
-                className="file-input file-input-bordered w-full"
-                onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] ?? null })}
-              />
-            </FormField>
+          <FormSection title="Attachments">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField label="Cover image">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="file-input file-input-bordered w-full"
+                  onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] ?? null })}
+                />
+              </FormField>
 
-            {editId && existing?.coverImage ? (
+              <FormField label="Attachment (PDF)">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="file-input file-input-bordered w-full"
+                  onChange={(e) => setForm({ ...form, attachment: e.target.files?.[0] ?? null })}
+                />
+              </FormField>
+            </div>
+
+            {editId && (existing?.coverImage || existing?.attachmentUrl) ? (
               <div className="space-y-3 rounded-lg border border-[var(--border-subtle)] p-3">
-                <p className="text-sm font-medium">Current cover</p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <img
-                    src={existing.coverImage}
-                    alt=""
-                    className="h-20 w-32 rounded object-cover"
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-xs btn-ghost text-rose-600"
-                    onClick={handleRemoveCover}
-                  >
-                    Remove cover
-                  </button>
-                  <FormCheckbox
-                    label="Remove cover on save"
-                    checked={form.removeCover}
-                    onChange={(e) => setForm({ ...form, removeCover: e.target.checked })}
-                  />
+                <p className="text-sm font-medium">Current files</p>
+                <div className="space-y-3">
+                  {existing?.coverImage ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <img
+                        src={existing.coverImage}
+                        alt=""
+                        className="h-20 w-32 rounded object-cover"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-xs btn-ghost text-rose-600"
+                        onClick={handleRemoveCover}
+                      >
+                        Remove cover
+                      </button>
+                      <FormCheckbox
+                        label="Remove cover on save"
+                        checked={form.removeCover}
+                        onChange={(e) => setForm({ ...form, removeCover: e.target.checked })}
+                      />
+                    </div>
+                  ) : null}
+                  {existing?.attachmentUrl ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <a
+                        href={existing.attachmentUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="link link-primary text-sm"
+                      >
+                        View attachment
+                      </a>
+                      <button
+                        type="button"
+                        className="btn btn-xs btn-ghost text-rose-600"
+                        onClick={handleRemoveAttachment}
+                      >
+                        Remove attachment
+                      </button>
+                      <FormCheckbox
+                        label="Remove attachment on save"
+                        checked={form.removeAttachment}
+                        onChange={(e) => setForm({ ...form, removeAttachment: e.target.checked })}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ) : null}

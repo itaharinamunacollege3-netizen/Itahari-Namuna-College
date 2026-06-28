@@ -177,3 +177,48 @@ export function getJournalUploadFiles(req: Request) {
     cover: files?.cover?.[0],
   };
 }
+
+function blogFileFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) {
+  if (file.fieldname === "attachment") {
+    if (file.mimetype !== PDF_MIME) {
+      return cb(new AppError(400, "Only PDF files are allowed for the attachment field"));
+    }
+  } else if (file.fieldname === "cover") {
+    if (!isAllowedImageMime(file.mimetype)) {
+      return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for the cover field"));
+    }
+  } else {
+    return cb(new AppError(400, `Unexpected file field: ${file.fieldname}`));
+  }
+  cb(null, true);
+}
+
+export const blogFileUpload = multer({
+  storage,
+  limits: { fileSize: env.maxUploadBytes, files: 2 },
+  fileFilter: blogFileFilter,
+});
+
+export function runBlogFileUpload() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    blogFileUpload.fields([
+      { name: "attachment", maxCount: 1 },
+      { name: "cover", maxCount: 1 },
+    ])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function getBlogUploadFiles(req: Request) {
+  const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  return {
+    attachment: files?.attachment?.[0],
+    cover: files?.cover?.[0],
+  };
+}

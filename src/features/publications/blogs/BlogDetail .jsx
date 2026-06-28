@@ -6,6 +6,7 @@ import {
   Calendar,
   ChevronRight,
   Clock,
+  Download,
   Share2,
   Tag,
   User,
@@ -126,6 +127,24 @@ export default function BlogDetail() {
             <p className="font-body text-brand-dark/80 text-lg leading-relaxed border-l-4 border-brand-primary pl-5 mb-10 italic">
               {post.intro}
             </p>
+
+            {post.attachmentUrl ? (
+              <a
+                href={post.attachmentUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 bg-brand-primary/8 text-brand-primary px-6 py-4 rounded-xl border border-brand-primary/20 hover:bg-brand-primary/12 transition-colors duration-200 mb-10"
+              >
+                <div className="p-3 rounded-lg bg-brand-primary text-white">
+                  <Download size={20} />
+                </div>
+                <div>
+                  <p className="font-heading font-bold text-sm text-brand-primary">Download Attachment</p>
+                  <p className="font-body text-xs text-brand-dark/50 mt-0.5">PDF document · Click to open</p>
+                </div>
+                <ChevronRight size={16} className="ml-auto text-brand-primary" />
+              </a>
+            ) : null}
 
             <div className="space-y-10">
               {post.sections?.map((section, index) => (

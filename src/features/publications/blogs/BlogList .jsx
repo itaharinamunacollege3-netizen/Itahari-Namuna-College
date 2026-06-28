@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, User, TrendingUp, Tag } from 'lucide-react';
+import { ArrowRight, Clock, User, TrendingUp, Tag, FileText } from 'lucide-react';
 import {
   getBlogLink,
   getBlogCategories,
@@ -187,9 +187,17 @@ export default function BlogList() {
                     {featured.readTime}
                   </span>
                 </div>
-                <span className="mt-2 inline-flex items-center gap-2 text-sm font-semibold font-body text-brand-primary group-hover:gap-3 transition-all duration-200">
-                  Read Article <ArrowRight size={14} />
-                </span>
+                <div className="flex items-center gap-4">
+                  {featured.attachmentUrl ? (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-dark/50">
+                      <FileText size={12} />
+                      Attachment
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-2 text-sm font-semibold font-body text-brand-primary group-hover:gap-3 transition-all duration-200">
+                    Read Article <ArrowRight size={14} />
+                  </span>
+                </div>
               </div>
             </Link>
           </section>
@@ -246,10 +254,17 @@ export default function BlogList() {
                       {post.excerpt}
                     </p>
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[11px] font-body text-brand-dark/40 flex items-center gap-1">
-                        <User size={10} />
-                        {post.author}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] font-body text-brand-dark/40 flex items-center gap-1">
+                          <User size={10} />
+                          {post.author}
+                        </span>
+                        {post.attachmentUrl ? (
+                          <span className="text-[11px] font-body text-brand-dark/40 flex items-center gap-1">
+                            <FileText size={9} />
+                          </span>
+                        ) : null}
+                      </div>
                       <Link
                         to={getBlogLink(post)}
                         className="inline-flex items-center gap-1 text-xs font-semibold font-body text-brand-primary hover:gap-2 transition-all duration-200"

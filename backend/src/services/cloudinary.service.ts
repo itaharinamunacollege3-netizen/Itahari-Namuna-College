@@ -358,6 +358,42 @@ export async function uploadJournalPdf(
   };
 }
 
+export async function uploadBlogPdf(
+  file: Express.Multer.File,
+  blogSlug: string
+): Promise<CloudinaryUploadResult> {
+  if (file.mimetype !== "application/pdf") {
+    throw new AppError(400, "Only PDF files are allowed");
+  }
+
+  const pdfCheck = validatePdfBuffer(file.buffer);
+  if (!pdfCheck.valid) {
+    throw new AppError(400, pdfCheck.reason ?? "File is not a valid PDF");
+  }
+
+  const compressedBuffer = await compressPdfBuffer(file.buffer);
+  const cloudinary = getCloudinary();
+  const safeName = sanitizeUploadFilename(file.originalname.replace(/\.[^.]+$/, ""));
+
+  const result = await withCloudinary(() =>
+    cloudinary.uploader.upload(
+      `data:application/pdf;base64,${compressedBuffer.toString("base64")}`,
+      {
+        folder: `${blogFolder(blogSlug)}/pdf`,
+        public_id: `${safeName}-${Date.now()}`,
+        resource_type: "raw",
+        overwrite: false,
+      }
+    )
+  );
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+    bytes: result.bytes,
+  };
+}
+
 export async function uploadProgramSyllabusPdf(
   file: Express.Multer.File,
   programSlug: string,

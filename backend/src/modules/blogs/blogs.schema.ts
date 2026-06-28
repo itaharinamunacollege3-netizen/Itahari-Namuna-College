@@ -101,6 +101,7 @@ const blogFieldsSchema = z.object({
   slug: z.string().trim().optional(),
   sortOrder: z.coerce.number().int().min(0).default(0),
   removeCover: z.boolean().default(false),
+  removeAttachment: z.boolean().default(false),
 });
 
 function normalizeBlogBody(body: unknown): unknown {
@@ -127,6 +128,7 @@ function normalizeBlogBody(body: unknown): unknown {
     slug: input.slug,
     sortOrder: input.sortOrder,
     removeCover: parseBoolean(input.removeCover, false),
+    removeAttachment: parseBoolean(input.removeAttachment, false),
   };
 }
 

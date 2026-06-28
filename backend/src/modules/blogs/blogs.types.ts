@@ -27,6 +27,7 @@ export interface BlogListItemDto {
   publishedAt: string;
   sortOrder: number;
   tags: string[];
+  attachmentUrl: string;
 }
 
 export interface BlogDetailDto extends BlogListItemDto {
@@ -64,8 +65,10 @@ export interface BlogWriteInput {
   slug?: string;
   sortOrder?: number;
   removeCover?: boolean;
+  removeAttachment?: boolean;
 }
 
 export interface BlogUploadFiles {
   cover?: Express.Multer.File;
+  attachment?: Express.Multer.File;
 }

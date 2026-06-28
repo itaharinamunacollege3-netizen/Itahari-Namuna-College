@@ -5,6 +5,7 @@ import { AppError } from "../../utils/apiResponse";
 import {
   deleteCloudinaryAsset,
   uploadBlogCoverImage,
+  uploadBlogPdf,
 } from "../../services/cloudinary.service";
 import { formatBlogDate, formatBlogDetail, formatBlogListItem } from "./blogs.formatter";
 import type { BlogUploadFiles, BlogWriteInput, ListBlogsParams } from "./blogs.types";
@@ -69,11 +70,11 @@ async function findBlogRecord(idOrSlug: string, publishedOnly = true) {
   });
 }
 
-async function resolveCoverFields(
+async function resolveMediaFields(
   data: Partial<BlogWriteInput>,
   files: BlogUploadFiles | undefined,
   blogSlug: string,
-  existing?: { coverImage: string | null; coverImageCloudinaryId: string | null }
+  existing?: { coverImage: string | null; coverImageCloudinaryId: string | null; attachmentUrl: string | null; attachmentCloudinaryId: string | null }
 ) {
   const result: Record<string, unknown> = {};
 
@@ -92,14 +93,32 @@ async function resolveCoverFields(
     result.coverImageCloudinaryId = upload.publicId;
   }
 
+  if (data.removeAttachment) {
+    if (existing?.attachmentCloudinaryId) {
+      await deleteCloudinaryAsset(existing.attachmentCloudinaryId, "raw");
+    }
+    result.attachmentUrl = null;
+    result.attachmentCloudinaryId = null;
+  } else if (files?.attachment) {
+    if (existing?.attachmentCloudinaryId) {
+      await deleteCloudinaryAsset(existing.attachmentCloudinaryId, "raw");
+    }
+    const upload = await uploadBlogPdf(files.attachment, blogSlug);
+    result.attachmentUrl = upload.url;
+    result.attachmentCloudinaryId = upload.publicId;
+  }
+
   return result;
 }
 
-async function deleteBlogAssets(post: { coverImageCloudinaryId: string | null }) {
-  await deleteCloudinaryAsset(post.coverImageCloudinaryId, "image");
+async function deleteBlogAssets(post: { coverImageCloudinaryId: string | null; attachmentCloudinaryId: string | null }) {
+  await Promise.all([
+    deleteCloudinaryAsset(post.coverImageCloudinaryId, "image"),
+    deleteCloudinaryAsset(post.attachmentCloudinaryId, "raw"),
+  ]);
 }
 
-function mapWriteInputToDb(data: BlogWriteInput, coverFields: Record<string, unknown>) {
+function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unknown>) {
   const callout = sanitizeCallout(data.callout ?? null);
 
   return {
@@ -119,7 +138,7 @@ function mapWriteInputToDb(data: BlogWriteInput, coverFields: Record<string, unk
     published: data.published ?? true,
     publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
     sortOrder: data.sortOrder ?? 0,
-    ...coverFields,
+    ...mediaFields,
   };
 }
 
@@ -236,8 +255,8 @@ export async function createBlog(data: BlogWriteInput, files?: BlogUploadFiles) 
     data.slug ||
     (await uniqueSlug(data.title, async (s) => !!(await prisma.blogPost.findUnique({ where: { slug: s } }))));
 
-  const coverFields = await resolveCoverFields(data, files, slug);
-  const dbData = mapWriteInputToDb(data, coverFields);
+  const mediaFields = await resolveMediaFields(data, files, slug);
+  const dbData = mapWriteInputToDb(data, mediaFields);
 
   const post = await prisma.$transaction(async (tx) => {
     if (dbData.featured) {
@@ -300,7 +319,7 @@ export async function updateBlog(
     updateData.slug = blogSlug;
   }
 
-  Object.assign(updateData, await resolveCoverFields(data, files, blogSlug, existing));
+  Object.assign(updateData, await resolveMediaFields(data, files, blogSlug, existing));
 
   const post = await prisma.$transaction(async (tx) => {
     if (updateData.featured) {
@@ -373,4 +392,43 @@ export async function listBlogCategories() {
   });
 
   return rows.map((row) => row.category);
+}
+
+export async function uploadBlogAttachment(id: number, file: Express.Multer.File) {
+  const existing = await prisma.blogPost.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, "Blog post not found");
+
+  if (existing.attachmentCloudinaryId) {
+    await deleteCloudinaryAsset(existing.attachmentCloudinaryId, "raw");
+  }
+
+  const upload = await uploadBlogPdf(file, existing.slug);
+  const post = await prisma.blogPost.update({
+    where: { id },
+    data: {
+      attachmentUrl: upload.url,
+      attachmentCloudinaryId: upload.publicId,
+    },
+  });
+
+  return formatBlogDetail(post);
+}
+
+export async function removeBlogAttachment(id: number) {
+  const existing = await prisma.blogPost.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, "Blog post not found");
+
+  if (existing.attachmentCloudinaryId) {
+    await deleteCloudinaryAsset(existing.attachmentCloudinaryId, "raw");
+  }
+
+  const post = await prisma.blogPost.update({
+    where: { id },
+    data: {
+      attachmentUrl: null,
+      attachmentCloudinaryId: null,
+    },
+  });
+
+  return formatBlogDetail(post);
 }

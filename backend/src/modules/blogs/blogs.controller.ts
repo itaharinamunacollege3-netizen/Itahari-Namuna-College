@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as blogsService from "./blogs.service";
 import { sendSuccess, AppError } from "../../utils/apiResponse";
 import { writeAuditLog } from "../../utils/audit";
-import { getUploadedFile } from "../../middleware/upload";
+import { getBlogUploadFiles, getUploadedFile } from "../../middleware/upload";
 import { listBlogsQuerySchema } from "./blogs.schema";
 import { z } from "zod";
 
@@ -108,8 +108,8 @@ export async function getAdminById(req: Request, res: Response, next: NextFuncti
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const cover = getUploadedFile(req, "cover");
-    const data = await blogsService.createBlog(req.body, cover ? { cover } : undefined);
+    const files = getBlogUploadFiles(req);
+    const data = await blogsService.createBlog(req.body, files);
     await writeAuditLog({
       userId: req.user?.id,
       action: "CREATE_BLOG",
@@ -126,8 +126,8 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    const cover = getUploadedFile(req, "cover");
-    const data = await blogsService.updateBlog(id, req.body, cover ? { cover } : undefined);
+    const files = getBlogUploadFiles(req);
+    const data = await blogsService.updateBlog(id, req.body, files);
     await writeAuditLog({
       userId: req.user?.id,
       action: "UPDATE_BLOG",
@@ -185,6 +185,43 @@ export async function removeCover(req: Request, res: Response, next: NextFunctio
     await writeAuditLog({
       userId: req.user?.id,
       action: "DELETE_BLOG_COVER",
+      resource: "blogs",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function uploadAttachment(req: Request, res: Response, next: NextFunction) {
+  try {
+    const file = getUploadedFile(req, "attachment");
+    if (!file) throw new AppError(400, "Attachment file is required");
+
+    const id = Number(req.params.id);
+    const data = await blogsService.uploadBlogAttachment(id, file);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "UPLOAD_BLOG_ATTACHMENT",
+      resource: "blogs",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function removeAttachment(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const data = await blogsService.removeBlogAttachment(id);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "DELETE_BLOG_ATTACHMENT",
       resource: "blogs",
       resourceId: id,
       ipAddress: req.ip,

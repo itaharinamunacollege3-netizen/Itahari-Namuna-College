@@ -59,6 +59,7 @@ export function formatBlogListItem(post: BlogPost): BlogListItemDto {
     publishedAt: post.publishedAt.toISOString(),
     sortOrder: post.sortOrder,
     tags: parseTags(post.tags),
+    attachmentUrl: post.attachmentUrl ?? "",
   };
 }
 
