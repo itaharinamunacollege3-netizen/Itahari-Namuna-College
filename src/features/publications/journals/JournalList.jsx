@@ -8,7 +8,6 @@ import {
   getJournals,
   getPopularJournals,
 } from './journalsService';
-import { fieldColors } from './mockJournals';
 
 function FieldBadge({ field, small = false }) {
   const c = fieldColors[field] ?? { bg: 'bg-brand-gray', text: 'text-brand-dark/60' };
@@ -25,6 +24,9 @@ function FieldBadge({ field, small = false }) {
 function CoverPanel({ entry, className = 'min-h-64 md:min-h-72' }) {
   if (entry.coverImage) {
     return (
+
+
+      
       <div className={`relative overflow-hidden ${className}`}>
         <img src={entry.coverImage} alt="" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />

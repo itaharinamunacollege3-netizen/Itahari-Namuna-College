@@ -8,7 +8,7 @@ import {
   getFeaturedBlog,
   getPopularBlogs,
 } from './blogsService';
-import { categoryColors } from './mockBlogs';
+
 
 function CategoryBadge({ category, small = false }) {
   const c = categoryColors[category] ?? { bg: 'bg-brand-gray', text: 'text-brand-dark/60' };
