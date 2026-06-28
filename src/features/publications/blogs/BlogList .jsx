@@ -35,7 +35,7 @@ function CoverPanel({ post, className = 'min-h-64 md:min-h-72' }) {
   return (
     <div
       className={`relative overflow-hidden ${className}`}
-      style={{ background: `linear-gradient(135deg, ${post.accentColor} 0%, #3db2e1 100%)` }}
+      style={{ background: `linear-gradient(135deg, #045d30 0%, #3db2e1 100%)` }}
     >
       <span className="absolute inset-0 flex items-center justify-center font-heading font-black text-[10rem] text-white/5 select-none pointer-events-none leading-none">
         {post.category?.[0]}
@@ -224,7 +224,7 @@ export default function BlogList() {
                     <div className="absolute bottom-3 left-3">
                       <span
                         className="bg-white/90 backdrop-blur-sm text-[10px] font-semibold font-body px-2.5 py-0.5 rounded-full"
-                        style={{ color: post.accentColor }}
+                        style={{ color: '#045d30' }}
                       >
                         {post.category}
                       </span>

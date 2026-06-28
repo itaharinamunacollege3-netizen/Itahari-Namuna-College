@@ -52,7 +52,6 @@ export function formatBlogListItem(post: BlogPost): BlogListItemDto {
     date: formatBlogDate(post.publishedAt),
     readTime: post.readTime,
     coverImage: post.coverImage ?? "",
-    accentColor: post.accentColor,
     featured: post.featured,
     isPopular: post.isPopular,
     published: post.published,

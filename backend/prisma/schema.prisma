@@ -336,7 +336,6 @@ model BlogPost {
   readTime               String   @default("5 min read")
   coverImage             String?
   coverImageCloudinaryId String?
-  accentColor            String   @default("#045d30")
   sections               Json
   callout                Json?
   tags                   Json     @default("[]")

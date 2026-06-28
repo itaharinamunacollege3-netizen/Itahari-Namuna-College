@@ -126,6 +126,9 @@ export function getNoticeUploadFiles(req: Request) {
 }
 
 export function getUploadedFile(req: Request, fieldName: string) {
+  if (req.file && req.file.fieldname === fieldName) {
+    return req.file;
+  }
   const files = req.files as Record<string, Express.Multer.File[]> | undefined;
   return files?.[fieldName]?.[0];
 }

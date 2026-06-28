@@ -74,7 +74,7 @@ export default function BlogDetail() {
   const toc = Array.isArray(post.sections) ? post.sections.map((section) => section.heading) : [];
   const bannerStyle = post.coverImage
     ? { backgroundImage: `url(${post.coverImage})` }
-    : { backgroundImage: `linear-gradient(135deg, ${post.accentColor} 0%, #3db2e1 100%)` };
+    : { backgroundImage: `linear-gradient(135deg, #045d30 0%, #3db2e1 100%)` };
 
   return (
     <div className="min-h-screen bg-brand-gray/30">

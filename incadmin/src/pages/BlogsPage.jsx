@@ -26,7 +26,6 @@ import {
   FormActions,
 } from "@/components/ui/Modal";
 import {
-  BLOG_ACCENT_COLORS,
   BLOG_CATEGORIES,
   BLOG_FIELD_HINTS,
   EMPTY_BLOG_SECTION,
@@ -51,7 +50,6 @@ const emptyForm = {
   author: "",
   authorRole: "",
   readTime: "5 min read",
-  accentColor: "#045d30",
   sections: [{ ...EMPTY_BLOG_SECTION }],
   calloutHeading: "",
   calloutBody: "",
@@ -86,7 +84,6 @@ function toForm(blog) {
     author: blog.author ?? "",
     authorRole: blog.authorRole ?? "",
     readTime: blog.readTime ?? "5 min read",
-    accentColor: blog.accentColor ?? "#045d30",
     sections: sectionsToForm(blog.sections),
     calloutHeading: blog.callout?.heading ?? "",
     calloutBody: blog.callout?.body ?? "",
@@ -127,7 +124,6 @@ function toPayload(form) {
     author: form.author.trim(),
     authorRole: optionalString(form.authorRole),
     readTime: form.readTime.trim() || "5 min read",
-    accentColor: form.accentColor,
     sections,
     callout:
       calloutHeading && calloutBody
@@ -411,19 +407,6 @@ export default function BlogsPage() {
                   {BLOG_CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
-                    </option>
-                  ))}
-                </FormSelect>
-              </FormField>
-
-              <FormField label="Accent color">
-                <FormSelect
-                  value={form.accentColor}
-                  onChange={(e) => setForm({ ...form, accentColor: e.target.value })}
-                >
-                  {BLOG_ACCENT_COLORS.map((color) => (
-                    <option key={color.value} value={color.value}>
-                      {color.label}
                     </option>
                   ))}
                 </FormSelect>
