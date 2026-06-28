@@ -14,6 +14,7 @@ export default function Navbar() {
     { name: 'Programs', path: '/academic' },
     { name: 'Notices', path: '/notices' },
     { name: 'Gallery', path: '/gallery' },
+    {name: 'Cells & Units', path: '/cells-and-units'},
     { name: 'Facilities', path: '/facilities' },
     { name: 'Contact', path: '/contact' },
   ];
