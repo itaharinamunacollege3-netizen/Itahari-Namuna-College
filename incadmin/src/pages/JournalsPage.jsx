@@ -79,6 +79,9 @@ function sectionsToForm(sections) {
     heading: section.heading ?? "",
     body: section.body ?? "",
     bullets: Array.isArray(section.bullets) ? section.bullets.join(", ") : "",
+    imageUrl: section.imageUrl ?? "",
+    imageCloudinaryId: section.imageCloudinaryId ?? "",
+    removeImage: false,
   }));
 }
 
@@ -121,7 +124,15 @@ function toPayload(form) {
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
-      return bullets.length ? { heading, body, bullets } : { heading, body };
+      const base = {
+        heading,
+        body,
+        ...(bullets.length ? { bullets } : {}),
+        ...(section.imageUrl ? { imageUrl: section.imageUrl } : {}),
+        ...(section.imageCloudinaryId ? { imageCloudinaryId: section.imageCloudinaryId } : {}),
+        removeImage: section.removeImage,
+      };
+      return base;
     })
     .filter(Boolean);
 
@@ -248,7 +259,11 @@ export default function JournalsPage() {
     }
 
     setSaving(true);
-    const files = { cover: form.cover, pdf: form.pdf };
+    const files = { 
+      cover: form.cover, 
+      pdf: form.pdf,
+      sectionImages: form.sections.map((section) => section.imageFile || null),
+    };
 
     try {
       if (editId) {
@@ -562,6 +577,32 @@ export default function JournalsPage() {
                       onChange={(e) => updateSection(index, "bullets", e.target.value)}
                     />
                   </FormField>
+
+                  <FormField label="Section image">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="file-input file-input-bordered w-full"
+                      onChange={(e) => updateSection(index, "imageFile", e.target.files?.[0] || null)}
+                    />
+                  </FormField>
+
+                  {section.imageUrl ? (
+                    <div className="space-y-2">
+                      <img
+                        src={section.imageUrl}
+                        alt=""
+                        className="h-40 w-full rounded object-cover"
+                      />
+                      <div className="flex items-center gap-2">
+                        <FormCheckbox
+                          label="Remove image on save"
+                          checked={section.removeImage}
+                          onChange={(e) => updateSection(index, "removeImage", e.target.checked)}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -597,7 +638,7 @@ export default function JournalsPage() {
                   type="file"
                   accept="image/*"
                   className="file-input file-input-bordered w-full"
-                  onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] ?? null })}
+                  onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] || null })}
                 />
               </FormField>
 
@@ -606,7 +647,7 @@ export default function JournalsPage() {
                   type="file"
                   accept="application/pdf"
                   className="file-input file-input-bordered w-full"
-                  onChange={(e) => setForm({ ...form, pdf: e.target.files?.[0] ?? null })}
+                  onChange={(e) => setForm({ ...form, pdf: e.target.files?.[0] || null })}
                 />
               </FormField>
             </div>

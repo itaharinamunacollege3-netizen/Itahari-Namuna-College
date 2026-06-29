@@ -12,6 +12,7 @@ import {
   Share2,
   Users,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { getJournalById, getJournalLink, getRelatedJournals } from './journalsService';
 
 export default function JournalDetail() {
@@ -57,7 +58,10 @@ export default function JournalDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-brand-gray/30 flex items-center justify-center">
-        <p className="font-body text-brand-dark/60">Loading paper…</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin" />
+          <p className="font-body text-brand-dark/60">Loading paper…</p>
+        </div>
       </div>
     );
   }
@@ -66,8 +70,11 @@ export default function JournalDetail() {
     return (
       <div className="min-h-screen bg-brand-gray/30 flex flex-col items-center justify-center gap-4 px-6">
         <p className="font-body text-brand-crimson">{error || 'Journal paper not found.'}</p>
-        <Link to="/publications/journal" className="font-body text-brand-primary hover:underline">
-          ← Back to Journal
+        <Link
+          to="/publications/journal"
+          className="font-body text-brand-primary hover:underline flex items-center gap-2"
+        >
+          <ArrowLeft size={16} /> Back to Journal
         </Link>
       </div>
     );
@@ -81,7 +88,7 @@ export default function JournalDetail() {
   return (
     <div className="min-h-screen bg-brand-gray/30">
       <div
-        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[300px] flex items-end"
+        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[400px] flex items-end"
         style={bannerStyle}
       >
         <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
@@ -92,8 +99,11 @@ export default function JournalDetail() {
             backgroundSize: '28px 28px',
           }}
         />
+        {entry.coverImage && (
+          <div className="absolute inset-0 bg-black/20 z-10" />
+        )}
 
-        <div className="max-w-7xl mx-auto relative z-20 space-y-3 pb-2 w-full">
+        <div className="max-w-7xl mx-auto relative z-20 space-y-4 pb-2 w-full">
           <Link
             to="/publications/journal"
             className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors font-body"
@@ -101,127 +111,23 @@ export default function JournalDetail() {
             <ArrowLeft className="w-3.5 h-3.5" /> Journal
           </Link>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-xs font-body font-semibold bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-full text-white">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 text-xs font-body font-semibold bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-white">
               <FlaskConical size={10} /> {entry.field}
             </span>
-            <span className="text-xs text-white/50 font-body">
-              {entry.volume} · {entry.date}
+            <span className="text-xs text-white/60 font-body">
+              {entry.volume} · {entry.year}
             </span>
           </div>
 
-          <h1 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl text-white leading-tight max-w-3xl">
+          <h1 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-tight max-w-4xl">
             {entry.title}
           </h1>
 
-          <div className="flex flex-wrap gap-3 pt-1">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-xs px-4 py-1.5 text-xs font-medium text-white font-body">
-              <Users size={11} /> {entry.authors?.join(' · ')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-xs px-4 py-1.5 text-xs font-medium text-white font-body">
-              <Calendar size={11} /> {entry.date}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-12">
-        <div className="flex flex-col lg:flex-row gap-10 items-start">
-          <article className="flex-1 min-w-0">
-            <div className="mb-10 rounded-xl bg-brand-primary/8 border-l-4 border-brand-primary p-6">
-              <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-primary mb-2">
-                Abstract
-              </p>
-              <p className="font-body text-[15px] text-brand-dark/80 leading-relaxed italic">
-                {entry.abstract}
-              </p>
-            </div>
-
-            {entry.doi ? (
-              <div className="flex items-center gap-2 text-xs font-body text-brand-dark/40 mb-10">
-                <ExternalLink size={11} />
-                <span>DOI:</span>
-                <span className="text-brand-primary font-medium">{entry.doi}</span>
-                <button
-                  type="button"
-                  className="ml-auto p-2 rounded-lg hover:bg-brand-gray transition-colors"
-                  aria-label="Share"
-                >
-                  <Share2 size={13} className="text-brand-dark/30 hover:text-brand-primary transition-colors" />
-                </button>
-              </div>
-            ) : null}
-
-            <div className="space-y-10">
-              {entry.sections?.map((section, index) => (
-                <section key={index} id={`section-${index}`}>
-                  <h2 className="font-heading text-xl font-bold text-brand-dark mb-3 leading-snug">
-                    {section.heading}
-                  </h2>
-                  <p className="font-body text-[15px] text-brand-dark/75 leading-relaxed mb-4">
-                    {section.body}
-                  </p>
-                  {section.bullets?.length ? (
-                    <ul className="space-y-2 mt-3">
-                      {section.bullets.map((bullet, bulletIndex) => (
-                        <li
-                          key={bulletIndex}
-                          className="flex items-start gap-3 font-body text-sm text-brand-dark/70 leading-relaxed"
-                        >
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
-                          {bullet}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </section>
-              ))}
-            </div>
-
-            {entry.callout ? (
-              <div className="mt-10 rounded-xl bg-brand-dark/95 p-6 relative overflow-hidden">
-                <Quote size={48} className="absolute top-4 right-4 text-white/5" />
-                <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-gold mb-3">
-                  {entry.callout.label}
-                </p>
-                <p className="font-heading text-base font-semibold text-white leading-relaxed">
-                  {entry.callout.body}
-                </p>
-              </div>
-            ) : null}
-
-            {entry.keywords?.length ? (
-              <div className="mt-10 pt-6 border-t border-brand-gray">
-                <p className="text-xs font-body font-semibold text-brand-dark/40 uppercase tracking-widest mb-3">
-                  Keywords
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {entry.keywords.map((keyword) => (
-                    <span
-                      key={keyword}
-                      className="text-xs font-body font-medium px-3 py-1.5 rounded-full bg-brand-gray text-brand-dark/60"
-                    >
-                      {keyword}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {entry.citeSuggestion ? (
-              <div className="mt-8 rounded-xl border border-brand-gray/60 bg-brand-white p-5">
-                <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-dark/40 mb-2">
-                  Cite This Paper
-                </p>
-                <p className="font-body text-xs text-brand-dark/70 leading-relaxed bg-brand-gray/50 rounded-lg px-4 py-3 select-all">
-                  {entry.citeSuggestion}
-                </p>
-              </div>
-            ) : null}
-
-            <div className="mt-6 flex items-center gap-5 bg-brand-white rounded-xl border border-brand-gray/60 p-5">
-              <div className="w-14 h-14 rounded-full bg-linear-to-br from-brand-primary to-brand-blue shrink-0 flex items-center justify-center">
-                <span className="font-heading font-black text-white text-lg">
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-white/20 to-white/10 flex items-center justify-center backdrop-blur-sm">
+                <span className="font-heading font-black text-white">
                   {entry.authors?.[0]
                     ?.split(' ')
                     .map((word) => word[0])
@@ -230,24 +136,209 @@ export default function JournalDetail() {
                 </span>
               </div>
               <div>
-                <p className="font-heading font-bold text-brand-dark text-sm">
+                <p className="font-heading font-semibold text-white">
+                  {entry.authors?.join(', ')}
+                </p>
+                {entry.authorAffiliation && (
+                  <p className="text-xs text-white/70">{entry.authorAffiliation}</p>
+                )}
+              </div>
+            </div>
+            <span className="text-white/50">·</span>
+            <span className="inline-flex items-center gap-1.5 text-sm text-white/80 font-body">
+              <Calendar size={14} /> {entry.date}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-12 lg:py-16">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <article className="flex-1 min-w-0">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="mb-12 rounded-2xl bg-gradient-to-r from-brand-primary/8 to-brand-blue/8 border-l-4 border-brand-primary p-7">
+                <p className="text-xs font-body font-extrabold uppercase tracking-widest text-brand-primary mb-3">
+                  Abstract
+                </p>
+                <p className="font-body text-base sm:text-lg text-brand-dark/80 leading-relaxed italic">
+                  {entry.abstract}
+                </p>
+              </div>
+            </motion.div>
+
+            {entry.doi ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="flex items-center gap-2 text-xs font-body text-brand-dark/40 mb-12"
+              >
+                <ExternalLink size={13} />
+                <span>DOI:</span>
+                <span className="text-brand-primary font-medium">{entry.doi}</span>
+                <button
+                  type="button"
+                  className="ml-auto p-2.5 rounded-xl hover:bg-brand-gray transition-all hover:scale-105"
+                  aria-label="Share"
+                >
+                  <Share2
+                    size={16} className="text-brand-dark/30 hover:text-brand-primary transition-colors"
+                  />
+                </button>
+              </motion.div>
+            ) : null}
+
+            <div className="space-y-16">
+              {entry.sections?.map((section, index) => (
+              <motion.section
+                key={index}
+                id={`section-${index}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-brand-dark mb-5 leading-snug">
+                  {section.heading}
+                </h2>
+                <p className="font-body text-base sm:text-[17px] text-brand-dark/80 leading-relaxed mb-6">
+                  {section.body}
+                </p>
+                {section.bullets?.length ? (
+                  <ul className="space-y-3 mt-6 mb-6">
+                    {section.bullets.map((bullet, bulletIndex) => (
+                      <li
+                        key={bulletIndex}
+                        className="flex items-start gap-4 font-body text-base text-brand-dark/75 leading-relaxed"
+                      >
+                        <div className="mt-2 w-2.5 h-2.5 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 shadow-sm" />
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {section.imageUrl ? (
+                  <div className="mt-8 mb-8 rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
+                    <img
+                      src={section.imageUrl}
+                      alt={section.heading}
+                      className="w-full h-auto object-cover transition-transform duration-700 hover:scale-[1.02]"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : null}
+              </motion.section>
+            ))}
+            </div>
+
+            {entry.callout ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="mt-16 rounded-2xl bg-gradient-to-br from-brand-dark/95 to-brand-dark p-8 relative overflow-hidden"
+              >
+                <div className="absolute top-4 right-4 w-20 bg-brand-primary/10 rounded-full blur-3xl" />
+                <Quote
+                  size={56}
+                  className="absolute top-4 right-4 text-white/5"
+                />
+                <p className="text-xs font-body font-extrabold uppercase tracking-widest text-brand-gold mb-3">
+                  {entry.callout.label}
+                </p>
+                <p className="font-heading text-base sm:text-lg font-semibold text-white leading-relaxed">
+                  {entry.callout.body}
+                </p>
+              </motion.div>
+            ) : null}
+
+            {entry.keywords?.length ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="mt-14 pt-8 border-t border-brand-gray/60"
+              >
+                <p className="text-xs font-body font-bold text-brand-dark/40 uppercase tracking-widest mb-4">
+                  Keywords
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {entry.keywords.map((keyword) => (
+                    <span
+                      key={keyword}
+                      className="text-sm font-body font-medium px-4 py-2 rounded-full bg-gradient-to-r from-brand-gray to-brand-gray/80 text-brand-dark/70 hover:text-brand-primary hover:from-brand-primary/10 hover:to-brand-blue/10 transition-all duration-300 cursor-default"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ) : null}
+
+            {entry.citeSuggestion ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="mt-10 rounded-2xl border border-brand-gray/60 bg-gradient-to-br from-brand-white to-brand-gray/30 p-7 shadow-sm"
+              >
+                <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-dark/40 mb-3">
+                  Cite This Paper
+                </p>
+                <p className="font-body text-xs sm:text-sm text-brand-dark/70 leading-relaxed bg-gradient-to-br from-brand-gray/50 to-brand-gray/40 rounded-xl px-5 py-4 select-all">
+                  {entry.citeSuggestion}
+                </p>
+              </motion.div>
+            ) : null}
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="mt-10 flex items-center gap-6 bg-gradient-to-br from-brand-white to-brand-gray/30 rounded-2xl border border-brand-gray/60 p-6 sm:p-8 shadow-sm"
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 flex items-center justify-center shadow-lg">
+                <span className="font-heading font-black text-white text-xl">
+                  {entry.authors?.[0]
+                    ?.split(' ')
+                    .map((word) => word[0])
+                    .join('')
+                    .slice(0, 2)}
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="font-heading font-bold text-brand-dark text-lg">
                   {entry.authors?.join(', ')}
                 </p>
                 {entry.authorAffiliation ? (
-                  <p className="font-body text-xs text-brand-dark/50 mt-0.5">{entry.authorAffiliation}</p>
+                  <p className="font-body text-sm text-brand-dark/60 mt-1">{entry.authorAffiliation}</p>
                 ) : null}
-                <p className="font-body text-xs text-brand-dark/35 mt-1">
-                  {entry.volume} · Published {entry.date}
+                <p className="font-body text-xs text-brand-dark/50 mt-2 flex items-center gap-2">
+                  <Calendar size={12} /> {entry.volume} · Published {entry.date}
                 </p>
               </div>
-            </div>
+            </motion.div>
           </article>
 
-          <aside className="lg:w-72 shrink-0 space-y-5 lg:sticky lg:top-24">
-            <div className="rounded-xl overflow-hidden bg-linear-to-br from-brand-primary to-brand-blue p-5 text-white">
-              <BookOpen size={20} className="mb-3 opacity-80" />
-              <p className="font-heading text-sm font-bold mb-1">Full Paper (PDF)</p>
-              <p className="font-body text-xs text-white/70 mb-4 leading-relaxed">
+          <aside className="lg:w-80 shrink-0 space-y-6 lg:sticky lg:top-24">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="rounded-2xl overflow-hidden bg-gradient-to-br from-brand-primary to-brand-blue p-7 text-white shadow-lg"
+            >
+              <BookOpen size={24} className="mb-4 opacity-90" />
+              <p className="font-heading text-base font-bold mb-2">Full Paper (PDF)</p>
+              <p className="font-body text-sm text-white/80 mb-5 leading-relaxed">
                 Download the complete peer-reviewed article with references and appendices.
               </p>
               {entry.pdfUrl ? (
@@ -255,77 +346,89 @@ export default function JournalDetail() {
                   href={entry.pdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full flex items-center justify-center gap-2 bg-white text-brand-primary text-xs font-bold font-body px-4 py-2.5 rounded-lg hover:bg-brand-gray transition-colors duration-200"
+                  className="w-full flex items-center justify-center gap-3 bg-white text-brand-primary text-sm font-bold font-body px-6 py-3.5 rounded-xl hover:bg-brand-gray/20 hover:text-white transition-all duration-300"
                 >
-                  <Download size={13} /> Download PDF
+                  <Download size={16} /> Download PDF <ExternalLink size={14} />
                 </a>
               ) : (
                 <button
                   type="button"
                   disabled
-                  className="w-full flex items-center justify-center gap-2 bg-white/60 text-brand-primary/60 text-xs font-bold font-body px-4 py-2.5 rounded-lg cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 bg-white/60 text-brand-primary/60 text-sm font-bold font-body px-6 py-3.5 rounded-xl cursor-not-allowed"
                 >
-                  <Download size={13} /> PDF not available
+                  <Download size={16} /> PDF not available
                 </button>
               )}
-            </div>
+            </motion.div>
 
             {toc.length ? (
-              <div className="bg-brand-white rounded-xl border border-brand-gray/60 overflow-hidden">
-                <div className="px-5 py-4 border-b border-brand-gray/50 bg-brand-primary/5">
-                  <p className="font-heading text-xs font-bold text-brand-primary uppercase tracking-widest">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-brand-white rounded-2xl border border-brand-gray/60 overflow-hidden shadow-sm"
+              >
+                <div className="px-6 py-5 border-b border-brand-gray/50 bg-gradient-to-r from-brand-primary/5 to-brand-blue/5">
+                  <p className="font-heading text-xs font-extrabold text-brand-primary uppercase tracking-widest">
                     Contents
                   </p>
                 </div>
-                <ol className="p-3 space-y-1">
+                <ol className="p-4 space-y-2">
                   {toc.map((heading, index) => (
                     <li key={index}>
                       <a
                         href={`#section-${index}`}
-                        className="flex items-start gap-2.5 px-3 py-2 rounded-lg hover:bg-brand-gray/50 group transition-colors duration-150"
+                        className="flex items-start gap-3.5 px-4 py-3 rounded-xl hover:bg-brand-gray/50 group transition-all duration-200"
                       >
-                        <span className="font-heading text-xs font-black text-brand-gray/60 shrink-0 mt-0.5">
-                          {index + 1}.
+                        <span className="font-heading text-sm font-black text-brand-gray/70 shrink-0 mt-0.5">
+                          {String(index + 1).padStart(2, '0')}
                         </span>
-                        <span className="font-body text-xs text-brand-dark/70 group-hover:text-brand-primary transition-colors duration-150 leading-snug">
+                        <span className="font-body text-sm text-brand-dark/75 group-hover:text-brand-primary transition-colors duration-200 leading-snug">
                           {heading}
                         </span>
                       </a>
                     </li>
                   ))}
                 </ol>
-              </div>
+              </motion.div>
             ) : null}
 
-            <div className="bg-brand-white rounded-xl border border-brand-gray/60 overflow-hidden">
-              <div className="px-5 py-4 border-b border-brand-gray/50">
-                <p className="font-heading text-sm font-bold text-brand-dark">Related Research</p>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-brand-white rounded-2xl border border-brand-gray/60 overflow-hidden shadow-sm"
+            >
+              <div className="px-6 py-5 border-b border-brand-gray/50">
+                <p className="font-heading text-base font-bold text-brand-dark">Related Research</p>
               </div>
               <ul className="divide-y divide-brand-gray/40">
                 {related.map((item) => (
                   <li key={item.id}>
                     <Link
                       to={getJournalLink(item)}
-                      className="flex items-start gap-3 px-5 py-4 group hover:bg-brand-gray/30 transition-colors duration-150"
+                      className="flex items-start gap-4 px-6 py-5 group hover:bg-brand-gray/30 transition-colors duration-200"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-brand-primary/10 shrink-0 flex items-center justify-center mt-0.5">
-                        <FlaskConical size={13} className="text-brand-primary" />
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary/10 to-brand-blue/10 shrink-0 flex items-center justify-center mt-0.5">
+                        <FlaskConical size={16} className="text-brand-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-body text-xs font-medium text-brand-dark group-hover:text-brand-primary transition-colors duration-200 leading-snug line-clamp-2">
+                        <p className="font-body text-sm font-medium text-brand-dark group-hover:text-brand-primary transition-colors duration-200 leading-snug line-clamp-2">
                           {item.title}
                         </p>
-                        <p className="text-[10px] text-brand-dark/35 mt-1 font-body">{item.volume}</p>
+                        <p className="text-[11px] text-brand-dark/40 mt-1.5 font-body">{item.volume}</p>
                       </div>
                       <ChevronRight
-                        size={12}
-                        className="text-brand-dark/20 group-hover:text-brand-primary shrink-0 mt-1 transition-colors"
+                        size={14}
+                        className="text-brand-dark/20 group-hover:text-brand-primary shrink-0 mt-1 transition-all duration-200"
                       />
                     </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </aside>
         </div>
       </div>

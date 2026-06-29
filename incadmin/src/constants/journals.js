@@ -29,4 +29,7 @@ export const EMPTY_JOURNAL_SECTION = {
   heading: "",
   body: "",
   bullets: "",
+  imageUrl: "",
+  imageCloudinaryId: "",
+  removeImage: false,
 };

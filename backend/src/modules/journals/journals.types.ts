@@ -2,6 +2,9 @@ export interface JournalSectionDto {
   heading: string;
   body: string;
   bullets?: string[];
+  imageUrl?: string;
+  imageCloudinaryId?: string;
+  removeImage?: boolean;
 }
 
 export interface JournalCalloutDto {
@@ -74,4 +77,5 @@ export interface JournalWriteInput {
 export interface JournalUploadFiles {
   cover?: Express.Multer.File;
   pdf?: Express.Multer.File;
+  sectionImages?: Express.Multer.File[];
 }

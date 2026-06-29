@@ -340,6 +340,8 @@ export async function updateBlog(
         })
       : existing.slug);
 
+  const mediaFields = await resolveMediaFields(data, files, blogSlug, existing);
+  
   const updateData: Record<string, unknown> = {};
 
   if (data.title !== undefined) updateData.title = data.title.trim();
@@ -350,7 +352,11 @@ export async function updateBlog(
   if (data.authorRole !== undefined) updateData.authorRole = data.authorRole?.trim() || null;
   if (data.readTime !== undefined) updateData.readTime = data.readTime.trim();
   if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
-  if (data.sections !== undefined) updateData.sections = sanitizeSections(data.sections);
+  if (data.sections !== undefined) {
+    // Use sections from mediaFields if available, otherwise sanitize original sections
+    const sections = mediaFields.sections || data.sections;
+    updateData.sections = sanitizeSections(sections);
+  }
   if (data.callout !== undefined) {
     const callout = sanitizeCallout(data.callout ?? null);
     updateData.callout = callout;
@@ -368,7 +374,9 @@ export async function updateBlog(
     updateData.slug = blogSlug;
   }
 
-  Object.assign(updateData, await resolveMediaFields(data, files, blogSlug, existing));
+  // Merge media fields without overwriting sections we already sanitized
+  const { sections: _, ...restMediaFields } = mediaFields;
+  Object.assign(updateData, restMediaFields);
 
   const post = await prisma.$transaction(async (tx) => {
     if (updateData.featured) {

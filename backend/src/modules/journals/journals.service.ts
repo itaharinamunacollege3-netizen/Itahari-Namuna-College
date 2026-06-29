@@ -6,6 +6,7 @@ import {
   deleteCloudinaryAsset,
   uploadJournalCoverImage,
   uploadJournalPdf,
+  uploadJournalSectionImage,
 } from "../../services/cloudinary.service";
 import {
   formatJournalDate,
@@ -25,6 +26,8 @@ function sanitizeSections(sections: JournalWriteInput["sections"]) {
     ...(section.bullets?.length
       ? { bullets: section.bullets.map((bullet) => sanitizeText(bullet)) }
       : {}),
+    ...(section.imageUrl ? { imageUrl: section.imageUrl } : {}),
+    ...(section.imageCloudinaryId ? { imageCloudinaryId: section.imageCloudinaryId } : {}),
   }));
 }
 
@@ -80,6 +83,7 @@ async function resolveMediaFields(
   existing?: {
     coverImageCloudinaryId: string | null;
     pdfCloudinaryId: string | null;
+    sections?: unknown;
   }
 ) {
   const result: Record<string, unknown> = {};
@@ -114,16 +118,62 @@ async function resolveMediaFields(
     result.pdfCloudinaryId = upload.publicId;
   }
 
+  // Handle section images
+  if (data.sections) {
+    const existingSections = (existing?.sections || []) as Array<{ imageUrl?: string | null, imageCloudinaryId?: string | null }>;
+    const updatedSections = [...data.sections];
+
+    for (let i = 0; i < updatedSections.length; i++) {
+      const section = updatedSections[i];
+      const file = files?.sectionImages?.[i];
+      const existingSection = existingSections[i];
+
+      if (section.removeImage) {
+        if (existingSection?.imageCloudinaryId) {
+          await deleteCloudinaryAsset(existingSection.imageCloudinaryId, "image");
+        }
+        delete section.imageUrl;
+        delete section.imageCloudinaryId;
+      } else if (file) {
+        if (existingSection?.imageCloudinaryId) {
+          await deleteCloudinaryAsset(existingSection.imageCloudinaryId, "image");
+        }
+        const upload = await uploadJournalSectionImage(file, journalSlug);
+        section.imageUrl = upload.url;
+        section.imageCloudinaryId = upload.publicId;
+      } else if (existingSection?.imageUrl && !section.removeImage) {
+        // Keep existing image
+        section.imageUrl = existingSection.imageUrl;
+        section.imageCloudinaryId = existingSection.imageCloudinaryId ?? undefined;
+      }
+
+      delete section.removeImage;
+    }
+
+    result.sections = updatedSections;
+  }
+
   return result;
 }
 
 async function deleteJournalAssets(entry: {
   coverImageCloudinaryId: string | null;
   pdfCloudinaryId: string | null;
+  sections?: unknown;
 }) {
+  const sectionImagesToDelete: (string | null | undefined)[] = [];
+  const sections = (entry.sections || []) as Array<{ imageCloudinaryId?: string | null }>;
+  
+  for (const section of sections) {
+    if (section.imageCloudinaryId) {
+      sectionImagesToDelete.push(section.imageCloudinaryId);
+    }
+  }
+
   await Promise.all([
     deleteCloudinaryAsset(entry.coverImageCloudinaryId, "image"),
     deleteCloudinaryAsset(entry.pdfCloudinaryId, "raw"),
+    ...sectionImagesToDelete.map(id => deleteCloudinaryAsset(id, "image")),
   ]);
 }
 
@@ -316,6 +366,8 @@ export async function updateJournal(
         })
       : existing.slug);
 
+  const mediaFields = await resolveMediaFields(data, files, journalSlug, existing);
+
   const updateData: Record<string, unknown> = {};
 
   if (data.title !== undefined) updateData.title = data.title.trim();
@@ -330,7 +382,11 @@ export async function updateJournal(
   if (data.doi !== undefined) updateData.doi = data.doi?.trim() || null;
   if (data.keywords !== undefined) updateData.keywords = data.keywords;
   if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
-  if (data.sections !== undefined) updateData.sections = sanitizeSections(data.sections);
+  if (data.sections !== undefined) {
+    // Use sections from mediaFields if available, otherwise sanitize original sections
+    const sections = mediaFields.sections || data.sections;
+    updateData.sections = sanitizeSections(sections);
+  }
   if (data.callout !== undefined) updateData.callout = sanitizeCallout(data.callout ?? null);
   if (data.citeSuggestion !== undefined) {
     updateData.citeSuggestion = data.citeSuggestion?.trim() || null;
@@ -347,7 +403,9 @@ export async function updateJournal(
     updateData.slug = journalSlug;
   }
 
-  Object.assign(updateData, await resolveMediaFields(data, files, journalSlug, existing));
+  // Merge media fields without overwriting sections we already sanitized
+  const { sections: _, ...restMediaFields } = mediaFields;
+  Object.assign(updateData, restMediaFields);
 
   const entry = await prisma.$transaction(async (tx) => {
     if (updateData.featured) {
