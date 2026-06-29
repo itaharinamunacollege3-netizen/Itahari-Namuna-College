@@ -345,6 +345,7 @@ async function main() {
       author: "Dr. Ramesh Sharma",
       authorRole: "Head of Academic Affairs",
       readTime: "5 min read",
+      accentColor: "#045d30",
       featured: true,
       isPopular: true,
       publishedAt: new Date("2025-06-15"),
@@ -390,6 +391,7 @@ async function main() {
       author: "Priya Thapa",
       authorRole: "Innovation Lab Coordinator",
       readTime: "4 min read",
+      accentColor: "#e17622",
       featured: false,
       isPopular: true,
       publishedAt: new Date("2025-05-28"),
@@ -426,6 +428,7 @@ async function main() {
       author: "Sita Karki",
       authorRole: "Career Counsellor",
       readTime: "6 min read",
+      accentColor: "#c22368",
       featured: false,
       isPopular: true,
       publishedAt: new Date("2025-05-10"),
@@ -452,6 +455,7 @@ async function main() {
         author: post.author,
         authorRole: post.authorRole,
         readTime: post.readTime,
+        accentColor: post.accentColor,
         sections: post.sections,
         callout: post.callout,
         tags: post.tags,
@@ -463,6 +467,112 @@ async function main() {
       },
       create: {
         ...post,
+        published: true,
+      },
+    });
+  }
+
+  const journalEntries = [
+    {
+      slug: "socioeconomic-barriers-stem-rural-nepal",
+      title: "Socioeconomic Barriers to STEM Access in Rural Nepal",
+      abstract:
+        "This study examines the structural and cultural factors limiting STEM participation among rural youth in the Koshi Province, drawing on survey data from 12 secondary schools.",
+      field: "Social Sciences",
+      authors: ["Dr. Kamala Adhikari", "Prof. Sunil Bhattarai"],
+      authorAffiliation: "Department of Social Sciences, Itahari Namuna College",
+      volume: "Vol. 4, Issue 2",
+      year: "2025",
+      doi: "10.XXXXX/inc.journal.2025.04.02.001",
+      accentColor: "#045d30",
+      keywords: ["STEM Education", "Rural Nepal", "Socioeconomic Barriers", "Koshi Province"],
+      featured: true,
+      isPopular: true,
+      publishedAt: new Date("2025-03-01"),
+      sections: [
+        {
+          heading: "1. Introduction",
+          body: "Access to STEM education remains unequal across Nepal's geographic and socioeconomic divides.",
+          bullets: [
+            "Nepal's STEM enrolment in rural secondary schools lags urban rates by an estimated 34%.",
+            "Female students represented only 29% of science stream enrolments in surveyed schools.",
+          ],
+        },
+        {
+          heading: "2. Methodology",
+          body: "A mixed-methods approach was employed, combining structured surveys with semi-structured interviews.",
+        },
+      ],
+      callout: {
+        label: "Highlighted Finding",
+        body: "Female students in surveyed rural schools were 2.4 times more likely to cite family discouragement as a barrier to STEM participation.",
+      },
+      citeSuggestion:
+        "Adhikari, K. & Bhattarai, S. (2025). Socioeconomic Barriers to STEM Access in Rural Nepal. INC Journal of Interdisciplinary Research, 4(2), 14–29.",
+      sortOrder: 1,
+    },
+    {
+      slug: "microfinance-women-entrepreneurship-longitudinal",
+      title: "Microfinance and Women Entrepreneurship: A Longitudinal Analysis",
+      abstract:
+        "Tracking 200 female entrepreneurs over three years, this paper evaluates the long-term impact of microfinance access on household income and business growth in eastern Nepal.",
+      field: "Economics",
+      authors: ["Dr. Nirmala Chaudhary"],
+      authorAffiliation: "Department of Economics, Itahari Namuna College",
+      volume: "Vol. 4, Issue 1",
+      year: "2025",
+      doi: "10.XXXXX/inc.journal.2025.04.01.003",
+      accentColor: "#c22368",
+      keywords: ["Microfinance", "Women Entrepreneurship", "Nepal", "Longitudinal Study"],
+      featured: false,
+      isPopular: true,
+      publishedAt: new Date("2025-01-01"),
+      sections: [
+        {
+          heading: "1. Introduction",
+          body: "Microfinance has long been positioned as a tool for poverty alleviation and women's economic empowerment in South Asia.",
+        },
+        {
+          heading: "2. Findings",
+          body: "Significant income gains were observed in the 24–36 month window.",
+          bullets: ["Average household income increased by 38% in the treatment group by month 36."],
+        },
+      ],
+      callout: {
+        label: "Key Finding",
+        body: "Microfinance combined with structured business training produced income gains 2.1× greater than microfinance alone.",
+      },
+      citeSuggestion:
+        "Chaudhary, N. (2025). Microfinance and Women Entrepreneurship: A Longitudinal Analysis. INC Journal of Interdisciplinary Research, 4(1), 44–61.",
+      sortOrder: 2,
+    },
+  ];
+
+  for (const entry of journalEntries) {
+    await prisma.journalEntry.upsert({
+      where: { slug: entry.slug },
+      update: {
+        title: entry.title,
+        abstract: entry.abstract,
+        field: entry.field,
+        authors: entry.authors,
+        authorAffiliation: entry.authorAffiliation,
+        volume: entry.volume,
+        year: entry.year,
+        doi: entry.doi,
+        accentColor: entry.accentColor,
+        keywords: entry.keywords,
+        sections: entry.sections,
+        callout: entry.callout,
+        citeSuggestion: entry.citeSuggestion,
+        featured: entry.featured,
+        isPopular: entry.isPopular,
+        published: true,
+        publishedAt: entry.publishedAt,
+        sortOrder: entry.sortOrder,
+      },
+      create: {
+        ...entry,
         published: true,
       },
     });

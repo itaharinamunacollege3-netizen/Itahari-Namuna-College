@@ -86,6 +86,11 @@ const blogFieldsSchema = z.object({
   author: z.string().trim().min(1),
   authorRole: z.string().trim().optional(),
   readTime: z.string().trim().min(1).default("5 min read"),
+  accentColor: z
+    .string()
+    .trim()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "accentColor must be a hex color like #045d30")
+    .default("#045d30"),
   sections: z.array(blogSectionSchema).min(1),
   callout: blogCalloutSchema,
   tags: z.array(z.string().trim().min(1)).default([]),
@@ -111,6 +116,7 @@ function normalizeBlogBody(body: unknown): unknown {
     author: input.author,
     authorRole: input.authorRole,
     readTime: input.readTime,
+    accentColor: input.accentColor,
     sections: parseSections(input.sections),
     callout: parseCallout(input.callout),
     tags: parseTags(input.tags),

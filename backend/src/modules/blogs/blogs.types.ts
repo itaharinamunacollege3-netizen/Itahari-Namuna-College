@@ -20,6 +20,7 @@ export interface BlogListItemDto {
   date: string;
   readTime: string;
   coverImage: string;
+  accentColor: string;
   featured: boolean;
   isPopular: boolean;
   published: boolean;
@@ -52,6 +53,7 @@ export interface BlogWriteInput {
   author: string;
   authorRole?: string;
   readTime?: string;
+  accentColor?: string;
   sections: BlogSectionDto[];
   callout?: BlogCalloutDto | null;
   tags: string[];

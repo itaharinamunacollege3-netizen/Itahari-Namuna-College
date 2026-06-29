@@ -35,14 +35,16 @@ export function createApp(): Application {
 
   app.use(
     cors({
-      origin(origin, callback) {
-        const allowed = env.corsOrigins;
-        if (!origin || allowed.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error(`Origin ${origin} not allowed by CORS`));
-        }
-      },
+      origin: env.isProduction 
+        ? (origin, callback) => {
+            const allowed = env.corsOrigins;
+            if (!origin || allowed.includes(origin)) {
+              callback(null, true);
+            } else {
+              callback(new Error(`Origin ${origin} not allowed by CORS`));
+            }
+          }
+        : true,
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
