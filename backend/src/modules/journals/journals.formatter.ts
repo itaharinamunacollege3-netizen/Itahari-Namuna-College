@@ -17,7 +17,7 @@ export function formatJournalDate(publishedAt: Date): string {
 
 function parseSections(value: unknown): JournalSectionDto[] {
   if (!Array.isArray(value)) return [];
-  return value
+  const sections = value
     .map((section) => {
       if (typeof section !== "object" || section === null) return null;
       const item = section as Record<string, unknown>;
@@ -27,12 +27,13 @@ function parseSections(value: unknown): JournalSectionDto[] {
       const bullets = Array.isArray(item.bullets)
         ? item.bullets.map(String).map((b) => b.trim()).filter(Boolean)
         : undefined;
-      const result: Record<string, unknown> = { heading, body };
+      const result: JournalSectionDto = { heading, body };
       if (bullets?.length) result.bullets = bullets;
       if (item.imageUrl) result.imageUrl = String(item.imageUrl);
       return result;
     })
-    .filter(Boolean) as JournalSectionDto[];
+    .filter((s): s is JournalSectionDto => s !== null);
+  return sections;
 }
 
 function parseCallout(value: unknown): JournalCalloutDto | null {

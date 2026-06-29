@@ -9,7 +9,7 @@ import {
   uploadBlogSectionImage,
 } from "../../services/cloudinary.service";
 import { formatBlogDate, formatBlogDetail, formatBlogListItem } from "./blogs.formatter";
-import type { BlogUploadFiles, BlogWriteInput, ListBlogsParams } from "./blogs.types";
+import type { BlogSectionDto, BlogUploadFiles, BlogWriteInput, ListBlogsParams } from "./blogs.types";
 
 function sanitizeText(value: string) {
   return sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }).trim();
@@ -168,8 +168,11 @@ async function deleteBlogAssets(post: { coverImageCloudinaryId: string | null; a
 
 function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unknown>) {
   const callout = sanitizeCallout(data.callout ?? null);
-  // Use sections from mediaFields if available, otherwise sanitize original
-  const sectionsToSanitize = mediaFields.sections || data.sections;
+  // Use sections from mediaFields if available and it's an array, otherwise sanitize original
+  let sectionsToSanitize = data.sections;
+  if (Array.isArray(mediaFields.sections)) {
+    sectionsToSanitize = mediaFields.sections as BlogSectionDto[];
+  }
 
   return {
     title: data.title.trim(),
@@ -357,9 +360,12 @@ export async function updateBlog(
   if (data.readTime !== undefined) updateData.readTime = data.readTime.trim();
   if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
   if (data.sections !== undefined) {
-    // Use sections from mediaFields if available, otherwise sanitize original sections
-    const sections = mediaFields.sections || data.sections;
-    updateData.sections = sanitizeSections(sections);
+    // Use sections from mediaFields if available and it's an array, otherwise sanitize original sections
+    let sectionsToSanitize = data.sections;
+    if (Array.isArray(mediaFields.sections)) {
+      sectionsToSanitize = mediaFields.sections as BlogSectionDto[];
+    }
+    updateData.sections = sanitizeSections(sectionsToSanitize);
   }
   if (data.callout !== undefined) {
     const callout = sanitizeCallout(data.callout ?? null);

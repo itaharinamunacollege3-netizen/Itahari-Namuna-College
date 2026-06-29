@@ -13,7 +13,7 @@ import {
   formatJournalDetail,
   formatJournalListItem,
 } from "./journals.formatter";
-import type { JournalUploadFiles, JournalWriteInput, ListJournalsParams } from "./journals.types";
+import type { JournalSectionDto, JournalUploadFiles, JournalWriteInput, ListJournalsParams } from "./journals.types";
 
 function sanitizeText(value: string) {
   return sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }).trim();
@@ -179,8 +179,11 @@ async function deleteJournalAssets(entry: {
 
 function mapWriteInputToDb(data: JournalWriteInput, mediaFields: Record<string, unknown>) {
   const callout = sanitizeCallout(data.callout ?? null);
-  // Use sections from mediaFields if available, otherwise sanitize original
-  const sectionsToSanitize = mediaFields.sections || data.sections;
+  // Use sections from mediaFields if available and it's an array, otherwise sanitize original
+  let sectionsToSanitize = data.sections;
+  if (Array.isArray(mediaFields.sections)) {
+    sectionsToSanitize = mediaFields.sections as JournalSectionDto[];
+  }
 
   return {
     title: data.title.trim(),
@@ -388,9 +391,12 @@ export async function updateJournal(
   if (data.keywords !== undefined) updateData.keywords = data.keywords;
   if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
   if (data.sections !== undefined) {
-    // Use sections from mediaFields if available, otherwise sanitize original sections
-    const sections = mediaFields.sections || data.sections;
-    updateData.sections = sanitizeSections(sections);
+    // Use sections from mediaFields if available and it's an array, otherwise sanitize original sections
+    let sectionsToSanitize = data.sections;
+    if (Array.isArray(mediaFields.sections)) {
+      sectionsToSanitize = mediaFields.sections as JournalSectionDto[];
+    }
+    updateData.sections = sanitizeSections(sectionsToSanitize);
   }
   if (data.callout !== undefined) updateData.callout = sanitizeCallout(data.callout ?? null);
   if (data.citeSuggestion !== undefined) {
