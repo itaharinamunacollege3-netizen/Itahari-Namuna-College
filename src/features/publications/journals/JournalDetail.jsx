@@ -1,135 +1,109 @@
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Users, Calendar, BookOpen, Download, ExternalLink, FlaskConical, ChevronRight, Share2, Quote } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  FlaskConical,
+  Quote,
+  Share2,
+  Users,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { getJournalById, getJournalLink, getRelatedJournals } from './journalsService';
 
-// ─── Dummy Data ───────────────────────────────────────────────────────────────
-const journalEntries = {
-  1: {
-    title: 'Socioeconomic Barriers to STEM Access in Rural Nepal',
-    authors: ['Dr. Kamala Adhikari', 'Prof. Sunil Bhattarai'],
-    authorAffiliation: 'Department of Social Sciences, Itahari Namuna College',
-    date: 'March 2025',
-    volume: 'Vol. 4, Issue 2',
-    field: 'Social Sciences',
-    doi: '10.XXXXX/inc.journal.2025.04.02.001',
-    accentColor: '#045d30',
-    coverGradient: 'from-[#045d30]/90 via-[#045d30]/80 to-transparent',
-    abstract: 'This study examines the structural and cultural factors limiting STEM participation among rural youth in the Koshi Province, drawing on survey data from 12 secondary schools and 480 respondents aged 14–18. Findings reveal significant infrastructure gaps, teacher qualification deficits, and gendered patterns in STEM aspiration.',
-    keywords: ['STEM Education', 'Rural Nepal', 'Socioeconomic Barriers', 'Koshi Province', 'Youth Participation', 'Gender'],
-    sections: [
-      {
-        heading: '1. Introduction',
-        body: 'Access to STEM education remains unequal across Nepal\'s geographic and socioeconomic divides. While urban centres have seen steady growth in science enrolment, rural communities — particularly in Province 1 — continue to face compounding challenges including infrastructure gaps, teacher shortages, and cultural attitudes toward non-agricultural careers.',
-        bullets: [
-          'Nepal\'s STEM enrolment in rural secondary schools lags urban rates by an estimated 34%.',
-          'Teacher-to-student ratios in sampled schools averaged 1:52 for science subjects.',
-          'Female students represented only 29% of science stream enrolments in surveyed schools.',
-        ],
-      },
-      {
-        heading: '2. Methodology',
-        body: 'A mixed-methods approach was employed, combining structured surveys administered to 480 students across 12 secondary schools with semi-structured interviews with 32 teachers and 20 school administrators. Data were collected between September and December 2024. Thematic analysis was applied to qualitative data; regression analysis was used for quantitative findings.',
-      },
-      {
-        heading: '3. Findings',
-        body: 'Results indicate that cost, connectivity, and qualification gaps are the primary structural barriers. However, cultural attitudes — particularly regarding female participation — compound structural disadvantage significantly.',
-        bullets: [
-          '67% of respondents cited cost of materials and internet access as primary barriers.',
-          'Teacher qualification gaps were reported in 83% of surveyed schools.',
-          'Female students were 2.4× more likely to report family discouragement as a key obstacle.',
-          'Students with educated parents were 3.1× more likely to aspire to STEM careers.',
-        ],
-      },
-      {
-        heading: '4. Discussion',
-        body: 'The findings align with prior research on structural determinants of educational access in developing economies, while adding nuance to the gendered dimensions of STEM aspiration in Nepal specifically. The interaction between household income, parental education, and cultural norms creates compounding disadvantage that single-variable interventions are unlikely to address effectively.',
-      },
-      {
-        heading: '5. Conclusion & Recommendations',
-        body: 'Targeted policy interventions are required at multiple levels — from national curriculum reform to district-level teacher training and community awareness programs. The following are recommended as immediate priorities.',
-        bullets: [
-          'Subsidised laboratory equipment program for rural secondary schools.',
-          'Rural STEM teacher incentive scheme with housing and salary supplements.',
-          'Community awareness campaigns co-designed with local leaders.',
-          'Longitudinal tracking of student outcomes following policy implementation.',
-        ],
-      },
-    ],
-    callout: {
-      label: 'Highlighted Finding',
-      body: 'Female students in surveyed rural schools were 2.4 times more likely to cite family discouragement as a barrier to STEM participation than male peers — the single largest gendered gap identified in this study.',
-    },
-    citeSuggestion: 'Adhikari, K. & Bhattarai, S. (2025). Socioeconomic Barriers to STEM Access in Rural Nepal. INC Journal of Interdisciplinary Research, 4(2), 14–29. DOI: 10.XXXXX/inc.journal.2025.04.02.001',
-  },
-  2: {
-    title: 'Microfinance and Women Entrepreneurship: A Longitudinal Analysis',
-    authors: ['Dr. Nirmala Chaudhary'],
-    authorAffiliation: 'Department of Economics, Itahari Namuna College',
-    date: 'January 2025',
-    volume: 'Vol. 4, Issue 1',
-    field: 'Economics',
-    doi: '10.XXXXX/inc.journal.2025.04.01.003',
-    accentColor: '#c22368',
-    coverGradient: 'from-[#c22368]/80 via-[#f2b843]/70 to-transparent',
-    abstract: 'Tracking 200 female entrepreneurs over three years, this paper evaluates the long-term impact of microfinance access on household income and business growth in eastern Nepal. Results show significant income gains in years two and three, but highlight sustainability concerns.',
-    keywords: ['Microfinance', 'Women Entrepreneurship', 'Nepal', 'Longitudinal Study', 'Household Income'],
-    sections: [
-      {
-        heading: '1. Introduction',
-        body: 'Microfinance has long been positioned as a tool for poverty alleviation and women\'s economic empowerment in South Asia. Nepal\'s microfinance sector has expanded rapidly over the past decade, yet rigorous longitudinal evidence on outcomes for female entrepreneurs remains limited.',
-      },
-      {
-        heading: '2. Methodology',
-        body: 'A panel study tracked 200 female microfinance recipients in Sunsari and Morang districts over 36 months. Baseline data were collected in January 2022. Follow-up surveys were conducted at 12, 24, and 36 months. Matched control group of 200 non-recipients was used for comparison.',
-      },
-      {
-        heading: '3. Findings',
-        body: 'Significant income gains were observed in the 24–36 month window, but early-stage outcomes were mixed due to high interest burdens and limited business training.',
-        bullets: [
-          'Average household income increased by 38% in the treatment group by month 36.',
-          'Business survival rate was 71% at 36 months, compared to 58% in the control group.',
-          'Women who also accessed business training showed 2.1× higher income gains.',
-          'Debt stress was reported by 44% of participants in the first 12 months.',
-        ],
-      },
-    ],
-    callout: {
-      label: 'Key Finding',
-      body: 'Microfinance combined with structured business training produced income gains 2.1× greater than microfinance alone — suggesting that capital access without capability building yields significantly diminished returns.',
-    },
-    citeSuggestion: 'Chaudhary, N. (2025). Microfinance and Women Entrepreneurship: A Longitudinal Analysis. INC Journal of Interdisciplinary Research, 4(1), 44–61. DOI: 10.XXXXX/inc.journal.2025.04.01.003',
-  },
-};
-
-const fallbackEntry = journalEntries[1];
-
-const allEntries = [
-  { id: 1, title: 'Socioeconomic Barriers to STEM Access in Rural Nepal', field: 'Social Sciences', volume: 'Vol. 4, Issue 2' },
-  { id: 2, title: 'Microfinance and Women Entrepreneurship: A Longitudinal Analysis', field: 'Economics', volume: 'Vol. 4, Issue 1' },
-  { id: 3, title: 'Machine Learning Applications in Agricultural Yield Prediction', field: 'Computer Science', volume: 'Vol. 3, Issue 4' },
-  { id: 4, title: 'Post-Earthquake Urban Resilience: Lessons from 2015', field: 'Urban Studies', volume: 'Vol. 3, Issue 3' },
-  { id: 5, title: 'Digital Literacy Among Secondary School Teachers in Province 1', field: 'Education', volume: 'Vol. 3, Issue 2' },
-];
-
-// ─── Component ────────────────────────────────────────────────────────────────
 export default function JournalDetail() {
   const { id } = useParams();
-  const entry = journalEntries[id] ?? fallbackEntry;
-  const related = allEntries.filter((e) => String(e.id) !== String(id)).slice(0, 4);
-  const toc = entry.sections.map((s) => s.heading);
+  const [entry, setEntry] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    async function load() {
+      setLoading(true);
+      setError('');
+      try {
+        const [detail, relatedEntries] = await Promise.all([
+          getJournalById(id),
+          getRelatedJournals(id),
+        ]);
+        if (!active) return;
+        if (!detail) {
+          setError('Journal paper not found.');
+          setEntry(null);
+          setRelated([]);
+          return;
+        }
+        setEntry(detail);
+        setRelated(relatedEntries);
+      } catch (err) {
+        if (active) setError(err.message || 'Failed to load journal paper.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-gray/30 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin" />
+          <p className="font-body text-brand-dark/60">Loading paper…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !entry) {
+    return (
+      <div className="min-h-screen bg-brand-gray/30 flex flex-col items-center justify-center gap-4 px-6">
+        <p className="font-body text-brand-crimson">{error || 'Journal paper not found.'}</p>
+        <Link
+          to="/publications/journal"
+          className="font-body text-brand-primary hover:underline flex items-center gap-2"
+        >
+          <ArrowLeft size={16} /> Back to Journal
+        </Link>
+      </div>
+    );
+  }
+
+  const toc = Array.isArray(entry.sections) ? entry.sections.map((section) => section.heading) : [];
+  const bannerStyle = entry.coverImage
+    ? { backgroundImage: `url(${entry.coverImage})` }
+    : { backgroundImage: `linear-gradient(135deg, #20242b 0%, ${entry.accentColor} 100%)` };
 
   return (
     <div className="min-h-screen bg-brand-gray/30">
-
-      {/* ── BANNER ── */}
       <div
-        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[300px] flex items-end"
-        style={{ backgroundImage: `linear-gradient(135deg, #20242b 0%, #045d30 100%)` }}
+        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[400px] flex items-end"
+        style={bannerStyle}
       >
         <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
-        <div className="absolute inset-0 opacity-5 z-10"
-          style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div
+          className="absolute inset-0 opacity-5 z-10"
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+        {entry.coverImage && (
+          <div className="absolute inset-0 bg-black/20 z-10" />
+        )}
 
-        <div className="max-w-7xl mx-auto relative z-20 space-y-3 pb-2 w-full">
+        <div className="max-w-7xl mx-auto relative z-20 space-y-4 pb-2 w-full">
           <Link
             to="/publications/journal"
             className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors font-body"
@@ -137,187 +111,324 @@ export default function JournalDetail() {
             <ArrowLeft className="w-3.5 h-3.5" /> Journal
           </Link>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-xs font-body font-semibold bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-full text-white">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 text-xs font-body font-semibold bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-white">
               <FlaskConical size={10} /> {entry.field}
             </span>
-            <span className="text-xs text-white/50 font-body">{entry.volume} · {entry.date}</span>
+            <span className="text-xs text-white/60 font-body">
+              {entry.volume} · {entry.year}
+            </span>
           </div>
 
-          <h1 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl text-white leading-tight max-w-3xl">
+          <h1 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-tight max-w-4xl">
             {entry.title}
           </h1>
 
-          <div className="flex flex-wrap gap-3 pt-1">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-xs px-4 py-1.5 text-xs font-medium text-white font-body">
-              <Users size={11} /> {entry.authors.join(' · ')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-xs px-4 py-1.5 text-xs font-medium text-white font-body">
-              <Calendar size={11} /> {entry.date}
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-white/20 to-white/10 flex items-center justify-center backdrop-blur-sm">
+                <span className="font-heading font-black text-white">
+                  {entry.authors?.[0]
+                    ?.split(' ')
+                    .map((word) => word[0])
+                    .join('')
+                    .slice(0, 2)}
+                </span>
+              </div>
+              <div>
+                <p className="font-heading font-semibold text-white">
+                  {entry.authors?.join(', ')}
+                </p>
+                {entry.authorAffiliation && (
+                  <p className="text-xs text-white/70">{entry.authorAffiliation}</p>
+                )}
+              </div>
+            </div>
+            <span className="text-white/50">·</span>
+            <span className="inline-flex items-center gap-1.5 text-sm text-white/80 font-body">
+              <Calendar size={14} /> {entry.date}
             </span>
           </div>
         </div>
       </div>
 
-      {/* ── BODY ── */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-12">
-        <div className="flex flex-col lg:flex-row gap-10 items-start">
-
-          {/* ── ARTICLE ── */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-12 lg:py-16">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
           <article className="flex-1 min-w-0">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="mb-12 rounded-2xl bg-gradient-to-r from-brand-primary/8 to-brand-blue/8 border-l-4 border-brand-primary p-7">
+                <p className="text-xs font-body font-extrabold uppercase tracking-widest text-brand-primary mb-3">
+                  Abstract
+                </p>
+                <p className="font-body text-base sm:text-lg text-brand-dark/80 leading-relaxed italic">
+                  {entry.abstract}
+                </p>
+              </div>
+            </motion.div>
 
-            {/* Abstract */}
-            <div className="mb-10 rounded-xl bg-brand-primary/8 border-l-4 border-brand-primary p-6">
-              <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-primary mb-2">Abstract</p>
-              <p className="font-body text-[15px] text-brand-dark/80 leading-relaxed italic">{entry.abstract}</p>
+            {entry.doi ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="flex items-center gap-2 text-xs font-body text-brand-dark/40 mb-12"
+              >
+                <ExternalLink size={13} />
+                <span>DOI:</span>
+                <span className="text-brand-primary font-medium">{entry.doi}</span>
+                <button
+                  type="button"
+                  className="ml-auto p-2.5 rounded-xl hover:bg-brand-gray transition-all hover:scale-105"
+                  aria-label="Share"
+                >
+                  <Share2
+                    size={16} className="text-brand-dark/30 hover:text-brand-primary transition-colors"
+                  />
+                </button>
+              </motion.div>
+            ) : null}
+
+            <div className="space-y-16">
+              {entry.sections?.map((section, index) => (
+              <motion.section
+                key={index}
+                id={`section-${index}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-brand-dark mb-5 leading-snug">
+                  {section.heading}
+                </h2>
+                <p className="font-body text-base sm:text-[17px] text-brand-dark/80 leading-relaxed mb-6">
+                  {section.body}
+                </p>
+                {section.bullets?.length ? (
+                  <ul className="space-y-3 mt-6 mb-6">
+                    {section.bullets.map((bullet, bulletIndex) => (
+                      <li
+                        key={bulletIndex}
+                        className="flex items-start gap-4 font-body text-base text-brand-dark/75 leading-relaxed"
+                      >
+                        <div className="mt-2 w-2.5 h-2.5 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 shadow-sm" />
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {section.imageUrl ? (
+                  <div className="mt-6 mb-6 rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5 max-w-3xl mx-auto">
+                    <img
+                      src={section.imageUrl}
+                      alt={section.heading}
+                      className="w-full h-auto max-h-[320px] object-cover transition-transform duration-700 hover:scale-[1.02]"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : null}
+              </motion.section>
+            ))}
             </div>
 
-            {/* DOI */}
-            <div className="flex items-center gap-2 text-xs font-body text-brand-dark/40 mb-10">
-              <ExternalLink size={11} />
-              <span>DOI:</span>
-              <span className="text-brand-primary font-medium">{entry.doi}</span>
-              <button className="ml-auto p-2 rounded-lg hover:bg-brand-gray transition-colors" aria-label="Share">
-                <Share2 size={13} className="text-brand-dark/30 hover:text-brand-primary transition-colors" />
-              </button>
-            </div>
-
-            {/* Sections */}
-            <div className="space-y-10">
-              {entry.sections.map((section, i) => (
-                <section key={i} id={`section-${i}`}>
-                  <h2 className="font-heading text-xl font-bold text-brand-dark mb-3 leading-snug">
-                    {section.heading}
-                  </h2>
-                  <p className="font-body text-[15px] text-brand-dark/75 leading-relaxed mb-4">
-                    {section.body}
-                  </p>
-                  {section.bullets && (
-                    <ul className="space-y-2 mt-3">
-                      {section.bullets.map((b, bi) => (
-                        <li key={bi} className="flex items-start gap-3 font-body text-sm text-brand-dark/70 leading-relaxed">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </section>
-              ))}
-            </div>
-
-            {/* Highlighted finding callout */}
-            {entry.callout && (
-              <div className="mt-10 rounded-xl bg-brand-dark/95 p-6 relative overflow-hidden">
-                <Quote size={48} className="absolute top-4 right-4 text-white/5" />
-                <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-gold mb-3">
+            {entry.callout ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="mt-16 rounded-2xl bg-gradient-to-br from-brand-dark/95 to-brand-dark p-8 relative overflow-hidden"
+              >
+                <div className="absolute top-4 right-4 w-20 bg-brand-primary/10 rounded-full blur-3xl" />
+                <Quote
+                  size={56}
+                  className="absolute top-4 right-4 text-white/5"
+                />
+                <p className="text-xs font-body font-extrabold uppercase tracking-widest text-brand-gold mb-3">
                   {entry.callout.label}
                 </p>
-                <p className="font-heading text-base font-semibold text-white leading-relaxed">
+                <p className="font-heading text-base sm:text-lg font-semibold text-white leading-relaxed">
                   {entry.callout.body}
                 </p>
-              </div>
-            )}
+              </motion.div>
+            ) : null}
 
-            {/* Keywords */}
-            <div className="mt-10 pt-6 border-t border-brand-gray">
-              <p className="text-xs font-body font-semibold text-brand-dark/40 uppercase tracking-widest mb-3">Keywords</p>
-              <div className="flex flex-wrap gap-2">
-                {entry.keywords.map((kw) => (
-                  <span key={kw} className="text-xs font-body font-medium px-3 py-1.5 rounded-full bg-brand-gray text-brand-dark/60 hover:bg-brand-primary/10 hover:text-brand-primary transition-colors duration-150 cursor-pointer">
-                    {kw}
-                  </span>
-                ))}
-              </div>
-            </div>
+            {entry.keywords?.length ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="mt-14 pt-8 border-t border-brand-gray/60"
+              >
+                <p className="text-xs font-body font-bold text-brand-dark/40 uppercase tracking-widest mb-4">
+                  Keywords
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {entry.keywords.map((keyword) => (
+                    <span
+                      key={keyword}
+                      className="text-sm font-body font-medium px-4 py-2 rounded-full bg-gradient-to-r from-brand-gray to-brand-gray/80 text-brand-dark/70 hover:text-brand-primary hover:from-brand-primary/10 hover:to-brand-blue/10 transition-all duration-300 cursor-default"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ) : null}
 
-            {/* Cite this paper */}
-            <div className="mt-8 rounded-xl border border-brand-gray/60 bg-brand-white p-5">
-              <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-dark/40 mb-2">Cite This Paper</p>
-              <p className="font-body text-xs text-brand-dark/70 leading-relaxed bg-brand-gray/50 rounded-lg px-4 py-3 select-all">
-                {entry.citeSuggestion}
-              </p>
-            </div>
+            {entry.citeSuggestion ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="mt-10 rounded-2xl border border-brand-gray/60 bg-gradient-to-br from-brand-white to-brand-gray/30 p-7 shadow-sm"
+              >
+                <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-dark/40 mb-3">
+                  Cite This Paper
+                </p>
+                <p className="font-body text-xs sm:text-sm text-brand-dark/70 leading-relaxed bg-gradient-to-br from-brand-gray/50 to-brand-gray/40 rounded-xl px-5 py-4 select-all">
+                  {entry.citeSuggestion}
+                </p>
+              </motion.div>
+            ) : null}
 
-            {/* Author card */}
-            <div className="mt-6 flex items-center gap-5 bg-brand-white rounded-xl border border-brand-gray/60 p-5">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 flex items-center justify-center">
-                <span className="font-heading font-black text-white text-lg">
-                  {entry.authors[0].split(' ').map(w => w[0]).join('').slice(0, 2)}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="mt-10 flex items-center gap-6 bg-gradient-to-br from-brand-white to-brand-gray/30 rounded-2xl border border-brand-gray/60 p-6 sm:p-8 shadow-sm"
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 flex items-center justify-center shadow-lg">
+                <span className="font-heading font-black text-white text-xl">
+                  {entry.authors?.[0]
+                    ?.split(' ')
+                    .map((word) => word[0])
+                    .join('')
+                    .slice(0, 2)}
                 </span>
               </div>
-              <div>
-                <p className="font-heading font-bold text-brand-dark text-sm">{entry.authors.join(', ')}</p>
-                <p className="font-body text-xs text-brand-dark/50 mt-0.5">{entry.authorAffiliation}</p>
-                <p className="font-body text-xs text-brand-dark/35 mt-1">{entry.volume} · Published {entry.date}</p>
+              <div className="flex-1">
+                <p className="font-heading font-bold text-brand-dark text-lg">
+                  {entry.authors?.join(', ')}
+                </p>
+                {entry.authorAffiliation ? (
+                  <p className="font-body text-sm text-brand-dark/60 mt-1">{entry.authorAffiliation}</p>
+                ) : null}
+                <p className="font-body text-xs text-brand-dark/50 mt-2 flex items-center gap-2">
+                  <Calendar size={12} /> {entry.volume} · Published {entry.date}
+                </p>
               </div>
-            </div>
+            </motion.div>
           </article>
 
-          {/* ── SIDEBAR ── */}
-          <aside className="lg:w-72 shrink-0 space-y-5 lg:sticky lg:top-24">
-
-            {/* Download */}
-            <div className="rounded-xl overflow-hidden bg-gradient-to-br from-brand-primary to-brand-blue p-5 text-white">
-              <BookOpen size={20} className="mb-3 opacity-80" />
-              <p className="font-heading text-sm font-bold mb-1">Full Paper (PDF)</p>
-              <p className="font-body text-xs text-white/70 mb-4 leading-relaxed">
+          <aside className="lg:w-80 shrink-0 space-y-6 lg:sticky lg:top-24">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="rounded-2xl overflow-hidden bg-gradient-to-br from-brand-primary to-brand-blue p-7 text-white shadow-lg"
+            >
+              <BookOpen size={24} className="mb-4 opacity-90" />
+              <p className="font-heading text-base font-bold mb-2">Full Paper (PDF)</p>
+              <p className="font-body text-sm text-white/80 mb-5 leading-relaxed">
                 Download the complete peer-reviewed article with references and appendices.
               </p>
-              <button className="w-full flex items-center justify-center gap-2 bg-white text-brand-primary text-xs font-bold font-body px-4 py-2.5 rounded-lg hover:bg-brand-gray transition-colors duration-200">
-                <Download size={13} /> Download PDF
-              </button>
-            </div>
+              {entry.pdfUrl ? (
+                <a
+                  href={entry.pdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full flex items-center justify-center gap-3 bg-white text-brand-primary text-sm font-bold font-body px-6 py-3.5 rounded-xl hover:bg-brand-gray/20 hover:text-white transition-all duration-300"
+                >
+                  <Download size={16} /> Download PDF <ExternalLink size={14} />
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-3 bg-white/60 text-brand-primary/60 text-sm font-bold font-body px-6 py-3.5 rounded-xl cursor-not-allowed"
+                >
+                  <Download size={16} /> PDF not available
+                </button>
+              )}
+            </motion.div>
 
-            {/* Table of Contents */}
-            <div className="bg-brand-white rounded-xl border border-brand-gray/60 overflow-hidden">
-              <div className="px-5 py-4 border-b border-brand-gray/50 bg-brand-primary/5">
-                <p className="font-heading text-xs font-bold text-brand-primary uppercase tracking-widest">Contents</p>
-              </div>
-              <ol className="p-3 space-y-1">
-                {toc.map((heading, i) => (
-                  <li key={i}>
-                    <a
-                      href={`#section-${i}`}
-                      className="flex items-start gap-2.5 px-3 py-2 rounded-lg hover:bg-brand-gray/50 group transition-colors duration-150"
-                    >
-                      <span className="font-heading text-xs font-black text-brand-gray/60 shrink-0 mt-0.5">{i + 1}.</span>
-                      <span className="font-body text-xs text-brand-dark/70 group-hover:text-brand-primary transition-colors duration-150 leading-snug">
-                        {heading}
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            {toc.length ? (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-brand-white rounded-2xl border border-brand-gray/60 overflow-hidden shadow-sm"
+              >
+                <div className="px-6 py-5 border-b border-brand-gray/50 bg-gradient-to-r from-brand-primary/5 to-brand-blue/5">
+                  <p className="font-heading text-xs font-extrabold text-brand-primary uppercase tracking-widest">
+                    Contents
+                  </p>
+                </div>
+                <ol className="p-4 space-y-2">
+                  {toc.map((heading, index) => (
+                    <li key={index}>
+                      <a
+                        href={`#section-${index}`}
+                        className="flex items-start gap-3.5 px-4 py-3 rounded-xl hover:bg-brand-gray/50 group transition-all duration-200"
+                      >
+                        <span className="font-heading text-sm font-black text-brand-gray/70 shrink-0 mt-0.5">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="font-body text-sm text-brand-dark/75 group-hover:text-brand-primary transition-colors duration-200 leading-snug">
+                          {heading}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </motion.div>
+            ) : null}
 
-            {/* Related */}
-            <div className="bg-brand-white rounded-xl border border-brand-gray/60 overflow-hidden">
-              <div className="px-5 py-4 border-b border-brand-gray/50">
-                <p className="font-heading text-sm font-bold text-brand-dark">Related Research</p>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-brand-white rounded-2xl border border-brand-gray/60 overflow-hidden shadow-sm"
+            >
+              <div className="px-6 py-5 border-b border-brand-gray/50">
+                <p className="font-heading text-base font-bold text-brand-dark">Related Research</p>
               </div>
               <ul className="divide-y divide-brand-gray/40">
-                {related.map((r) => (
-                  <li key={r.id}>
+                {related.map((item) => (
+                  <li key={item.id}>
                     <Link
-                      to={`/publications/journal/${r.id}`}
-                      className="flex items-start gap-3 px-5 py-4 group hover:bg-brand-gray/30 transition-colors duration-150"
+                      to={getJournalLink(item)}
+                      className="flex items-start gap-4 px-6 py-5 group hover:bg-brand-gray/30 transition-colors duration-200"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-brand-primary/10 shrink-0 flex items-center justify-center mt-0.5">
-                        <FlaskConical size={13} className="text-brand-primary" />
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary/10 to-brand-blue/10 shrink-0 flex items-center justify-center mt-0.5">
+                        <FlaskConical size={16} className="text-brand-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-body text-xs font-medium text-brand-dark group-hover:text-brand-primary transition-colors duration-200 leading-snug line-clamp-2">
-                          {r.title}
+                        <p className="font-body text-sm font-medium text-brand-dark group-hover:text-brand-primary transition-colors duration-200 leading-snug line-clamp-2">
+                          {item.title}
                         </p>
-                        <p className="text-[10px] text-brand-dark/35 mt-1 font-body">{r.volume}</p>
+                        <p className="text-[11px] text-brand-dark/40 mt-1.5 font-body">{item.volume}</p>
                       </div>
-                      <ChevronRight size={12} className="text-brand-dark/20 group-hover:text-brand-primary shrink-0 mt-1 transition-colors" />
+                      <ChevronRight
+                        size={14}
+                        className="text-brand-dark/20 group-hover:text-brand-primary shrink-0 mt-1 transition-all duration-200"
+                      />
                     </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </aside>
         </div>
       </div>

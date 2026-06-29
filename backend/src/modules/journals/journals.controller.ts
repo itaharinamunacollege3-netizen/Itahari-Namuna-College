@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import * as blogsService from "./blogs.service";
+import * as journalsService from "./journals.service";
 import { sendSuccess, AppError } from "../../utils/apiResponse";
 import { writeAuditLog } from "../../utils/audit";
-import { getBlogUploadFiles, getUploadedFile } from "../../middleware/upload";
-import { listBlogsQuerySchema } from "./blogs.schema";
+import { getJournalUploadFiles, getUploadedFile } from "../../middleware/upload";
+import { listJournalsQuerySchema } from "./journals.schema";
 import { z } from "zod";
 
-type ListQuery = z.infer<typeof listBlogsQuerySchema>;
+type ListQuery = z.infer<typeof listJournalsQuerySchema>;
 
 function getListQuery(req: Request): ListQuery {
   return (req.validatedQuery ?? {}) as ListQuery;
@@ -15,12 +15,12 @@ function getListQuery(req: Request): ListQuery {
 export async function listPublic(req: Request, res: Response, next: NextFunction) {
   try {
     const query = getListQuery(req);
-    const result = await blogsService.listBlogs({
+    const result = await journalsService.listJournals({
       page: query.page,
       limit: query.limit,
       search: query.search,
-      category: query.category,
-      tag: query.tag,
+      field: query.field,
+      keyword: query.keyword,
       publishedOnly: true,
     });
     sendSuccess(res, result.items, result.meta);
@@ -31,7 +31,7 @@ export async function listPublic(req: Request, res: Response, next: NextFunction
 
 export async function getFeatured(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await blogsService.getFeaturedBlog();
+    const data = await journalsService.getFeaturedJournal();
     sendSuccess(res, data);
   } catch (err) {
     next(err);
@@ -41,16 +41,16 @@ export async function getFeatured(req: Request, res: Response, next: NextFunctio
 export async function getPopular(req: Request, res: Response, next: NextFunction) {
   try {
     const limit = Math.min(Number(req.query.limit) || 4, 10);
-    const data = await blogsService.getPopularBlogs(limit);
+    const data = await journalsService.getPopularJournals(limit);
     sendSuccess(res, data);
   } catch (err) {
     next(err);
   }
 }
 
-export async function getCategories(req: Request, res: Response, next: NextFunction) {
+export async function getFields(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await blogsService.listBlogCategories();
+    const data = await journalsService.listJournalFields();
     sendSuccess(res, data);
   } catch (err) {
     next(err);
@@ -60,8 +60,8 @@ export async function getCategories(req: Request, res: Response, next: NextFunct
 export async function getById(req: Request, res: Response, next: NextFunction) {
   try {
     const idOrSlug = String(req.params.id);
-    const data = await blogsService.getBlogByIdentifier(idOrSlug, true);
-    void blogsService.incrementBlogViewCount(idOrSlug);
+    const data = await journalsService.getJournalByIdentifier(idOrSlug, true);
+    void journalsService.incrementJournalViewCount(idOrSlug);
     sendSuccess(res, data);
   } catch (err) {
     next(err);
@@ -71,8 +71,8 @@ export async function getById(req: Request, res: Response, next: NextFunction) {
 export async function getRelated(req: Request, res: Response, next: NextFunction) {
   try {
     const idOrSlug = String(req.params.id);
-    const post = await blogsService.getBlogByIdentifier(idOrSlug, true);
-    const data = await blogsService.getRelatedBlogs(post.id);
+    const entry = await journalsService.getJournalByIdentifier(idOrSlug, true);
+    const data = await journalsService.getRelatedJournals(entry.id);
     sendSuccess(res, data);
   } catch (err) {
     next(err);
@@ -82,12 +82,12 @@ export async function getRelated(req: Request, res: Response, next: NextFunction
 export async function listAdmin(req: Request, res: Response, next: NextFunction) {
   try {
     const query = getListQuery(req);
-    const result = await blogsService.listBlogs({
+    const result = await journalsService.listJournals({
       page: query.page,
       limit: query.limit,
       search: query.search,
-      category: query.category,
-      tag: query.tag,
+      field: query.field,
+      keyword: query.keyword,
       publishedOnly: false,
     });
     sendSuccess(res, result.items, result.meta);
@@ -99,7 +99,7 @@ export async function listAdmin(req: Request, res: Response, next: NextFunction)
 export async function getAdminById(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    const data = await blogsService.getBlogById(id, false);
+    const data = await journalsService.getJournalById(id, false);
     sendSuccess(res, data);
   } catch (err) {
     next(err);
@@ -108,12 +108,12 @@ export async function getAdminById(req: Request, res: Response, next: NextFuncti
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const files = getBlogUploadFiles(req);
-    const data = await blogsService.createBlog(req.body, files);
+    const files = getJournalUploadFiles(req);
+    const data = await journalsService.createJournal(req.body, files);
     await writeAuditLog({
       userId: req.user?.id,
-      action: "CREATE_BLOG",
-      resource: "blogs",
+      action: "CREATE_JOURNAL",
+      resource: "journals",
       resourceId: data.id,
       ipAddress: req.ip,
     });
@@ -126,12 +126,12 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    const files = getBlogUploadFiles(req);
-    const data = await blogsService.updateBlog(id, req.body, files);
+    const files = getJournalUploadFiles(req);
+    const data = await journalsService.updateJournal(id, req.body, files);
     await writeAuditLog({
       userId: req.user?.id,
-      action: "UPDATE_BLOG",
-      resource: "blogs",
+      action: "UPDATE_JOURNAL",
+      resource: "journals",
       resourceId: id,
       ipAddress: req.ip,
     });
@@ -144,15 +144,15 @@ export async function update(req: Request, res: Response, next: NextFunction) {
 export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    await blogsService.deleteBlog(id);
+    await journalsService.deleteJournal(id);
     await writeAuditLog({
       userId: req.user?.id,
-      action: "DELETE_BLOG",
-      resource: "blogs",
+      action: "DELETE_JOURNAL",
+      resource: "journals",
       resourceId: id,
       ipAddress: req.ip,
     });
-    sendSuccess(res, { message: "Blog post deleted" });
+    sendSuccess(res, { message: "Journal entry deleted" });
   } catch (err) {
     next(err);
   }
@@ -164,11 +164,31 @@ export async function uploadCover(req: Request, res: Response, next: NextFunctio
     if (!file) throw new AppError(400, "Cover image file is required");
 
     const id = Number(req.params.id);
-    const data = await blogsService.uploadBlogCover(id, file);
+    const data = await journalsService.uploadJournalCoverAttachment(id, file);
     await writeAuditLog({
       userId: req.user?.id,
-      action: "UPLOAD_BLOG_COVER",
-      resource: "blogs",
+      action: "UPLOAD_JOURNAL_COVER",
+      resource: "journals",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function uploadPdf(req: Request, res: Response, next: NextFunction) {
+  try {
+    const file = getUploadedFile(req, "pdf");
+    if (!file) throw new AppError(400, "PDF file is required");
+
+    const id = Number(req.params.id);
+    const data = await journalsService.uploadJournalPdfAttachment(id, file);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "UPLOAD_JOURNAL_PDF",
+      resource: "journals",
       resourceId: id,
       ipAddress: req.ip,
     });
@@ -181,11 +201,11 @@ export async function uploadCover(req: Request, res: Response, next: NextFunctio
 export async function removeCover(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    const data = await blogsService.removeBlogCover(id);
+    const data = await journalsService.removeJournalCoverAttachment(id);
     await writeAuditLog({
       userId: req.user?.id,
-      action: "DELETE_BLOG_COVER",
-      resource: "blogs",
+      action: "DELETE_JOURNAL_COVER",
+      resource: "journals",
       resourceId: id,
       ipAddress: req.ip,
     });
@@ -195,34 +215,14 @@ export async function removeCover(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export async function uploadAttachment(req: Request, res: Response, next: NextFunction) {
-  try {
-    const file = getUploadedFile(req, "attachment");
-    if (!file) throw new AppError(400, "Attachment file is required");
-
-    const id = Number(req.params.id);
-    const data = await blogsService.uploadBlogAttachment(id, file);
-    await writeAuditLog({
-      userId: req.user?.id,
-      action: "UPLOAD_BLOG_ATTACHMENT",
-      resource: "blogs",
-      resourceId: id,
-      ipAddress: req.ip,
-    });
-    sendSuccess(res, data);
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function removeAttachment(req: Request, res: Response, next: NextFunction) {
+export async function removePdf(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    const data = await blogsService.removeBlogAttachment(id);
+    const data = await journalsService.removeJournalPdfAttachment(id);
     await writeAuditLog({
       userId: req.user?.id,
-      action: "DELETE_BLOG_ATTACHMENT",
-      resource: "blogs",
+      action: "DELETE_JOURNAL_PDF",
+      resource: "journals",
       resourceId: id,
       ipAddress: req.ip,
     });

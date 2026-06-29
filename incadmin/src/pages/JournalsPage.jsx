@@ -26,36 +26,39 @@ import {
   FormActions,
 } from "@/components/ui/Modal";
 import {
-  BLOG_ACCENT_COLORS,
-  BLOG_CATEGORIES,
-  BLOG_FIELD_HINTS,
-  EMPTY_BLOG_SECTION,
-} from "@/constants/blogs";
+  EMPTY_JOURNAL_SECTION,
+  JOURNAL_ACCENT_COLORS,
+  JOURNAL_FIELD_HINTS,
+  JOURNAL_FIELDS,
+} from "@/constants/journals";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import {
-  createBlog,
-  deleteBlog,
-  getBlog,
-  listBlogs,
-  removeBlogCover,
-  updateBlog,
-} from "@/services/blogs.service";
+  createJournal,
+  deleteJournal,
+  getJournal,
+  listJournals,
+  removeJournalCover,
+  removeJournalPdf,
+  updateJournal,
+} from "@/services/journals.service";
 import { optionalString } from "@/utils/formHelpers";
 import { formatDate } from "@/utils/format";
 
 const emptyForm = {
   title: "",
-  excerpt: "",
-  intro: "",
-  category: "Education",
-  author: "",
-  authorRole: "",
-  readTime: "5 min read",
+  abstract: "",
+  field: "Social Sciences",
+  authors: "",
+  authorAffiliation: "",
+  volume: "",
+  year: String(new Date().getFullYear()),
+  doi: "",
+  keywords: "",
   accentColor: "#045d30",
-  sections: [{ ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }],
-  calloutHeading: "",
+  sections: [{ ...EMPTY_JOURNAL_SECTION }],
+  calloutLabel: "",
   calloutBody: "",
-  tags: "",
+  citeSuggestion: "",
   slug: "",
   publishedAt: new Date().toISOString().slice(0, 10),
   sortOrder: 0,
@@ -63,14 +66,14 @@ const emptyForm = {
   isPopular: false,
   published: true,
   removeCover: false,
-  removeAttachment: false,
+  removePdf: false,
   cover: null,
-  attachment: null,
+  pdf: null,
 };
 
 function sectionsToForm(sections) {
   if (!Array.isArray(sections) || !sections.length) {
-    return [{ ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }];
+    return [{ ...EMPTY_JOURNAL_SECTION }];
   }
   return sections.map((section) => ({
     heading: section.heading ?? "",
@@ -82,30 +85,32 @@ function sectionsToForm(sections) {
   }));
 }
 
-function toForm(blog) {
+function toForm(entry) {
   return {
-    title: blog.title ?? "",
-    excerpt: blog.excerpt ?? "",
-    intro: blog.intro ?? "",
-    category: blog.category ?? "Education",
-    author: blog.author ?? "",
-    authorRole: blog.authorRole ?? "",
-    readTime: blog.readTime ?? "5 min read",
-    accentColor: blog.accentColor ?? "#045d30",
-    sections: sectionsToForm(blog.sections),
-    calloutHeading: blog.callout?.heading ?? "",
-    calloutBody: blog.callout?.body ?? "",
-    tags: Array.isArray(blog.tags) ? blog.tags.join(", ") : "",
-    slug: blog.slug ?? "",
-    publishedAt: blog.publishedAt?.slice?.(0, 10) ?? new Date().toISOString().slice(0, 10),
-    sortOrder: blog.sortOrder ?? 0,
-    featured: Boolean(blog.featured),
-    isPopular: Boolean(blog.isPopular),
-    published: blog.published !== false,
+    title: entry.title ?? "",
+    abstract: entry.abstract ?? "",
+    field: entry.field ?? "Social Sciences",
+    authors: Array.isArray(entry.authors) ? entry.authors.join(", ") : "",
+    authorAffiliation: entry.authorAffiliation ?? "",
+    volume: entry.volume ?? "",
+    year: entry.year ?? String(new Date().getFullYear()),
+    doi: entry.doi ?? "",
+    keywords: Array.isArray(entry.keywords) ? entry.keywords.join(", ") : "",
+    accentColor: entry.accentColor ?? "#045d30",
+    sections: sectionsToForm(entry.sections),
+    calloutLabel: entry.callout?.label ?? "",
+    calloutBody: entry.callout?.body ?? "",
+    citeSuggestion: entry.citeSuggestion ?? "",
+    slug: entry.slug ?? "",
+    publishedAt: entry.publishedAt?.slice?.(0, 10) ?? new Date().toISOString().slice(0, 10),
+    sortOrder: entry.sortOrder ?? 0,
+    featured: Boolean(entry.featured),
+    isPopular: Boolean(entry.isPopular),
+    published: entry.published !== false,
     removeCover: false,
-    removeAttachment: false,
+    removePdf: false,
     cover: null,
-    attachment: null,
+    pdf: null,
   };
 }
 
@@ -131,27 +136,30 @@ function toPayload(form) {
     })
     .filter(Boolean);
 
-  const calloutHeading = form.calloutHeading.trim();
+  const calloutLabel = form.calloutLabel.trim();
   const calloutBody = form.calloutBody.trim();
 
   return {
     title: form.title.trim(),
-    excerpt: form.excerpt.trim(),
-    intro: form.intro.trim(),
-    category: form.category.trim(),
-    author: form.author.trim(),
-    authorRole: optionalString(form.authorRole),
-    readTime: form.readTime.trim() || "5 min read",
+    abstract: form.abstract.trim(),
+    field: form.field.trim(),
+    authors: form.authors
+      .split(",")
+      .map((name) => name.trim())
+      .filter(Boolean),
+    authorAffiliation: optionalString(form.authorAffiliation),
+    volume: form.volume.trim(),
+    year: form.year.trim(),
+    doi: optionalString(form.doi),
+    keywords: form.keywords
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean),
     accentColor: form.accentColor,
     sections,
     callout:
-      calloutHeading && calloutBody
-        ? { heading: calloutHeading, body: calloutBody }
-        : null,
-    tags: form.tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
+      calloutLabel && calloutBody ? { label: calloutLabel, body: calloutBody } : null,
+    citeSuggestion: optionalString(form.citeSuggestion),
     slug: optionalString(form.slug),
     publishedAt: form.publishedAt,
     sortOrder: Number(form.sortOrder) || 0,
@@ -159,11 +167,11 @@ function toPayload(form) {
     isPopular: form.isPopular,
     published: form.published,
     removeCover: form.removeCover,
-    removeAttachment: form.removeAttachment,
+    removePdf: form.removePdf,
   };
 }
 
-export default function BlogsPage() {
+export default function JournalsPage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -171,7 +179,7 @@ export default function BlogsPage() {
   const [saving, setSaving] = useState(false);
 
   const { data, loading, error, reload } = useAsyncData(
-    () => listBlogs({ limit: 50 }),
+    () => listJournals({ limit: 50 }),
     []
   );
 
@@ -184,10 +192,10 @@ export default function BlogsPage() {
 
   async function openEdit(id) {
     try {
-      const { data: blog } = await getBlog(id);
+      const { data: entry } = await getJournal(id);
       setEditId(id);
-      setExisting(blog);
-      setForm(toForm(blog));
+      setExisting(entry);
+      setForm(toForm(entry));
       setOpen(true);
     } catch (err) {
       toast.error(err.message);
@@ -206,7 +214,7 @@ export default function BlogsPage() {
   function addSection() {
     setForm((prev) => ({
       ...prev,
-      sections: [...prev.sections, { ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }],
+      sections: [...prev.sections, { ...EMPTY_JOURNAL_SECTION }],
     }));
   }
 
@@ -215,7 +223,7 @@ export default function BlogsPage() {
       ...prev,
       sections:
         prev.sections.length <= 1
-          ? [{ ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }]
+          ? [{ ...EMPTY_JOURNAL_SECTION }]
           : prev.sections.filter((_, i) => i !== index),
     }));
   }
@@ -227,20 +235,24 @@ export default function BlogsPage() {
       toast.error("Title must be at least 3 characters");
       return;
     }
-    if (form.excerpt.trim().length < 10) {
-      toast.error("Excerpt must be at least 10 characters");
+    if (form.abstract.trim().length < 20) {
+      toast.error("Abstract must be at least 20 characters");
       return;
     }
-    if (form.intro.trim().length < 10) {
-      toast.error("Intro must be at least 10 characters");
+    if (!form.volume.trim()) {
+      toast.error("Volume is required");
       return;
     }
-    if (!form.author.trim()) {
-      toast.error("Author is required");
+    if (!/^\d{4}$/.test(form.year.trim())) {
+      toast.error("Year must be a 4-digit value");
       return;
     }
 
     const payload = toPayload(form);
+    if (!payload.authors.length) {
+      toast.error("At least one author is required");
+      return;
+    }
     if (!payload.sections.length) {
       toast.error("At least one complete section is required");
       return;
@@ -249,17 +261,17 @@ export default function BlogsPage() {
     setSaving(true);
     const files = { 
       cover: form.cover, 
-      attachment: form.attachment,
+      pdf: form.pdf,
       sectionImages: form.sections.map((section) => section.imageFile || null),
     };
 
     try {
       if (editId) {
-        await updateBlog(editId, payload, files);
-        toast.success("Blog post updated");
+        await updateJournal(editId, payload, files);
+        toast.success("Journal entry updated");
       } else {
-        await createBlog(payload, files);
-        toast.success("Blog post created");
+        await createJournal(payload, files);
+        toast.success("Journal entry created");
       }
       setOpen(false);
       setForm(emptyForm);
@@ -274,10 +286,10 @@ export default function BlogsPage() {
   }
 
   async function handleDelete(id) {
-    if (!confirm("Delete this blog post?")) return;
+    if (!confirm("Delete this journal entry?")) return;
     try {
-      await deleteBlog(id);
-      toast.success("Blog post deleted");
+      await deleteJournal(id);
+      toast.success("Journal entry deleted");
       reload();
     } catch (err) {
       toast.error(err.message);
@@ -287,29 +299,23 @@ export default function BlogsPage() {
   async function handleRemoveCover() {
     if (!editId || !confirm("Remove cover image?")) return;
     try {
-      await removeBlogCover(editId);
-      toast.success("Cover image removed");
-      const { data: blog } = await getBlog(editId);
-      setExisting(blog);
-      setForm((prev) => ({ ...prev, removeCover: false }));
+      await removeJournalCover(editId);
+      toast.success("Cover removed");
+      const { data: entry } = await getJournal(editId);
+      setExisting(entry);
       reload();
     } catch (err) {
       toast.error(err.message);
     }
   }
 
-  async function handleRemoveAttachment() {
-    if (!editId || !confirm("Remove attachment?")) return;
+  async function handleRemovePdf() {
+    if (!editId || !confirm("Remove PDF attachment?")) return;
     try {
-      const response = await fetch(`/api/admin/blogs/${editId}/attachment`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Failed to remove attachment");
-      toast.success("Attachment removed");
-      const { data: blog } = await getBlog(editId);
-      setExisting(blog);
-      setForm((prev) => ({ ...prev, removeAttachment: false }));
+      await removeJournalPdf(editId);
+      toast.success("PDF removed");
+      const { data: entry } = await getJournal(editId);
+      setExisting(entry);
       reload();
     } catch (err) {
       toast.error(err.message);
@@ -319,12 +325,12 @@ export default function BlogsPage() {
   return (
     <div>
       <PageHeader
-        title="Blog Posts"
-        subtitle="Manage publications shown on the public blog"
+        title="Journal"
+        subtitle="Manage academic research papers on the public journal page"
         actions={
           <Button type="button" size="sm" variant="primary" onClick={openCreate}>
             <Plus className="h-4 w-4" />
-            Add Blog Post
+            Add Paper
           </Button>
         }
       />
@@ -339,9 +345,9 @@ export default function BlogsPage() {
             <DataTableHead>
               <DataTableRow className="text-xs uppercase text-[var(--text-muted)]">
                 <DataTableHeaderCell>Title</DataTableHeaderCell>
-                <DataTableHeaderCell>Category</DataTableHeaderCell>
-                <DataTableHeaderCell>Author</DataTableHeaderCell>
-                <DataTableHeaderCell>Date</DataTableHeaderCell>
+                <DataTableHeaderCell>Field</DataTableHeaderCell>
+                <DataTableHeaderCell>Volume</DataTableHeaderCell>
+                <DataTableHeaderCell>Year</DataTableHeaderCell>
                 <DataTableHeaderCell>Status</DataTableHeaderCell>
                 <DataTableHeaderCell />
               </DataTableRow>
@@ -352,20 +358,14 @@ export default function BlogsPage() {
                   <DataTableRow key={row.id}>
                     <DataTableCell>
                       <p className="font-medium">{row.title}</p>
-                      <p className="text-xs text-[var(--text-muted)] line-clamp-1">{row.excerpt}</p>
-                      {row.tags?.length ? (
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {row.tags.slice(0, 3).map((tag) => (
-                            <span key={tag} className="badge badge-ghost badge-xs">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                      <p className="text-xs text-[var(--text-muted)] line-clamp-1">{row.abstract}</p>
+                      {row.authors?.length ? (
+                        <p className="mt-1 text-xs text-[var(--text-muted)]">{row.authors.join(", ")}</p>
                       ) : null}
                     </DataTableCell>
-                    <DataTableCell>{row.category ?? "—"}</DataTableCell>
-                    <DataTableCell>{row.author ?? "—"}</DataTableCell>
-                    <DataTableCell>{formatDate(row.publishedAt || row.date)}</DataTableCell>
+                    <DataTableCell>{row.field}</DataTableCell>
+                    <DataTableCell>{row.volume}</DataTableCell>
+                    <DataTableCell>{row.year}</DataTableCell>
                     <DataTableCell>
                       <div className="flex flex-wrap gap-1">
                         {row.published ? (
@@ -394,7 +394,7 @@ export default function BlogsPage() {
                   </DataTableRow>
                 ))
               ) : (
-                <DataTableEmpty colSpan={6}>No blog posts found</DataTableEmpty>
+                <DataTableEmpty colSpan={6}>No journal entries found</DataTableEmpty>
               )}
             </DataTableBody>
           </DataTable>
@@ -403,52 +403,41 @@ export default function BlogsPage() {
 
       <Modal
         open={open}
-        title={editId ? "Edit Blog Post" : "Create Blog Post"}
+        title={editId ? "Edit Journal Paper" : "Create Journal Paper"}
         onClose={() => setOpen(false)}
         wide="xl"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormSection title="Basic information">
+          <FormSection title="Paper information">
             <FormField label="Title *">
               <FormInput
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                minLength={3}
                 required
               />
-              <FormHint>{BLOG_FIELD_HINTS.title}</FormHint>
+              <FormHint>{JOURNAL_FIELD_HINTS.title}</FormHint>
             </FormField>
 
-            <FormField label="Excerpt *">
+            <FormField label="Abstract *">
               <FormTextarea
-                value={form.excerpt}
-                onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                rows={3}
-                required
-              />
-              <FormHint>{BLOG_FIELD_HINTS.excerpt}</FormHint>
-            </FormField>
-
-            <FormField label="Intro / lead paragraph *">
-              <FormTextarea
-                value={form.intro}
-                onChange={(e) => setForm({ ...form, intro: e.target.value })}
+                value={form.abstract}
+                onChange={(e) => setForm({ ...form, abstract: e.target.value })}
                 rows={4}
                 required
               />
-              <FormHint>{BLOG_FIELD_HINTS.intro}</FormHint>
+              <FormHint>{JOURNAL_FIELD_HINTS.abstract}</FormHint>
             </FormField>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category *">
+              <FormField label="Research field *">
                 <FormSelect
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  value={form.field}
+                  onChange={(e) => setForm({ ...form, field: e.target.value })}
                   required
                 >
-                  {BLOG_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
+                  {JOURNAL_FIELDS.map((field) => (
+                    <option key={field} value={field}>
+                      {field}
                     </option>
                   ))}
                 </FormSelect>
@@ -459,7 +448,7 @@ export default function BlogsPage() {
                   value={form.accentColor}
                   onChange={(e) => setForm({ ...form, accentColor: e.target.value })}
                 >
-                  {BLOG_ACCENT_COLORS.map((color) => (
+                  {JOURNAL_ACCENT_COLORS.map((color) => (
                     <option key={color.value} value={color.value}>
                       {color.label}
                     </option>
@@ -469,31 +458,40 @@ export default function BlogsPage() {
             </div>
           </FormSection>
 
-          <FormSection title="Author & metadata">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Author *">
+          <FormSection title="Authors & publication">
+            <FormField label="Authors *">
+              <FormInput
+                value={form.authors}
+                onChange={(e) => setForm({ ...form, authors: e.target.value })}
+                placeholder="Dr. Kamala Adhikari, Prof. Sunil Bhattarai"
+                required
+              />
+              <FormHint>{JOURNAL_FIELD_HINTS.authors}</FormHint>
+            </FormField>
+
+            <FormField label="Author affiliation">
+              <FormInput
+                value={form.authorAffiliation}
+                onChange={(e) => setForm({ ...form, authorAffiliation: e.target.value })}
+              />
+            </FormField>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <FormField label="Volume *">
                 <FormInput
-                  value={form.author}
-                  onChange={(e) => setForm({ ...form, author: e.target.value })}
+                  value={form.volume}
+                  onChange={(e) => setForm({ ...form, volume: e.target.value })}
+                  placeholder="Vol. 4, Issue 2"
                   required
                 />
               </FormField>
 
-              <FormField label="Author role">
+              <FormField label="Year *">
                 <FormInput
-                  value={form.authorRole}
-                  onChange={(e) => setForm({ ...form, authorRole: e.target.value })}
-                  placeholder="Head of Academic Affairs"
-                />
-              </FormField>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <FormField label="Read time">
-                <FormInput
-                  value={form.readTime}
-                  onChange={(e) => setForm({ ...form, readTime: e.target.value })}
-                  placeholder="5 min read"
+                  value={form.year}
+                  onChange={(e) => setForm({ ...form, year: e.target.value })}
+                  pattern="\d{4}"
+                  required
                 />
               </FormField>
 
@@ -504,37 +502,42 @@ export default function BlogsPage() {
                   onChange={(e) => setForm({ ...form, publishedAt: e.target.value })}
                 />
               </FormField>
-
-              <FormField label="Sort order">
-                <FormInput
-                  type="number"
-                  min={0}
-                  value={form.sortOrder}
-                  onChange={(e) => setForm({ ...form, sortOrder: e.target.value })}
-                />
-              </FormField>
             </div>
 
-            <FormField label="Tags">
+            <FormField label="DOI">
               <FormInput
-                value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                placeholder="Education, Career Readiness"
+                value={form.doi}
+                onChange={(e) => setForm({ ...form, doi: e.target.value })}
+                placeholder="10.XXXXX/inc.journal.2025.04.02.001"
               />
-              <FormHint>{BLOG_FIELD_HINTS.tags}</FormHint>
+            </FormField>
+
+            <FormField label="Keywords">
+              <FormInput
+                value={form.keywords}
+                onChange={(e) => setForm({ ...form, keywords: e.target.value })}
+                placeholder="STEM Education, Rural Nepal"
+              />
+              <FormHint>{JOURNAL_FIELD_HINTS.keywords}</FormHint>
+            </FormField>
+
+            <FormField label="Citation suggestion">
+              <FormTextarea
+                value={form.citeSuggestion}
+                onChange={(e) => setForm({ ...form, citeSuggestion: e.target.value })}
+                rows={3}
+              />
             </FormField>
 
             <FormField label="Slug">
               <FormInput
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                placeholder="experiential-learning-higher-education"
               />
-              <FormHint>{BLOG_FIELD_HINTS.slug}</FormHint>
             </FormField>
           </FormSection>
 
-          <FormSection title="Article sections">
+          <FormSection title="Paper sections">
             <div className="space-y-4">
               {form.sections.map((section, index) => (
                 <div
@@ -546,12 +549,7 @@ export default function BlogsPage() {
                       <GripVertical className="h-4 w-4" />
                       Section {index + 1}
                     </div>
-                    <Button
-                      type="button"
-                      size="xs"
-                      variant="ghost"
-                      onClick={() => removeSection(index)}
-                    >
+                    <Button type="button" size="xs" variant="ghost" onClick={() => removeSection(index)}>
                       Remove
                     </Button>
                   </div>
@@ -577,7 +575,6 @@ export default function BlogsPage() {
                     <FormInput
                       value={section.bullets}
                       onChange={(e) => updateSection(index, "bullets", e.target.value)}
-                      placeholder="Point one, Point two"
                     />
                   </FormField>
 
@@ -586,7 +583,7 @@ export default function BlogsPage() {
                       type="file"
                       accept="image/*"
                       className="file-input file-input-bordered w-full"
-                      onChange={(e) => updateSection(index, "imageFile", e.target.files?.[0] ?? null)}
+                      onChange={(e) => updateSection(index, "imageFile", e.target.files?.[0] || null)}
                     />
                   </FormField>
 
@@ -614,14 +611,15 @@ export default function BlogsPage() {
               <Plus className="h-4 w-4" />
               Add section
             </Button>
-            <FormHint>{BLOG_FIELD_HINTS.sections}</FormHint>
+            <FormHint>{JOURNAL_FIELD_HINTS.sections}</FormHint>
           </FormSection>
 
-          <FormSection title="Callout box (optional)">
-            <FormField label="Callout heading">
+          <FormSection title="Highlighted finding (optional)">
+            <FormField label="Callout label">
               <FormInput
-                value={form.calloutHeading}
-                onChange={(e) => setForm({ ...form, calloutHeading: e.target.value })}
+                value={form.calloutLabel}
+                onChange={(e) => setForm({ ...form, calloutLabel: e.target.value })}
+                placeholder="Highlighted Finding"
               />
             </FormField>
             <FormField label="Callout body">
@@ -640,70 +638,50 @@ export default function BlogsPage() {
                   type="file"
                   accept="image/*"
                   className="file-input file-input-bordered w-full"
-                  onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] ?? null })}
+                  onChange={(e) => setForm({ ...form, cover: e.target.files?.[0] || null })}
                 />
               </FormField>
 
-              <FormField label="Attachment (PDF)">
+              <FormField label="Full paper PDF">
                 <input
                   type="file"
                   accept="application/pdf"
                   className="file-input file-input-bordered w-full"
-                  onChange={(e) => setForm({ ...form, attachment: e.target.files?.[0] ?? null })}
+                  onChange={(e) => setForm({ ...form, pdf: e.target.files?.[0] || null })}
                 />
               </FormField>
             </div>
 
-            {editId && (existing?.coverImage || existing?.attachmentUrl) ? (
+            {editId && existing ? (
               <div className="space-y-3 rounded-lg border border-[var(--border-subtle)] p-3">
-                <p className="text-sm font-medium">Current files</p>
-                <div className="space-y-3">
-                  {existing?.coverImage ? (
-                    <div className="flex flex-wrap items-center gap-3">
-                      <img
-                        src={existing.coverImage}
-                        alt=""
-                        className="h-20 w-32 rounded object-cover"
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-xs btn-ghost text-rose-600"
-                        onClick={handleRemoveCover}
-                      >
-                        Remove cover
-                      </button>
-                      <FormCheckbox
-                        label="Remove cover on save"
-                        checked={form.removeCover}
-                        onChange={(e) => setForm({ ...form, removeCover: e.target.checked })}
-                      />
-                    </div>
-                  ) : null}
-                  {existing?.attachmentUrl ? (
-                    <div className="flex flex-wrap items-center gap-3">
-                      <a
-                        href={existing.attachmentUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="link link-primary text-sm"
-                      >
-                        View attachment
-                      </a>
-                      <button
-                        type="button"
-                        className="btn btn-xs btn-ghost text-rose-600"
-                        onClick={handleRemoveAttachment}
-                      >
-                        Remove attachment
-                      </button>
-                      <FormCheckbox
-                        label="Remove attachment on save"
-                        checked={form.removeAttachment}
-                        onChange={(e) => setForm({ ...form, removeAttachment: e.target.checked })}
-                      />
-                    </div>
-                  ) : null}
-                </div>
+                {existing.coverImage ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <img src={existing.coverImage} alt="" className="h-16 w-24 rounded object-cover" />
+                    <button type="button" className="btn btn-xs btn-ghost text-rose-600" onClick={handleRemoveCover}>
+                      Remove cover
+                    </button>
+                    <FormCheckbox
+                      label="Remove cover on save"
+                      checked={form.removeCover}
+                      onChange={(e) => setForm({ ...form, removeCover: e.target.checked })}
+                    />
+                  </div>
+                ) : null}
+                {existing.pdfUrl ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a href={existing.pdfUrl} target="_blank" rel="noreferrer" className="link link-primary text-sm">
+                      View PDF
+                    </a>
+                    <button type="button" className="btn btn-xs btn-ghost text-rose-600" onClick={handleRemovePdf}>
+                      Remove PDF
+                    </button>
+                    <FormCheckbox
+                      label="Remove PDF on save"
+                      checked={form.removePdf}
+                      onChange={(e) => setForm({ ...form, removePdf: e.target.checked })}
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </FormSection>
@@ -711,18 +689,18 @@ export default function BlogsPage() {
           <FormSection title="Visibility">
             <div className="space-y-3">
               <FormCheckbox
-                label="Featured post (hero section on blog page)"
+                label="Featured (Editor's Pick on journal page)"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
               />
-              <FormHint>{BLOG_FIELD_HINTS.featured}</FormHint>
+              <FormHint>{JOURNAL_FIELD_HINTS.featured}</FormHint>
 
               <FormCheckbox
-                label="Popular post (sidebar list)"
+                label="Popular / Most Cited (sidebar list)"
                 checked={form.isPopular}
                 onChange={(e) => setForm({ ...form, isPopular: e.target.checked })}
               />
-              <FormHint>{BLOG_FIELD_HINTS.isPopular}</FormHint>
+              <FormHint>{JOURNAL_FIELD_HINTS.isPopular}</FormHint>
 
               <FormCheckbox
                 label="Published — visible on public website"

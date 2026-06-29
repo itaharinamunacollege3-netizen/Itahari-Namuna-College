@@ -2,6 +2,9 @@ export interface BlogSectionDto {
   heading: string;
   body: string;
   bullets?: string[];
+  imageUrl?: string;
+  imageCloudinaryId?: string;
+  removeImage?: boolean;
 }
 
 export interface BlogCalloutDto {
@@ -27,6 +30,7 @@ export interface BlogListItemDto {
   publishedAt: string;
   sortOrder: number;
   tags: string[];
+  attachmentUrl: string;
 }
 
 export interface BlogDetailDto extends BlogListItemDto {
@@ -64,8 +68,11 @@ export interface BlogWriteInput {
   slug?: string;
   sortOrder?: number;
   removeCover?: boolean;
+  removeAttachment?: boolean;
 }
 
 export interface BlogUploadFiles {
   cover?: Express.Multer.File;
+  attachment?: Express.Multer.File;
+  sectionImages?: Express.Multer.File[];
 }

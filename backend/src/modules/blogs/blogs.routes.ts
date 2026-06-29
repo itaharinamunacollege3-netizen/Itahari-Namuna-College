@@ -9,7 +9,7 @@ import {
 } from "./blogs.schema";
 import { authenticate } from "../../middleware/authenticate";
 import { requireAdmin } from "../../middleware/adminGuard";
-import { runSingleImageUpload } from "../../middleware/upload";
+import { runSingleImageUpload, runSinglePdfUpload, runBlogFileUpload } from "../../middleware/upload";
 import { uploadLimiter } from "../../middleware/rateLimiter";
 import { z } from "zod";
 
@@ -33,7 +33,7 @@ adminRouter.get("/:id", validateParams(adminBlogIdParamSchema), blogsController.
 adminRouter.post(
   "/",
   uploadLimiter,
-  runSingleImageUpload("cover"),
+  runBlogFileUpload(),
   validateBody(createBlogSchema),
   blogsController.create
 );
@@ -41,7 +41,7 @@ adminRouter.patch(
   "/:id",
   uploadLimiter,
   validateParams(adminBlogIdParamSchema),
-  runSingleImageUpload("cover"),
+  runBlogFileUpload(),
   validateBody(updateBlogSchema),
   blogsController.update
 );
@@ -54,5 +54,13 @@ adminRouter.post(
   blogsController.uploadCover
 );
 adminRouter.delete("/:id/cover", validateParams(adminBlogIdParamSchema), blogsController.removeCover);
+adminRouter.post(
+  "/:id/attachment",
+  uploadLimiter,
+  validateParams(adminBlogIdParamSchema),
+  runSinglePdfUpload("attachment"),
+  blogsController.uploadAttachment
+);
+adminRouter.delete("/:id/attachment", validateParams(adminBlogIdParamSchema), blogsController.removeAttachment);
 
 export { publicRouter as blogsPublicRoutes, adminRouter as blogsAdminRoutes };

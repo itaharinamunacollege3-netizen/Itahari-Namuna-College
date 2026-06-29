@@ -10,6 +10,7 @@ function buildBlogFormData(data, files) {
     author: data.author,
     authorRole: data.authorRole ?? "",
     readTime: data.readTime ?? "5 min read",
+    accentColor: data.accentColor ?? "#045d30",
     sections: JSON.stringify(data.sections ?? []),
     callout: data.callout ? JSON.stringify(data.callout) : "",
     tags: JSON.stringify(data.tags ?? []),
@@ -20,6 +21,7 @@ function buildBlogFormData(data, files) {
     publishedAt: data.publishedAt ?? "",
     sortOrder: String(data.sortOrder ?? 0),
     removeCover: String(Boolean(data.removeCover)),
+    removeAttachment: String(Boolean(data.removeAttachment)),
   };
 
   Object.entries(entries).forEach(([key, value]) => {
@@ -29,6 +31,25 @@ function buildBlogFormData(data, files) {
   });
 
   if (files?.cover) form.append("cover", files.cover);
+  if (files?.attachment) form.append("attachment", files.attachment);
+  
+  // Handle section images from both places for backwards compatibility
+  // First check files.sectionImages
+  if (files?.sectionImages) {
+    files.sectionImages.forEach((file, index) => {
+      if (file) form.append(`sectionImages[${index}]`, file);
+    });
+  }
+  
+  // Also check data.sections for imageFile property (newer pattern)
+  if (Array.isArray(data.sections)) {
+    data.sections.forEach((section, index) => {
+      if (section.imageFile) {
+        form.append(`sectionImages[${index}]`, section.imageFile);
+      }
+    });
+  }
+  
   return form;
 }
 
@@ -41,7 +62,11 @@ export async function getBlog(id) {
 }
 
 export async function createBlog(data, files) {
-  if (files?.cover) {
+  const hasSectionImagesFromFiles = files?.sectionImages?.some(file => file);
+  const hasSectionImagesFromData = Array.isArray(data.sections) && data.sections.some(section => section.imageFile);
+  const hasFiles = files?.cover || files?.attachment || hasSectionImagesFromFiles || hasSectionImagesFromData;
+  
+  if (hasFiles) {
     return apiFormRequest("/admin/blogs", buildBlogFormData(data, files));
   }
   return apiRequest("/admin/blogs", {
@@ -51,7 +76,11 @@ export async function createBlog(data, files) {
 }
 
 export async function updateBlog(id, data, files) {
-  if (files?.cover) {
+  const hasSectionImagesFromFiles = files?.sectionImages?.some(file => file);
+  const hasSectionImagesFromData = Array.isArray(data.sections) && data.sections.some(section => section.imageFile);
+  const hasFiles = files?.cover || files?.attachment || hasSectionImagesFromFiles || hasSectionImagesFromData;
+  
+  if (hasFiles) {
     return apiFormRequest(`/admin/blogs/${id}`, buildBlogFormData(data, files), "PATCH");
   }
   return apiRequest(`/admin/blogs/${id}`, {
