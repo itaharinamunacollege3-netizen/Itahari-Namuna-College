@@ -6,6 +6,7 @@ import {
   deleteCloudinaryAsset,
   uploadBlogCoverImage,
   uploadBlogPdf,
+  uploadBlogSectionImage,
 } from "../../services/cloudinary.service";
 import { formatBlogDate, formatBlogDetail, formatBlogListItem } from "./blogs.formatter";
 import type { BlogUploadFiles, BlogWriteInput, ListBlogsParams } from "./blogs.types";
@@ -21,6 +22,8 @@ function sanitizeSections(sections: BlogWriteInput["sections"]) {
     ...(section.bullets?.length
       ? { bullets: section.bullets.map((bullet) => sanitizeText(bullet)) }
       : {}),
+    ...(section.imageUrl ? { imageUrl: section.imageUrl } : {}),
+    ...(section.imageCloudinaryId ? { imageCloudinaryId: section.imageCloudinaryId } : {}),
   }));
 }
 
@@ -74,7 +77,7 @@ async function resolveMediaFields(
   data: Partial<BlogWriteInput>,
   files: BlogUploadFiles | undefined,
   blogSlug: string,
-  existing?: { coverImage: string | null; coverImageCloudinaryId: string | null; attachmentUrl: string | null; attachmentCloudinaryId: string | null }
+  existing?: { coverImage: string | null; coverImageCloudinaryId: string | null; attachmentUrl: string | null; attachmentCloudinaryId: string | null; sections?: unknown }
 ) {
   const result: Record<string, unknown> = {};
 
@@ -108,18 +111,64 @@ async function resolveMediaFields(
     result.attachmentCloudinaryId = upload.publicId;
   }
 
+  // Handle section images
+  if (data.sections) {
+    const existingSections = (existing?.sections || []) as Array<{ imageUrl?: string | null, imageCloudinaryId?: string | null }>;
+    const updatedSections = [...data.sections];
+
+    for (let i = 0; i < updatedSections.length; i++) {
+      const section = updatedSections[i];
+      const file = files?.sectionImages?.[i];
+      const existingSection = existingSections[i];
+
+      if (section.removeImage) {
+        if (existingSection?.imageCloudinaryId) {
+          await deleteCloudinaryAsset(existingSection.imageCloudinaryId, "image");
+        }
+        delete section.imageUrl;
+        delete section.imageCloudinaryId;
+      } else if (file) {
+        if (existingSection?.imageCloudinaryId) {
+          await deleteCloudinaryAsset(existingSection.imageCloudinaryId, "image");
+        }
+        const upload = await uploadBlogSectionImage(file, blogSlug);
+        section.imageUrl = upload.url;
+        section.imageCloudinaryId = upload.publicId;
+      } else if (existingSection?.imageUrl && !section.removeImage) {
+        // Keep existing image
+        section.imageUrl = existingSection.imageUrl;
+        section.imageCloudinaryId = existingSection.imageCloudinaryId ?? undefined;
+      }
+
+      delete section.removeImage;
+    }
+
+    result.sections = updatedSections;
+  }
+
   return result;
 }
 
-async function deleteBlogAssets(post: { coverImageCloudinaryId: string | null; attachmentCloudinaryId: string | null }) {
+async function deleteBlogAssets(post: { coverImageCloudinaryId: string | null; attachmentCloudinaryId: string | null; sections?: unknown }) {
+  const sectionImagesToDelete: (string | null | undefined)[] = [];
+  const sections = (post.sections || []) as Array<{ imageCloudinaryId?: string | null }>;
+  
+  for (const section of sections) {
+    if (section.imageCloudinaryId) {
+      sectionImagesToDelete.push(section.imageCloudinaryId);
+    }
+  }
+
   await Promise.all([
     deleteCloudinaryAsset(post.coverImageCloudinaryId, "image"),
     deleteCloudinaryAsset(post.attachmentCloudinaryId, "raw"),
+    ...sectionImagesToDelete.map(id => deleteCloudinaryAsset(id, "image")),
   ]);
 }
 
 function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unknown>) {
   const callout = sanitizeCallout(data.callout ?? null);
+  const sections = mediaFields.sections || sanitizeSections(data.sections);
 
   return {
     title: data.title.trim(),
@@ -130,7 +179,7 @@ function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unk
     authorRole: data.authorRole?.trim() || null,
     readTime: data.readTime?.trim() || "5 min read",
     accentColor: data.accentColor ?? "#045d30",
-    sections: sanitizeSections(data.sections),
+    sections,
     ...(callout ? { callout } : {}),
     tags: data.tags,
     featured: data.featured ?? false,

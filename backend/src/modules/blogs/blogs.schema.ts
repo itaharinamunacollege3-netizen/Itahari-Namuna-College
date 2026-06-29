@@ -4,6 +4,9 @@ const blogSectionSchema = z.object({
   heading: z.string().trim().min(1),
   body: z.string().trim().min(1),
   bullets: z.array(z.string().trim().min(1)).optional(),
+  imageUrl: z.string().trim().optional(),
+  imageCloudinaryId: z.string().trim().optional(),
+  removeImage: z.boolean().default(false).optional(),
 });
 
 const blogCalloutSchema = z

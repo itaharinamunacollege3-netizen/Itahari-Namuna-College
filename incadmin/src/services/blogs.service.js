@@ -21,6 +21,7 @@ function buildBlogFormData(data, files) {
     publishedAt: data.publishedAt ?? "",
     sortOrder: String(data.sortOrder ?? 0),
     removeCover: String(Boolean(data.removeCover)),
+    removeAttachment: String(Boolean(data.removeAttachment)),
   };
 
   Object.entries(entries).forEach(([key, value]) => {
@@ -30,6 +31,12 @@ function buildBlogFormData(data, files) {
   });
 
   if (files?.cover) form.append("cover", files.cover);
+  if (files?.attachment) form.append("attachment", files.attachment);
+  if (files?.sectionImages) {
+    files.sectionImages.forEach((file, index) => {
+      if (file) form.append(`sectionImages[${index}]`, file);
+    });
+  }
   return form;
 }
 
@@ -42,7 +49,8 @@ export async function getBlog(id) {
 }
 
 export async function createBlog(data, files) {
-  if (files?.cover) {
+  const hasFiles = files?.cover || files?.attachment || (files?.sectionImages?.some(file => file));
+  if (hasFiles) {
     return apiFormRequest("/admin/blogs", buildBlogFormData(data, files));
   }
   return apiRequest("/admin/blogs", {
@@ -52,7 +60,8 @@ export async function createBlog(data, files) {
 }
 
 export async function updateBlog(id, data, files) {
-  if (files?.cover) {
+  const hasFiles = files?.cover || files?.attachment || (files?.sectionImages?.some(file => file));
+  if (hasFiles) {
     return apiFormRequest(`/admin/blogs/${id}`, buildBlogFormData(data, files), "PATCH");
   }
   return apiRequest(`/admin/blogs/${id}`, {

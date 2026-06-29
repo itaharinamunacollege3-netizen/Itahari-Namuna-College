@@ -52,7 +52,7 @@ const emptyForm = {
   authorRole: "",
   readTime: "5 min read",
   accentColor: "#045d30",
-  sections: [{ ...EMPTY_BLOG_SECTION }],
+  sections: [{ ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }],
   calloutHeading: "",
   calloutBody: "",
   tags: "",
@@ -70,12 +70,15 @@ const emptyForm = {
 
 function sectionsToForm(sections) {
   if (!Array.isArray(sections) || !sections.length) {
-    return [{ ...EMPTY_BLOG_SECTION }];
+    return [{ ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }];
   }
   return sections.map((section) => ({
     heading: section.heading ?? "",
     body: section.body ?? "",
     bullets: Array.isArray(section.bullets) ? section.bullets.join(", ") : "",
+    imageUrl: section.imageUrl ?? "",
+    imageCloudinaryId: section.imageCloudinaryId ?? "",
+    removeImage: false,
   }));
 }
 
@@ -116,7 +119,15 @@ function toPayload(form) {
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
-      return bullets.length ? { heading, body, bullets } : { heading, body };
+      const base = {
+        heading,
+        body,
+        ...(bullets.length ? { bullets } : {}),
+        ...(section.imageUrl ? { imageUrl: section.imageUrl } : {}),
+        ...(section.imageCloudinaryId ? { imageCloudinaryId: section.imageCloudinaryId } : {}),
+        removeImage: section.removeImage,
+      };
+      return base;
     })
     .filter(Boolean);
 
@@ -195,7 +206,7 @@ export default function BlogsPage() {
   function addSection() {
     setForm((prev) => ({
       ...prev,
-      sections: [...prev.sections, { ...EMPTY_BLOG_SECTION }],
+      sections: [...prev.sections, { ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }],
     }));
   }
 
@@ -204,7 +215,7 @@ export default function BlogsPage() {
       ...prev,
       sections:
         prev.sections.length <= 1
-          ? [{ ...EMPTY_BLOG_SECTION }]
+          ? [{ ...EMPTY_BLOG_SECTION, imageUrl: "", imageCloudinaryId: "", removeImage: false }]
           : prev.sections.filter((_, i) => i !== index),
     }));
   }
@@ -236,7 +247,11 @@ export default function BlogsPage() {
     }
 
     setSaving(true);
-    const files = { cover: form.cover, attachment: form.attachment };
+    const files = { 
+      cover: form.cover, 
+      attachment: form.attachment,
+      sectionImages: form.sections.map((section) => section.imageFile || null),
+    };
 
     try {
       if (editId) {
@@ -565,6 +580,32 @@ export default function BlogsPage() {
                       placeholder="Point one, Point two"
                     />
                   </FormField>
+
+                  <FormField label="Section image">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="file-input file-input-bordered w-full"
+                      onChange={(e) => updateSection(index, "imageFile", e.target.files?.[0] ?? null)}
+                    />
+                  </FormField>
+
+                  {section.imageUrl ? (
+                    <div className="space-y-2">
+                      <img
+                        src={section.imageUrl}
+                        alt=""
+                        className="h-40 w-full rounded object-cover"
+                      />
+                      <div className="flex items-center gap-2">
+                        <FormCheckbox
+                          label="Remove image on save"
+                          checked={section.removeImage}
+                          onChange={(e) => updateSection(index, "removeImage", e.target.checked)}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>

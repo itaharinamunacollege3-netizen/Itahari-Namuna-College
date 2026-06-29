@@ -191,6 +191,10 @@ function blogFileFilter(
     if (!isAllowedImageMime(file.mimetype)) {
       return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for the cover field"));
     }
+  } else if (file.fieldname.startsWith("sectionImages[")) {
+    if (!isAllowedImageMime(file.mimetype)) {
+      return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for section images"));
+    }
   } else {
     return cb(new AppError(400, `Unexpected file field: ${file.fieldname}`));
   }
@@ -199,16 +203,23 @@ function blogFileFilter(
 
 export const blogFileUpload = multer({
   storage,
-  limits: { fileSize: env.maxUploadBytes, files: 2 },
+  limits: { fileSize: env.maxUploadBytes, files: 20 },
   fileFilter: blogFileFilter,
 });
 
 export function runBlogFileUpload() {
   return (req: Request, res: Response, next: NextFunction) => {
-    blogFileUpload.fields([
+    const fields = [
       { name: "attachment", maxCount: 1 },
       { name: "cover", maxCount: 1 },
-    ])(req, res, (err) => {
+    ];
+    
+    // Allow up to 20 section images (sectionImages[0], sectionImages[1], ...)
+    for (let i = 0; i < 20; i++) {
+      fields.push({ name: `sectionImages[${i}]`, maxCount: 1 });
+    }
+
+    blogFileUpload.fields(fields)(req, res, (err) => {
       if (err) return handleMulterError(err, req, res, next);
       next();
     });
@@ -217,8 +228,18 @@ export function runBlogFileUpload() {
 
 export function getBlogUploadFiles(req: Request) {
   const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  const sectionImages: Express.Multer.File[] = [];
+  
+  for (let i = 0; i < 20; i++) {
+    const key = `sectionImages[${i}]`;
+    if (files?.[key]?.[0]) {
+      sectionImages[i] = files[key][0];
+    }
+  }
+  
   return {
     attachment: files?.attachment?.[0],
     cover: files?.cover?.[0],
+    sectionImages,
   };
 }

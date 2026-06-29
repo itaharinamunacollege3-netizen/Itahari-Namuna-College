@@ -23,7 +23,13 @@ function parseSections(value: unknown): BlogSectionDto[] {
       const bullets = Array.isArray(item.bullets)
         ? item.bullets.map(String).map((b) => b.trim()).filter(Boolean)
         : undefined;
-      return bullets?.length ? { heading, body, bullets } : { heading, body };
+      const imageUrl = item.imageUrl ? String(item.imageUrl) : undefined;
+      return {
+        heading,
+        body,
+        ...(bullets?.length ? { bullets } : {}),
+        ...(imageUrl ? { imageUrl } : {}),
+      };
     })
     .filter(Boolean) as BlogSectionDto[];
 }

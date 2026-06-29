@@ -168,6 +168,15 @@ export default function BlogDetail() {
                       ))}
                     </ul>
                   ) : null}
+                  {section.imageUrl ? (
+                    <div className="mt-4 mb-3 rounded-xl overflow-hidden">
+                      <img
+                        src={section.imageUrl}
+                        alt={section.heading}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  ) : null}
                 </section>
               ))}
             </div>
