@@ -10,6 +10,7 @@ import {
   getPopularJournals,
 } from './journalsService';
 
+import Journal from '../../../assets/banner images/Journal.jpg';
 function FieldBadge({ field, small = false }) {
   return (
     <span
@@ -95,10 +96,10 @@ export default function JournalList() {
   return (
     <div className="min-h-screen bg-brand-gray/30">
       <div
-        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[260px] flex items-end"
-        style={{ backgroundImage: 'linear-gradient(135deg, #20242b 0%, #045d30 100%)' }}
+        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[60vh] flex items-end"
+        style={{ backgroundImage: 'url(' + Journal + ')' }}
       >
-        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
         <div
           className="absolute inset-0 opacity-5 z-10"
           style={{

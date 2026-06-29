@@ -9,12 +9,12 @@ import {
   getFeaturedBlog,
   getPopularBlogs,
 } from './blogsService';
-
+import Blog from '../../../assets/banner images/Blog.jpg';
 
 function CategoryBadge({ category, small = false }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 font-body font-semibold rounded-full bg-gradient-to-r from-brand-primary/10 to-brand-blue/10 text-brand-primary border border-brand-primary/20 ${small ? 'text-[10px] px-2 py-0.5' : 'text-xs px-3 py-1'}`}
+      className={`inline-flex items-center gap-1 font-body font-semibold rounded-full bg-linear-to-r from-brand-primary/10 to-brand-blue/10 text-brand-primary border border-brand-primary/20 ${small ? 'text-[10px] px-2 py-0.5' : 'text-xs px-3 py-1'}`}
     >
       <Tag size={small ? 9 : 10} />
       {category}
@@ -93,10 +93,10 @@ export default function BlogList() {
   return (
     <div className="min-h-screen bg-brand-gray/30">
       <div
-        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[260px] flex items-end"
-        style={{ backgroundImage: 'linear-gradient(135deg, #045d30 0%, #3db2e1 100%)' }}
+        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-65 flex items-end"
+        style={{ backgroundImage: Blog ? `url(${Blog})` : 'none' }}
       >
-        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
         <div
           className="absolute inset-0 opacity-5 z-10"
           style={{

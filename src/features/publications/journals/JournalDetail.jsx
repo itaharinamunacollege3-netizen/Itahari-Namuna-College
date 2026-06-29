@@ -91,7 +91,7 @@ export default function JournalDetail() {
         className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[400px] flex items-end"
         style={bannerStyle}
       >
-        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
         <div
           className="absolute inset-0 opacity-5 z-10"
           style={{
@@ -215,7 +215,7 @@ export default function JournalDetail() {
                         key={bulletIndex}
                         className="flex items-start gap-4 font-body text-base text-brand-dark/75 leading-relaxed"
                       >
-                        <div className="mt-2 w-2.5 h-2.5 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 shadow-sm" />
+                        <div className="mt-2 w-2.5 h-2.5 rounded-full bg-linear-to-br from-brand-primary to-brand-blue shrink-0 shadow-sm" />
                         {bullet}
                       </li>
                     ))}
@@ -241,7 +241,7 @@ export default function JournalDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="mt-16 rounded-2xl bg-gradient-to-br from-brand-dark/95 to-brand-dark p-8 relative overflow-hidden"
+                className="mt-16 rounded-2xl bg-linear-to-br from-brand-dark/95 to-brand-dark p-8 relative overflow-hidden"
               >
                 <div className="absolute top-4 right-4 w-20 bg-brand-primary/10 rounded-full blur-3xl" />
                 <Quote
@@ -272,7 +272,7 @@ export default function JournalDetail() {
                   {entry.keywords.map((keyword) => (
                     <span
                       key={keyword}
-                      className="text-sm font-body font-medium px-4 py-2 rounded-full bg-gradient-to-r from-brand-gray to-brand-gray/80 text-brand-dark/70 hover:text-brand-primary hover:from-brand-primary/10 hover:to-brand-blue/10 transition-all duration-300 cursor-default"
+                      className="text-sm font-body font-medium px-4 py-2 rounded-full bg-linear-to-r from-brand-gray to-brand-gray/80 text-brand-dark/70 hover:text-brand-primary hover:from-brand-primary/10 hover:to-brand-blue/10 transition-all duration-300 cursor-default"
                     >
                       {keyword}
                     </span>
@@ -287,12 +287,12 @@ export default function JournalDetail() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="mt-10 rounded-2xl border border-brand-gray/60 bg-gradient-to-br from-brand-white to-brand-gray/30 p-7 shadow-sm"
+                className="mt-10 rounded-2xl border border-brand-gray/60 bg-linear-to-br from-brand-white to-brand-gray/30 p-7 shadow-sm"
               >
                 <p className="text-xs font-body font-bold uppercase tracking-widest text-brand-dark/40 mb-3">
                   Cite This Paper
                 </p>
-                <p className="font-body text-xs sm:text-sm text-brand-dark/70 leading-relaxed bg-gradient-to-br from-brand-gray/50 to-brand-gray/40 rounded-xl px-5 py-4 select-all">
+                <p className="font-body text-xs sm:text-sm text-brand-dark/70 leading-relaxed bg-linear-to-br from-brand-gray/50 to-brand-gray/40 rounded-xl px-5 py-4 select-all">
                   {entry.citeSuggestion}
                 </p>
               </motion.div>
@@ -303,7 +303,7 @@ export default function JournalDetail() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="mt-10 flex items-center gap-6 bg-gradient-to-br from-brand-white to-brand-gray/30 rounded-2xl border border-brand-gray/60 p-6 sm:p-8 shadow-sm"
+              className="mt-10 flex items-center gap-6 bg-linear-to-br from-brand-white to-brand-gray/30 rounded-2xl border border-brand-gray/60 p-6 sm:p-8 shadow-sm"
             >
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-primary to-brand-blue shrink-0 flex items-center justify-center shadow-lg">
                 <span className="font-heading font-black text-white text-xl">

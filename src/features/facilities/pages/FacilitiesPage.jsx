@@ -13,7 +13,7 @@ const FacilitiesPage = () => {
     : facilitiesData.filter(item => item.category === activeFilter);
 
   return (
-    <AnimatedSection>
+   
         <div className="min-h-screen bg-[#F7F6F3]">
         <PageBanner title="College Facilities" subtitle="Why Itahari Namuna Campus?" />
 
@@ -49,7 +49,7 @@ const FacilitiesPage = () => {
             </div>
         </div>
         </div>
-    </AnimatedSection>
+    
   );
 };
 

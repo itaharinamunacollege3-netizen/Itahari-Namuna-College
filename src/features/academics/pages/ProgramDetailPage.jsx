@@ -63,7 +63,7 @@ const ProgramDetailPage = () => {
   }
 
   return (
-    <AnimatedSection>
+    
       <div className="w-full min-h-screen bg-stone-50 text-left">
         {/* 1. HEADER BANNER */}
         <div
@@ -72,7 +72,7 @@ const ProgramDetailPage = () => {
             backgroundImage: `url(${program.image || "/placeholder.png"})`
           }}
         >
-          <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
           <div className="max-w-7xl mx-auto relative z-20 space-y-4">
             <Link to="/academic" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors">
               <ArrowLeft className="w-3.5 h-3.5" /> <span>Academic Programs</span>
@@ -96,7 +96,7 @@ const ProgramDetailPage = () => {
             </div>
           </div>
         </div>
-
+<AnimatedSection>
         {/* 2. SLIDING PILL SWITCHER */}
         <div className="max-w-7xl mx-auto px-6 mt-10">
           <div className="inline-block bg-stone-200/60 p-1.5 rounded-2xl border border-stone-200/60 relative overflow-hidden backdrop-blur-xs">
@@ -198,8 +198,8 @@ const ProgramDetailPage = () => {
             </div>
           </div>
         </div>
-      </div>
     </AnimatedSection>
+      </div>
   );
 };
 

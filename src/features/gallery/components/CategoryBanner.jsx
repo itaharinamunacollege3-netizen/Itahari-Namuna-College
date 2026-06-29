@@ -9,7 +9,7 @@ export default function CategoryBanner({ title, subtitle, bgImage }) {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       {/* The same gradient overlay from your academic page */}
-      <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
+      <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
       
       <div className="max-w-7xl mx-auto relative z-20 space-y-4">
         <Link to="/gallery" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors">

@@ -27,7 +27,6 @@ const AcademicHubPage = () => {
   };
 
   return (
-    <AnimatedSection>
     <div className="w-full min-h-screen bg-stone-50 space-y-12 pb-20">
       
       {/* 1. REUSABLE COMMON BANNER INTEGRATION */}
@@ -35,7 +34,8 @@ const AcademicHubPage = () => {
         tag="Academic Excellence"
         title="Our Academic Offerings"
         subtitle="Five TU-affiliated undergraduate programs designed for intellectual rigour, professional readiness, and social impact."
-      />
+        />
+      <AnimatedSection>
 
       {/* 2. PROGRAM GRID HOUSING CONTAINER */}
       
@@ -52,8 +52,8 @@ const AcademicHubPage = () => {
         </div>
       </div>
 
-    </div>
     </AnimatedSection>
+    </div>
   );
 };
 export default AcademicHubPage;

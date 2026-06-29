@@ -6,10 +6,10 @@ import AnimatedSection from '../../components/animations/AnimatedSection';
 
 export default function ContactPage() {
   return (
-    <AnimatedSection>
-      <div className="w-full min-h-screen bg-stone-50 space-y-12 pb-20">
+    <div className="w-full min-h-screen bg-stone-50 space-y-12 pb-20">
         {/* Banner */}
         <PageBanner title="Contact Us" subtitle="Reach our admissions, academic, or administrative teams. We respond within 1 working day." />
+        <AnimatedSection>
 
         <div className="max-w-7xl mx-auto px-6 -mt-10 grid lg:grid-cols-2 gap-8">
           {/* Left: Map & Info */}
@@ -39,8 +39,8 @@ export default function ContactPage() {
             <ContactForm />
           </div>
         </div>
-      </div>
     </AnimatedSection>
+      </div>
   );
 }
 

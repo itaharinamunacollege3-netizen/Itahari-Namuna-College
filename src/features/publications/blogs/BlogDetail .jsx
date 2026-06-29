@@ -86,10 +86,10 @@ export default function BlogDetail() {
     <div className="min-h-screen bg-brand-gray/30">
       {/* Hero Banner */}
       <div
-        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[400px] flex items-end"
+        className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-100 flex items-end"
         style={bannerStyle}
       >
-        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/90 via-[#00522b]/85 to-transparent z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
         <div
           className="absolute inset-0 opacity-5 z-10"
           style={{

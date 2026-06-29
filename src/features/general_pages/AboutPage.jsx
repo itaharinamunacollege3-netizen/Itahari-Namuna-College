@@ -21,12 +21,12 @@ const AboutPage = () => {
     tabsConfig.findIndex((tab) => tab.id === activeTab);
 
   return (
-    <AnimatedSection>
-      <div className="w-full bg-stone-50 min-h-screen pb-20">
+    <div className="w-full bg-stone-50 min-h-screen pb-20">
         <PageBanner
           title="About Our Institution"
           subtitle="Built on a legacy of trust, quality, and service — Itahari Namuna College."
-        />
+          />
+          <AnimatedSection>
         <div className="max-w-7xl mx-auto px-6 mt-12 text-left">
           {/* PREMIUM SLIDING PILL SWITCHER CONTAINER */}
           {/* PREMIUM SLIDING PILL SWITCHER CONTAINER */}
@@ -94,8 +94,8 @@ const AboutPage = () => {
             )}
           </div>
         </div>
-      </div>
     </AnimatedSection>
+      </div>
   );
 };
 
