@@ -168,7 +168,8 @@ async function deleteBlogAssets(post: { coverImageCloudinaryId: string | null; a
 
 function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unknown>) {
   const callout = sanitizeCallout(data.callout ?? null);
-  const sections = mediaFields.sections || sanitizeSections(data.sections);
+  // Use sections from mediaFields if available, otherwise sanitize original
+  const sectionsToSanitize = mediaFields.sections || data.sections;
 
   return {
     title: data.title.trim(),
@@ -179,7 +180,7 @@ function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unk
     authorRole: data.authorRole?.trim() || null,
     readTime: data.readTime?.trim() || "5 min read",
     accentColor: data.accentColor ?? "#045d30",
-    sections,
+    sections: sanitizeSections(sectionsToSanitize),
     ...(callout ? { callout } : {}),
     tags: data.tags,
     featured: data.featured ?? false,
@@ -187,7 +188,10 @@ function mapWriteInputToDb(data: BlogWriteInput, mediaFields: Record<string, unk
     published: data.published ?? true,
     publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
     sortOrder: data.sortOrder ?? 0,
-    ...mediaFields,
+    // Don't spread all mediaFields because we already handled sections
+    ...Object.fromEntries(
+      Object.entries(mediaFields).filter(([key]) => key !== "sections")
+    ),
   };
 }
 

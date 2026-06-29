@@ -32,6 +32,16 @@ function buildJournalFormData(data, files) {
 
   if (files?.cover) form.append("cover", files.cover);
   if (files?.pdf) form.append("pdf", files.pdf);
+  
+  // Handle section images from data.sections (imageFile property)
+  if (Array.isArray(data.sections)) {
+    data.sections.forEach((section, index) => {
+      if (section.imageFile) {
+        form.append(`sectionImages[${index}]`, section.imageFile);
+      }
+    });
+  }
+  
   return form;
 }
 
@@ -44,7 +54,10 @@ export async function getJournal(id) {
 }
 
 export async function createJournal(data, files) {
-  if (files?.cover || files?.pdf) {
+  // Check if there are any section images to upload
+  const hasSectionImages = Array.isArray(data.sections) && data.sections.some(section => section.imageFile);
+  
+  if (files?.cover || files?.pdf || hasSectionImages) {
     return apiFormRequest("/admin/journals", buildJournalFormData(data, files));
   }
   return apiRequest("/admin/journals", {
@@ -54,7 +67,10 @@ export async function createJournal(data, files) {
 }
 
 export async function updateJournal(id, data, files) {
-  if (files?.cover || files?.pdf) {
+  // Check if there are any section images to upload
+  const hasSectionImages = Array.isArray(data.sections) && data.sections.some(section => section.imageFile);
+  
+  if (files?.cover || files?.pdf || hasSectionImages) {
     return apiFormRequest(`/admin/journals/${id}`, buildJournalFormData(data, files), "PATCH");
   }
   return apiRequest(`/admin/journals/${id}`, {

@@ -179,6 +179,8 @@ async function deleteJournalAssets(entry: {
 
 function mapWriteInputToDb(data: JournalWriteInput, mediaFields: Record<string, unknown>) {
   const callout = sanitizeCallout(data.callout ?? null);
+  // Use sections from mediaFields if available, otherwise sanitize original
+  const sectionsToSanitize = mediaFields.sections || data.sections;
 
   return {
     title: data.title.trim(),
@@ -191,7 +193,7 @@ function mapWriteInputToDb(data: JournalWriteInput, mediaFields: Record<string, 
     doi: data.doi?.trim() || null,
     keywords: data.keywords,
     accentColor: data.accentColor ?? "#045d30",
-    sections: sanitizeSections(data.sections),
+    sections: sanitizeSections(sectionsToSanitize),
     ...(callout ? { callout } : {}),
     citeSuggestion: data.citeSuggestion?.trim() || null,
     featured: data.featured ?? false,
@@ -199,7 +201,10 @@ function mapWriteInputToDb(data: JournalWriteInput, mediaFields: Record<string, 
     published: data.published ?? true,
     publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
     sortOrder: data.sortOrder ?? 0,
-    ...mediaFields,
+    // Don't spread all mediaFields because we already handled sections
+    ...Object.fromEntries(
+      Object.entries(mediaFields).filter(([key]) => key !== "sections")
+    ),
   };
 }
 

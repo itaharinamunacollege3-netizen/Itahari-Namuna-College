@@ -222,11 +222,11 @@ export default function JournalDetail() {
                   </ul>
                 ) : null}
                 {section.imageUrl ? (
-                  <div className="mt-8 mb-8 rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
+                  <div className="mt-6 mb-6 rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5 max-w-3xl mx-auto">
                     <img
                       src={section.imageUrl}
                       alt={section.heading}
-                      className="w-full h-auto object-cover transition-transform duration-700 hover:scale-[1.02]"
+                      className="w-full h-auto max-h-[320px] object-cover transition-transform duration-700 hover:scale-[1.02]"
                       loading="lazy"
                     />
                   </div>
