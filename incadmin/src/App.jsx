@@ -13,6 +13,7 @@ const ContactsPage = lazy(() => import("@/pages/ContactsPage"));
 const NoticesPage = lazy(() => import("@/pages/NoticesPage"));
 const ProgramsPage = lazy(() => import("@/pages/ProgramsPage"));
 const FacilitiesPage = lazy(() => import("@/pages/FacilitiesPage"));
+const UnitsPage = lazy(() => import("@/pages/UnitsPage"));
 const GalleryPage = lazy(() => import("@/pages/GalleryPage"));
 const FacultyPage = lazy(() => import("@/pages/FacultyPage"));
 const StaffPage = lazy(() => import("@/pages/StaffPage"));
@@ -48,6 +49,7 @@ export default function App() {
                   <Route path="/notices" element={<NoticesPage />} />
                   <Route path="/programs" element={<ProgramsPage />} />
                   <Route path="/facilities" element={<FacilitiesPage />} />
+                  <Route path="/units" element={<UnitsPage />} />
                   <Route path="/blogs" element={<BlogsPage />} />
                   <Route path="/journals" element={<JournalsPage />} />
                   <Route path="/gallery" element={<GalleryPage />} />

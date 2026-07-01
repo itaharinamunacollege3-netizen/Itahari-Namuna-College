@@ -11,6 +11,7 @@ import { programsPublicRoutes, programsAdminRoutes } from "../modules/programs/p
 import { blogsPublicRoutes, blogsAdminRoutes } from "../modules/blogs/blogs.routes";
 import { journalsPublicRoutes, journalsAdminRoutes } from "../modules/journals/journals.routes";
 import { facilitiesPublicRoutes, facilitiesAdminRoutes } from "../modules/facilities/facilities.routes";
+import { unitsPublicRoutes, unitsAdminRoutes } from "../modules/units/units.routes";
 import { notificationsAdminRoutes } from "../modules/notifications/notifications.routes";
 import { sendSuccess } from "../utils/apiResponse";
 
@@ -32,6 +33,7 @@ router.use("/programs", programsPublicRoutes);
 router.use("/blogs", blogsPublicRoutes);
 router.use("/journals", journalsPublicRoutes);
 router.use("/facilities", facilitiesPublicRoutes);
+router.use("/units", unitsPublicRoutes);
 
 router.use("/admin/notices", noticesAdminRoutes);
 router.use("/admin/contacts", contactsAdminRoutes);
@@ -44,6 +46,7 @@ router.use("/admin/programs", programsAdminRoutes);
 router.use("/admin/blogs", blogsAdminRoutes);
 router.use("/admin/journals", journalsAdminRoutes);
 router.use("/admin/facilities", facilitiesAdminRoutes);
+router.use("/admin/units", unitsAdminRoutes);
 router.use("/admin/notifications", notificationsAdminRoutes);
 
 export default router;

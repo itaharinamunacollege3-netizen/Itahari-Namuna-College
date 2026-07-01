@@ -8,6 +8,8 @@ import {
   updateFacultyDepartmentSchema,
   createFacilityCategorySchema,
   updateFacilityCategorySchema,
+  createUnitCategorySchema,
+  updateUnitCategorySchema,
 } from "./categories.schema";
 import { authenticate } from "../../middleware/authenticate";
 import { requireAdmin } from "../../middleware/adminGuard";
@@ -19,6 +21,7 @@ publicRouter.get("/staff-categories/:id", categoryController.getStaffCategory);
 publicRouter.get("/faculty-departments", categoryController.listFacultyDepartments);
 publicRouter.get("/faculty-departments/:id", categoryController.getFacultyDepartment);
 publicRouter.get("/facility-categories", categoryController.listAllFacilityCategories);
+publicRouter.get("/unit-categories", categoryController.listUnitCategories);
 
 // ── Admin routes (full CRUD, requires access token + admin role) ──
 const adminRouter = Router();
@@ -65,5 +68,19 @@ adminRouter.patch(
   categoryController.updateFacilityCategory
 );
 adminRouter.delete("/facility-categories/:id", categoryController.deleteFacilityCategory);
+
+// Unit categories
+adminRouter.get("/unit-categories", categoryController.listAllUnitCategories);
+adminRouter.post(
+  "/unit-categories",
+  validateBody(createUnitCategorySchema),
+  categoryController.createUnitCategory
+);
+adminRouter.patch(
+  "/unit-categories/:id",
+  validateBody(updateUnitCategorySchema),
+  categoryController.updateUnitCategory
+);
+adminRouter.delete("/unit-categories/:id", categoryController.deleteUnitCategory);
 
 export { publicRouter as categoriesPublicRoutes, adminRouter as categoriesAdminRoutes };

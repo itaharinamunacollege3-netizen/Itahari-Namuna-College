@@ -307,3 +307,40 @@ export function getFacilityUploadFiles(req: Request) {
   };
 }
 
+function unitFileFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) {
+  if (file.fieldname === "icon") {
+    if (!isAllowedImageMime(file.mimetype)) {
+      return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for the icon field"));
+    }
+  } else {
+    return cb(new AppError(400, `Unexpected file field: ${file.fieldname}`));
+  }
+  cb(null, true);
+}
+
+export const unitFileUpload = multer({
+  storage,
+  limits: { fileSize: env.maxUploadBytes, files: 1 },
+  fileFilter: unitFileFilter,
+});
+
+export function runUnitFileUpload() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    unitFileUpload.fields([{ name: "icon", maxCount: 1 }])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function getUnitUploadFiles(req: Request) {
+  const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  return {
+    icon: files?.icon?.[0],
+  };
+}
+

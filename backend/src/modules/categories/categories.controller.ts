@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as categoryService from "./categories.service";
 import * as facilitiesService from "../facilities/facilities.service";
+import * as unitsService from "../units/units.service";
 import { sendSuccess } from "../../utils/apiResponse";
 import { writeAuditLog } from "../../utils/audit";
 
@@ -230,6 +231,86 @@ export async function deleteFacilityCategory(req: Request, res: Response, next: 
       ipAddress: req.ip,
     });
     sendSuccess(res, { message: "Facility category deleted" });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Unit Categories ──
+
+export async function listUnitCategories(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await unitsService.listUnitCategories();
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function listAllUnitCategories(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await unitsService.listAllUnitCategories();
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getUnitCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const data = await unitsService.getUnitCategory(id);
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createUnitCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await unitsService.createUnitCategory(req.body);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "CREATE_UNIT_CATEGORY",
+      resource: "unit_category",
+      resourceId: data.id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data, undefined, 201);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateUnitCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const data = await unitsService.updateUnitCategory(id, req.body);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "UPDATE_UNIT_CATEGORY",
+      resource: "unit_category",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteUnitCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    await unitsService.deleteUnitCategory(id);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "DELETE_UNIT_CATEGORY",
+      resource: "unit_category",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, { message: "Unit category deleted" });
   } catch (err) {
     next(err);
   }

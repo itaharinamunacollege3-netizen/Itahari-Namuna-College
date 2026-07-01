@@ -13,6 +13,7 @@ import {
   Newspaper,
   FlaskConical,
   Building2,
+  Briefcase,
 } from "lucide-react";
 
 export const NAV_SECTIONS = [
@@ -26,6 +27,7 @@ export const NAV_SECTIONS = [
       { label: "Notices", path: "/notices", icon: Megaphone },
       { label: "Programs", path: "/programs", icon: BookOpen },
       { label: "Facilities", path: "/facilities", icon: Building2 },
+      { label: "Units", path: "/units", icon: Briefcase },
       { label: "Blog", path: "/blogs", icon: Newspaper },
       { label: "Journal", path: "/journals", icon: FlaskConical },
       { label: "Gallery", path: "/gallery", icon: Image },

@@ -426,3 +426,41 @@ model Facility {
   @@index([slug])
 }
 
+model UnitCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  units       Unit[]
+
+  @@index([slug])
+}
+
+model Unit {
+  id                  Int           @id @default(autoincrement())
+  slug                String        @unique
+  code                String
+  categoryId          Int
+  category            UnitCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title               String
+  objectives          Json
+  duties              Json
+  actionPlan          Json
+  iconUrl             String?
+  iconCloudinaryId    String?
+  featured            Boolean       @default(false)
+  published           Boolean       @default(true)
+  sortOrder           Int           @default(0)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([published, featured])
+  @@index([published, sortOrder])
+  @@index([categoryId])
+  @@index([slug])
+}
+
