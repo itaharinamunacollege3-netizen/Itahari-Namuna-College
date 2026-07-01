@@ -11,16 +11,9 @@ import pic4 from "../../assets/home hero section/group2.jpg"
 import pic5 from "../../assets/home hero section/hall4.jpg"
 import pic6 from "../../assets/home hero section/hall5.jpg"
 import pic7 from "../../assets/home hero section/hallgroup.png"
-import {
-  Calendar,
-  Award,
-  GraduationCap,
-  ClipboardList,
-  Bell,
-} from "lucide-react";
+import { Calendar, Award, GraduationCap, ClipboardList, Bell } from "lucide-react";
 import HomeProgramInfo from "../../components/common/homeComponent/HomeProgramInfo";
 import HomeWhyChooseUs from "../../components/common/homeComponent/HomeWhyChooseUs";
-import NoticePopup from "../notices/components/NoticePopup";
 import { getNotices } from "../notices/services/noticesService";
 import heroCampus from "../../assets/others/hero-campus.webp";
 import AnimatedSection from "../../components/animations/AnimatedSection";
@@ -62,7 +55,7 @@ export default function HomePage() {
     {
       title: "Innovation Meets Tradition",
       subtitle: "Experience a campus built for growth, featuring modern infrastructure, dedicated faculty, and global learning opportunities.",
-      cta: null, // No CTA for the third slide
+      cta: null,
       link: null
     }
   ];
@@ -77,19 +70,12 @@ export default function HomePage() {
     };
   }, []);
 
-
-  // 1. Separate the Marquee logic into its own useEffect
-  // Change your marquee useEffect dependency array
-  // changed the marquee useEffect to check if the notices are loaded in the DOM then only run the animation. 
-  // so added a delay 
   useEffect(() => {
-    // Only run if there are notices
     if (notices.length === 0) return;
 
     const marqueeTrack = marqueeRef.current;
     if (!marqueeTrack) return;
 
-    // Small delay to ensure the DOM has rendered the new content
     const timeout = setTimeout(() => {
       const trackWidth = marqueeTrack.scrollWidth / 2;
 
@@ -111,27 +97,22 @@ export default function HomePage() {
         marqueeTrack.removeEventListener("mouseenter", handleMouseEnter);
         marqueeTrack.removeEventListener("mouseleave", handleMouseLeave);
       };
-    }, 100); // 100ms delay to allow DOM paint
+    }, 100);
 
     return () => clearTimeout(timeout);
-  }, [notices]); // <--- Added 'notices' here
+  }, [notices]);
 
-  // 2. Keep the Carousel timer in a separate useEffect
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % carouselImages.length);
     }, 7000);
     return () => clearInterval(timer);
   }, [carouselImages.length]);
+
   return (
     <div className="w-full bg-brand-gray min-h-screen">
-      <NoticePopup />
-      {/* ========================================================================= */}
-      {/* HERO SECTION: Centered Contents Over a Full-Bleed Background Image         */}
-      {/* ========================================================================= */}
       <AnimatedSection>
         <section className="relative w-full h-[calc(100vh-64px-41.6px)] min-h-137.5 flex items-center justify-center bg-brand-dark/70 overflow-hidden">
-          {/* 1. College Background Image Media Layer */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <AnimatePresence>
               <motion.img
@@ -141,30 +122,26 @@ export default function HomePage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1 }}
-                // Use absolute so the new image sits ON TOP of the fading image
                 className="absolute w-full h-full object-cover"
               />
             </AnimatePresence>
 
-            {/* Keep your dark mask overlay here */}
             <div className="absolute inset-0 z-10 bg-linear-to-b from-brand-dark/70 via-brand-dark/60 to-brand-dark/75 mix-blend-multiply" />
           </div>
 
-          {/* 2. Content Canvas: Deeply Centered Layout Shell */}
           <AnimatePresence mode="wait">
             <motion.div
               key={index}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="relative z-10 max-w-4xl mx-auto px-6 flex flex-col items-center text-center space-y-6"
             >
-              {/* Heading: Slides up slightly with a fade */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
                 className="font-serif font-black text-5xl sm:text-7xl tracking-tighter uppercase leading-none"
               >
                 <span className="block text-brand-white">{carouselContent[index % carouselContent.length].title.split(' ')[0]}</span>
@@ -173,21 +150,19 @@ export default function HomePage() {
                 </span>
               </motion.h1>
 
-              {/* Paragraph: Slides in from the left */}
               <motion.p
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 1.1, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+                transition={{ delay: 0.3, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
                 className="font-heading text-sm sm:text-base md:text-lg text-brand-gray/90 max-w-2xl leading-relaxed font-normal mt-6 border-l-2 border-brand-blue pl-4"
               >
                 {carouselContent[index % carouselContent.length].subtitle}
               </motion.p>
 
-              {/* CTA: Fades in last */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Custom "power" ease
+                transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto"
               >
                 {carouselContent[index % carouselContent.length].cta && (
@@ -203,14 +178,12 @@ export default function HomePage() {
           </AnimatePresence>
         </section>
       </AnimatedSection>
-      {/* marquee */}
+      
       <div className="w-full bg-brand-primary overflow-hidden py-3 flex items-center select-none cursor-pointer shadow-xs">
-        {/* The Track element contains two sets of the data to stitch the loop perfectly */}
         <div
           ref={marqueeRef}
           className="flex whitespace-nowrap space-x-12 pl-12 will-change-transform"
         >
-          {/* Primary Set Loop (doubled to stitch the infinite scroll) */}
           {[...notices, ...notices].map((notice, idx) => {
             const Icon = TAG_ICONS[notice.tags?.[0]] ?? Bell;
             return (
@@ -228,14 +201,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* welcome section */}
       <AnimatedSection>
         <section className="w-full bg-brand-white py-20 lg:py-24 overflow-hidden relative">
-          {/* Soft background glow to eliminate template flatness */}
           <div className="absolute top-1/2 left-0 -translate-y-1/2 w-72 h-72 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* LEFT CANVAS: Premium Typography & Structural High-Contrast Content */}
             <div className="lg:col-span-7 space-y-8 text-left">
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
@@ -271,7 +241,6 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Border-Isolated Feature Blocks (No Interaction, Pure Visual Information Grid) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-brand-gray/60">
                 <div className="space-y-1 p-1">
                   <h4 className="font-heading font-extrabold text-sm text-brand-dark uppercase tracking-wider flex items-center space-x-2">
@@ -296,9 +265,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT CANVAS: 3D Editorial Framed Media & Floating Micro-Statement Layer */}
             <div className="lg:col-span-5 relative pt-6 lg:pt-0">
-              {/* Decorative Geometric Dot Pattern & Frame Background Shadows */}
               <div className="absolute -bottom-6 -left-6 w-36 h-36 bg-brand-gold/10 rounded-2xl blur-xl pointer-events-none" />
               <div className="absolute -top-10 -right-6 text-brand-gray/40 pointer-events-none hidden sm:block opacity-60">
                 <svg
@@ -331,24 +298,18 @@ export default function HomePage() {
               </div>
 
               <div className="relative w-full max-w-md mx-auto lg:max-w-none">
-                {/* Asymmetric Offset Color Accent Border Plate */}
                 <div className="absolute -inset-3 rounded-2xl bg-linear-to-tr from-[#f1b24a] to-brand-primary opacity-15 transform translate-x-4 translate-y-4 pointer-events-none" />
-
-                {/* Main Premium Card Image Box */}
                 <div className="relative bg-brand-white p-3 rounded-3xl border border-brand-gray/80 shadow-xl overflow-hidden">
                   <img loading="lazy" decoding="async"
                     src={heroCampus}
                     alt="Itahari Namuna Campus Main Academic Wing"
                     className="w-full h-80 sm:h-100 object-cover rounded-2xl shadow-inner grayscale-15 hover:grayscale-0 transition-all duration-700"
                   />
-
-                  {/* Subtle Custom Angular Framing Shape matching image_39149e.jpg signature line */}
                   <div className="absolute top-3 right-3 w-20 h-20 pointer-events-none overflow-hidden rounded-tr-2xl">
                     <div className="absolute top-0 right-0 w-[200%] h-[200%] bg-linear-to-bl from-[#f1b24a] via-transparent to-transparent opacity-90" />
                   </div>
                 </div>
 
-                {/* FLOATING CORNER STATEMENT BADGE: Intersects image layer for premium composition layout */}
                 <div className="absolute -top-4 -left-4 bg-brand-dark text-brand-white p-4 rounded-2xl border border-brand-white/10 shadow-xl max-w-37.5 text-left backdrop-blur-md">
                   <span className="font-heading font-black text-2xl sm:text-3xl text-[#f1b24a] block leading-none">
                     13+
