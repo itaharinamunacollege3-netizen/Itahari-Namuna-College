@@ -7,7 +7,7 @@ function parseBoolean(value: unknown, fallback = false): boolean {
   return fallback;
 }
 
-function parseSpecs(value: unknown): string[] {
+function parseStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value.map(String).map((s) => s.trim()).filter(Boolean);
   }
@@ -32,7 +32,7 @@ function parseSpecs(value: unknown): string[] {
 export const listFacilitiesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(100),
-  category: z.string().optional(),
+  categoryId: z.coerce.number().int().min(1).optional(),
 });
 
 export const facilityIdParamSchema = z.object({
@@ -41,11 +41,10 @@ export const facilityIdParamSchema = z.object({
 
 const facilityFieldsSchema = z.object({
   index: z.string().trim().min(1),
-  category: z.string().trim().min(1),
+  categoryId: z.coerce.number().int().min(1),
   title: z.string().trim().min(3),
   tagline: z.string().trim().min(3),
-  descriptionPart1: z.string().trim().min(10),
-  descriptionPart2: z.string().trim().min(10),
+  descriptions: z.array(z.string().trim().min(10)).min(1),
   specs: z.array(z.string().trim().min(1)).min(1),
   featured: z.boolean().default(false),
   published: z.boolean().default(true),
@@ -61,12 +60,11 @@ function normalizeFacilityBody(body: unknown): unknown {
 
   return {
     index: input.index,
-    category: input.category,
+    categoryId: input.categoryId,
     title: input.title,
     tagline: input.tagline,
-    descriptionPart1: input.descriptionPart1,
-    descriptionPart2: input.descriptionPart2,
-    specs: parseSpecs(input.specs),
+    descriptions: parseStringArray(input.descriptions),
+    specs: parseStringArray(input.specs),
     featured: parseBoolean(input.featured, false),
     published: parseBoolean(input.published, true),
     sortOrder: input.sortOrder,

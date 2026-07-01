@@ -18,7 +18,7 @@ export async function listPublic(req: Request, res: Response, next: NextFunction
     const result = await facilitiesService.listFacilities({
       page: query.page,
       limit: query.limit,
-      category: query.category,
+      categoryId: query.categoryId,
       publishedOnly: true,
     });
     sendSuccess(res, result.items, result.meta);
@@ -61,7 +61,7 @@ export async function listAdmin(req: Request, res: Response, next: NextFunction)
     const result = await facilitiesService.listFacilities({
       page: query.page,
       limit: query.limit,
-      category: query.category,
+      categoryId: query.categoryId,
       publishedOnly: false,
     });
     sendSuccess(res, result.items, result.meta);

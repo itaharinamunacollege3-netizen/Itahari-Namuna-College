@@ -25,29 +25,28 @@ import {
   FormSection,
   FormActions,
 } from "@/components/ui/Modal";
-import {
-  FACILITY_CATEGORIES,
-  FACILITY_FIELD_HINTS,
-} from "@/constants/facilities";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import {
-  createFacility,
-  deleteFacility,
-  getFacility,
   listFacilities,
-  removeFacilityImage,
+  getFacility,
+  createFacility,
   updateFacility,
+  deleteFacility,
+  removeFacilityImage,
+  listFacilityCategories,
+  createFacilityCategory,
+  updateFacilityCategory,
+  deleteFacilityCategory,
 } from "@/services/facilities.service";
 import { optionalString } from "@/utils/formHelpers";
 
 const emptyForm = {
   index: "",
-  category: "Computing Labs",
+  categoryId: "",
   title: "",
   tagline: "",
-  descriptionPart1: "",
-  descriptionPart2: "",
-  specs: "",
+  descriptions: [""],
+  specs: [""],
   slug: "",
   sortOrder: 0,
   featured: false,
@@ -56,17 +55,24 @@ const emptyForm = {
   image: null,
 };
 
+const emptyCategoryForm = {
+  name: "",
+  slug: "",
+  description: "",
+  sortOrder: 0,
+  isActive: true,
+};
+
 function toForm(facility) {
   return {
-    index: facility.index ?? "",
-    category: facility.category ?? "Computing Labs",
-    title: facility.title ?? "",
-    tagline: facility.tagline ?? "",
-    descriptionPart1: facility.descriptionPart1 ?? "",
-    descriptionPart2: facility.descriptionPart2 ?? "",
-    specs: Array.isArray(facility.specs) ? facility.specs.join(", ") : "",
-    slug: facility.slug ?? "",
-    sortOrder: facility.sortOrder ?? 0,
+    index: facility.index || "",
+    categoryId: facility.categoryId || "",
+    title: facility.title || "",
+    tagline: facility.tagline || "",
+    descriptions: facility.descriptions?.length > 0 ? facility.descriptions : [""],
+    specs: facility.specs?.length > 0 ? facility.specs : [""],
+    slug: facility.slug || "",
+    sortOrder: facility.sortOrder || 0,
     featured: Boolean(facility.featured),
     published: facility.published !== false,
     removeImage: false,
@@ -75,24 +81,30 @@ function toForm(facility) {
 }
 
 function toPayload(form) {
-  const specs = form.specs
-    .split(",")
-    .map((spec) => spec.trim())
-    .filter(Boolean);
-
+  const descriptions = form.descriptions.map((d) => d.trim()).filter((d) => d.length > 0);
+  const specs = form.specs.map((s) => s.trim()).filter((s) => s.length > 0);
   return {
     index: form.index.trim(),
-    category: form.category.trim(),
+    categoryId: Number(form.categoryId),
     title: form.title.trim(),
     tagline: form.tagline.trim(),
-    descriptionPart1: form.descriptionPart1.trim(),
-    descriptionPart2: form.descriptionPart2.trim(),
+    descriptions,
     specs,
     slug: optionalString(form.slug),
-    sortOrder: Number(form.sortOrder) ?? 0,
+    sortOrder: Number(form.sortOrder) || 0,
     featured: form.featured,
     published: form.published,
     removeImage: form.removeImage,
+  };
+}
+
+function categoryToPayload(form) {
+  return {
+    name: form.name.trim(),
+    slug: optionalString(form.slug),
+    description: optionalString(form.description),
+    sortOrder: Number(form.sortOrder) || 0,
+    isActive: form.isActive,
   };
 }
 
@@ -103,10 +115,20 @@ export default function FacilitiesPage() {
   const [existing, setExisting] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const { data, loading, error, reload } = useAsyncData(
-    () => listFacilities({ limit: 50 }),
-    []
-  );
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [editCategoryId, setEditCategoryId] = useState(null);
+  const [categoryForm, setCategoryForm] = useState(emptyCategoryForm);
+  const [categorySaving, setCategorySaving] = useState(false);
+
+  const { data: facilities, loading: facilitiesLoading, error: facilitiesError, reload: reloadFacilities } =
+    useAsyncData(() => listFacilities({ limit: 50 }), []);
+
+  const {
+    data: categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+    reload: reloadCategories,
+  } = useAsyncData(() => listFacilityCategories(), []);
 
   function openCreate() {
     setEditId(null);
@@ -130,6 +152,10 @@ export default function FacilitiesPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    if (!form.categoryId) {
+      toast.error("Please select a category");
+      return;
+    }
     if (form.index.trim().length < 1) {
       toast.error("Index is required");
       return;
@@ -142,21 +168,15 @@ export default function FacilitiesPage() {
       toast.error("Tagline must be at least 3 characters");
       return;
     }
-    if (form.descriptionPart1.trim().length < 10) {
-      toast.error("Description Part 1 must be at least 10 characters");
-      return;
-    }
-    if (form.descriptionPart2.trim().length < 10) {
-      toast.error("Description Part 2 must be at least 10 characters");
+
+    const payload = toPayload(form);
+
+    if (payload.descriptions.length < 1) {
+      toast.error("At least one description is required");
       return;
     }
 
-    const payload = toPayload(form);
-    const specsArray = form.specs
-      .split(",")
-      .map((spec) => spec.trim())
-      .filter(Boolean);
-    if (specsArray.length === 0) {
+    if (payload.specs.length < 1) {
       toast.error("At least one specification is required");
       return;
     }
@@ -176,7 +196,7 @@ export default function FacilitiesPage() {
       setForm(emptyForm);
       setEditId(null);
       setExisting(null);
-      reload();
+      reloadFacilities();
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -189,7 +209,7 @@ export default function FacilitiesPage() {
     try {
       await deleteFacility(id);
       toast.success("Facility deleted");
-      reload();
+      reloadFacilities();
     } catch (err) {
       toast.error(err.message);
     }
@@ -203,14 +223,119 @@ export default function FacilitiesPage() {
       const { data: facility } = await getFacility(editId);
       setExisting(facility);
       setForm((prev) => ({ ...prev, removeImage: false }));
-      reload();
+      reloadFacilities();
     } catch (err) {
       toast.error(err.message);
     }
   }
 
+  function openCreateCategory() {
+    setEditCategoryId(null);
+    setCategoryForm(emptyCategoryForm);
+    setCategoryModalOpen(true);
+  }
+
+  function openEditCategory(category) {
+    setEditCategoryId(category.id);
+    setCategoryForm({
+      name: category.name || "",
+      slug: category.slug || "",
+      description: category.description || "",
+      sortOrder: category.sortOrder || 0,
+      isActive: category.isActive !== false,
+    });
+    setCategoryModalOpen(true);
+  }
+
+  async function handleCategorySubmit(e) {
+    e.preventDefault();
+
+    if (categoryForm.name.trim().length < 2) {
+      toast.error("Category name must be at least 2 characters");
+      return;
+    }
+
+    setCategorySaving(true);
+    const payload = categoryToPayload(categoryForm);
+
+    try {
+      if (editCategoryId) {
+        await updateFacilityCategory(editCategoryId, payload);
+        toast.success("Category updated");
+      } else {
+        await createFacilityCategory(payload);
+        toast.success("Category created");
+      }
+      setCategoryModalOpen(false);
+      setCategoryForm(emptyCategoryForm);
+      setEditCategoryId(null);
+      reloadCategories();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setCategorySaving(false);
+    }
+  }
+
+  async function handleDeleteCategory(id) {
+    if (!confirm("Delete this category?")) return;
+    try {
+      await deleteFacilityCategory(id);
+      toast.success("Category deleted");
+      reloadCategories();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }
+
+  function addDescription() {
+    setForm((prev) => ({
+      ...prev,
+      descriptions: [...prev.descriptions, ""],
+    }));
+  }
+
+  function removeDescription(index) {
+    if (form.descriptions.length <= 1) return;
+    setForm((prev) => ({
+      ...prev,
+      descriptions: prev.descriptions.filter((_, i) => i !== index),
+    }));
+  }
+
+  function updateDescription(index, value) {
+    setForm((prev) => {
+      const newDescriptions = [...prev.descriptions];
+      newDescriptions[index] = value;
+      return { ...prev, descriptions: newDescriptions };
+    });
+  }
+
+  function addSpec() {
+    setForm((prev) => ({
+      ...prev,
+      specs: [...prev.specs, ""],
+    }));
+  }
+
+  function removeSpec(index) {
+    if (form.specs.length <= 1) return;
+    setForm((prev) => ({
+      ...prev,
+      specs: prev.specs.filter((_, i) => i !== index),
+    }));
+  }
+
+  function updateSpec(index, value) {
+    setForm((prev) => {
+      const newSpecs = [...prev.specs];
+      newSpecs[index] = value;
+      return { ...prev, specs: newSpecs };
+    });
+  }
+
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Facilities"
         subtitle="Manage college facilities shown on the public website"
@@ -222,71 +347,143 @@ export default function FacilitiesPage() {
         }
       />
 
-      <Card className="p-4">
-        {error ? (
-          <div className="alert alert-error">{error}</div>
-        ) : loading ? (
-          <TableSkeleton />
-        ) : (
-          <DataTable>
-            <DataTableHead>
-              <DataTableRow className="text-xs uppercase text-[var(--text-muted)]">
-                <DataTableHeaderCell>Title</DataTableHeaderCell>
-                <DataTableHeaderCell>Category</DataTableHeaderCell>
-                <DataTableHeaderCell>Index</DataTableHeaderCell>
-                <DataTableHeaderCell>Status</DataTableHeaderCell>
-                <DataTableHeaderCell />
-              </DataTableRow>
-            </DataTableHead>
-            <DataTableBody>
-              {data?.length ? (
-                data.map((row) => (
-                  <DataTableRow key={row.id}>
-                    <DataTableCell>
-                      <p className="font-medium">{row.title}</p>
-                      <p className="text-xs text-[var(--text-muted)] line-clamp-1">{row.tagline}</p>
-                    </DataTableCell>
-                    <DataTableCell>{row.category ?? "—"}</DataTableCell>
-                    <DataTableCell>{row.index ?? "—"}</DataTableCell>
-                    <DataTableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {row.published ? (
-                          <span className="badge badge-success badge-sm">Live</span>
-                        ) : (
-                          <span className="badge badge-ghost badge-sm">Draft</span>
-                        )}
-                        {row.featured ? (
-                          <span className="badge badge-warning badge-sm">Featured</span>
-                        ) : null}
-                      </div>
-                    </DataTableCell>
-                    <DataTableCell>
-                      <div className="flex gap-1">
-                        <Button type="button" size="xs" variant="ghost" onClick={() => openEdit(row.id)}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button type="button" size="xs" variant="danger" onClick={() => handleDelete(row.id)}>
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </DataTableCell>
-                  </DataTableRow>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-bold">Facilities</h3>
+          </div>
+          {facilitiesError ? (
+            <div className="alert alert-error">{facilitiesError}</div>
+          ) : facilitiesLoading ? (
+            <TableSkeleton />
+          ) : (
+            <DataTable>
+              <DataTableHead>
+                <DataTableRow className="text-xs uppercase text-[var(--text-muted)]">
+                  <DataTableHeaderCell>Title</DataTableHeaderCell>
+                  <DataTableHeaderCell>Category</DataTableHeaderCell>
+                  <DataTableHeaderCell>Index</DataTableHeaderCell>
+                  <DataTableHeaderCell>Status</DataTableHeaderCell>
+                  <DataTableHeaderCell />
+                </DataTableRow>
+              </DataTableHead>
+              <DataTableBody>
+                {facilities?.length ? (
+                  facilities.map((row) => (
+                    <DataTableRow key={row.id}>
+                      <DataTableCell>
+                        <p className="font-medium">{row.title}</p>
+                        <p className="text-xs text-[var(--text-muted)] line-clamp-1">{row.tagline}</p>
+                      </DataTableCell>
+                      <DataTableCell>{row.category || "—"}</DataTableCell>
+                      <DataTableCell>{row.index || "—"}</DataTableCell>
+                      <DataTableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {row.published ? (
+                            <span className="badge badge-success badge-sm">Live</span>
+                          ) : (
+                            <span className="badge badge-ghost badge-sm">Draft</span>
+                          )}
+                          {row.featured ? (
+                            <span className="badge badge-warning badge-sm">Featured</span>
+                          ) : null}
+                        </div>
+                      </DataTableCell>
+                      <DataTableCell>
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => openEdit(row.id)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="xs"
+                            variant="danger"
+                            onClick={() => handleDelete(row.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </DataTableCell>
+                    </DataTableRow>
+                  ))
+                ) : (
+                  <DataTableEmpty colSpan={5}>No facilities found</DataTableEmpty>
+                )}
+              </DataTableBody>
+            </DataTable>
+          )}
+        </Card>
+
+        <Card className="p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-bold">Categories</h3>
+            <Button type="button" size="sm" variant="primary" onClick={openCreateCategory}>
+              <Plus className="h-4 w-4" />
+              Add Category
+            </Button>
+          </div>
+          {categoriesError ? (
+            <div className="alert alert-error">{categoriesError}</div>
+          ) : categoriesLoading ? (
+            <TableSkeleton rows={4} />
+          ) : (
+            <ul className="space-y-2">
+              {categories?.length ? (
+                categories.map((category) => (
+                  <li
+                    key={category.id}
+                    className="flex items-center justify-between rounded-lg border border-[var(--border-subtle)] px-4 py-3"
+                  >
+                    <div>
+                      <p className="font-medium">{category.name}</p>
+                      <p className="text-xs text-[var(--text-muted)]">
+                        {category._count?.facilities || 0} facilities
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {!category.isActive ? (
+                        <span className="badge badge-ghost badge-sm">Inactive</span>
+                      ) : null}
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => openEditCategory(category)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="danger"
+                        onClick={() => handleDeleteCategory(category.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </li>
                 ))
               ) : (
-                <DataTableEmpty colSpan={5}>No facilities found</DataTableEmpty>
+                <p className="py-6 text-center text-[var(--text-muted)]">No categories</p>
               )}
-            </DataTableBody>
-          </DataTable>
-        )}
-      </Card>
+            </ul>
+          )}
+        </Card>
+      </div>
 
+      {/* Facility Modal */}
       <Modal
         open={open}
         title={editId ? "Edit Facility" : "Create Facility"}
         onClose={() => setOpen(false)}
         wide="xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <FormSection title="Basic Information">
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Index *">
@@ -296,21 +493,33 @@ export default function FacilitiesPage() {
                   placeholder="01"
                   required
                 />
-                <FormHint>{FACILITY_FIELD_HINTS.index}</FormHint>
               </FormField>
 
               <FormField label="Category *">
-                <FormSelect
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  required
-                >
-                  {FACILITY_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </FormSelect>
+                <div className="flex gap-2">
+                  <FormSelect
+                    value={form.categoryId}
+                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                    required
+                    className="flex-1"
+                  >
+                    <option value="">Select a category</option>
+                    {categories?.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </FormSelect>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={openCreateCategory}
+                    className="shrink-0"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </FormField>
             </div>
 
@@ -321,7 +530,6 @@ export default function FacilitiesPage() {
                 minLength={3}
                 required
               />
-              <FormHint>{FACILITY_FIELD_HINTS.title}</FormHint>
             </FormField>
 
             <FormField label="Tagline *">
@@ -331,42 +539,79 @@ export default function FacilitiesPage() {
                 minLength={3}
                 required
               />
-              <FormHint>{FACILITY_FIELD_HINTS.tagline}</FormHint>
             </FormField>
           </FormSection>
 
-          <FormSection title="Description">
-            <FormField label="Description Part 1 *">
-              <FormTextarea
-                value={form.descriptionPart1}
-                onChange={(e) => setForm({ ...form, descriptionPart1: e.target.value })}
-                rows={4}
-                required
-              />
-              <FormHint>{FACILITY_FIELD_HINTS.descriptionPart1}</FormHint>
-            </FormField>
-
-            <FormField label="Description Part 2 *">
-              <FormTextarea
-                value={form.descriptionPart2}
-                onChange={(e) => setForm({ ...form, descriptionPart2: e.target.value })}
-                rows={4}
-                required
-              />
-              <FormHint>{FACILITY_FIELD_HINTS.descriptionPart2}</FormHint>
-            </FormField>
+          <FormSection title="Descriptions">
+            {form.descriptions.map((desc, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-[var(--text-primary)]">
+                    Description {index + 1} *
+                  </label>
+                  <div className="flex gap-2">
+                    {index === form.descriptions.length - 1 && (
+                      <Button type="button" size="xs" variant="primary" onClick={addDescription}>
+                        <Plus className="h-3.5 w-3.5" />
+                        Add
+                      </Button>
+                    )}
+                    {form.descriptions.length > 1 && (
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="danger"
+                        onClick={() => removeDescription(index)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <FormTextarea
+                  value={desc}
+                  onChange={(e) => updateDescription(index, e.target.value)}
+                  rows={3}
+                  required
+                />
+              </div>
+            ))}
           </FormSection>
 
           <FormSection title="Specifications">
-            <FormField label="Specifications *">
-              <FormTextarea
-                value={form.specs}
-                onChange={(e) => setForm({ ...form, specs: e.target.value })}
-                rows={3}
-                placeholder="32-Core Workstations, GPU Cluster Nodes, Fiber 1Gbps Uplink"
-              />
-              <FormHint>{FACILITY_FIELD_HINTS.specs}</FormHint>
-            </FormField>
+            {form.specs.map((spec, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-[var(--text-primary)]">
+                    Specification {index + 1} *
+                  </label>
+                  <div className="flex gap-2">
+                    {index === form.specs.length - 1 && (
+                      <Button type="button" size="xs" variant="primary" onClick={addSpec}>
+                        <Plus className="h-3.5 w-3.5" />
+                        Add
+                      </Button>
+                    )}
+                    {form.specs.length > 1 && (
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="danger"
+                        onClick={() => removeSpec(index)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <FormTextarea
+                  value={spec}
+                  onChange={(e) => updateSpec(index, e.target.value)}
+                  rows={2}
+                  required
+                />
+              </div>
+            ))}
           </FormSection>
 
           <FormSection title="Media">
@@ -375,7 +620,7 @@ export default function FacilitiesPage() {
                 type="file"
                 accept="image/*"
                 className="file-input file-input-bordered w-full"
-                onChange={(e) => setForm({ ...form, image: e.target.files?.[0] ?? null })}
+                onChange={(e) => setForm({ ...form, image: e.target.files?.[0] || null })}
               />
             </FormField>
 
@@ -414,7 +659,6 @@ export default function FacilitiesPage() {
                   value={form.sortOrder}
                   onChange={(e) => setForm({ ...form, sortOrder: e.target.value })}
                 />
-                <FormHint>{FACILITY_FIELD_HINTS.sortOrder}</FormHint>
               </FormField>
 
               <FormField label="Slug">
@@ -423,7 +667,6 @@ export default function FacilitiesPage() {
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
                   placeholder="advanced-computing-lab"
                 />
-                <FormHint>{FACILITY_FIELD_HINTS.slug}</FormHint>
               </FormField>
             </div>
 
@@ -433,7 +676,6 @@ export default function FacilitiesPage() {
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
               />
-              <FormHint>{FACILITY_FIELD_HINTS.featured}</FormHint>
 
               <FormCheckbox
                 label="Published — visible on public website"
@@ -447,6 +689,63 @@ export default function FacilitiesPage() {
             onCancel={() => setOpen(false)}
             loading={saving}
             submitLabel={editId ? "Update" : "Create"}
+          />
+        </form>
+      </Modal>
+
+      {/* Category Modal */}
+      <Modal
+        open={categoryModalOpen}
+        title={editCategoryId ? "Edit Category" : "Add Category"}
+        onClose={() => setCategoryModalOpen(false)}
+      >
+        <form onSubmit={handleCategorySubmit} className="space-y-4">
+          <FormSection title="Category Details">
+            <FormField label="Name *">
+              <FormInput
+                value={categoryForm.name}
+                onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                minLength={2}
+                required
+              />
+            </FormField>
+
+            <FormField label="Slug">
+              <FormInput
+                value={categoryForm.slug}
+                onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })}
+                placeholder="computing-labs"
+              />
+              <FormHint>Auto-generated from name if left empty</FormHint>
+            </FormField>
+
+            <FormField label="Description">
+              <FormTextarea
+                value={categoryForm.description}
+                onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+              />
+            </FormField>
+
+            <FormField label="Sort Order">
+              <FormInput
+                type="number"
+                min={0}
+                value={categoryForm.sortOrder}
+                onChange={(e) => setCategoryForm({ ...categoryForm, sortOrder: e.target.value })}
+              />
+            </FormField>
+
+            <FormCheckbox
+              label="Active"
+              checked={categoryForm.isActive}
+              onChange={(e) => setCategoryForm({ ...categoryForm, isActive: e.target.checked })}
+            />
+          </FormSection>
+
+          <FormActions
+            onCancel={() => setCategoryModalOpen(false)}
+            loading={categorySaving}
+            submitLabel={editCategoryId ? "Update" : "Create"}
           />
         </form>
       </Modal>

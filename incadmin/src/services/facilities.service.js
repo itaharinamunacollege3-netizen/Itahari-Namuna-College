@@ -4,16 +4,15 @@ function buildFacilityFormData(data, files) {
   const form = new FormData();
   const entries = {
     index: data.index,
-    category: data.category,
+    categoryId: data.categoryId,
     title: data.title,
     tagline: data.tagline,
-    descriptionPart1: data.descriptionPart1,
-    descriptionPart2: data.descriptionPart2,
-    specs: JSON.stringify(data.specs ?? []),
-    slug: data.slug ?? "",
+    descriptions: JSON.stringify(data.descriptions || []),
+    specs: JSON.stringify(data.specs || []),
+    slug: data.slug || "",
     featured: String(Boolean(data.featured)),
     published: String(data.published !== false),
-    sortOrder: String(data.sortOrder ?? 0),
+    sortOrder: String(data.sortOrder || 0),
     removeImage: String(Boolean(data.removeImage)),
   };
 
@@ -29,7 +28,7 @@ function buildFacilityFormData(data, files) {
 }
 
 export async function listFacilities(params) {
-  return apiRequest(`/admin/facilities${buildQuery(params ?? {})}`);
+  return apiRequest(`/admin/facilities${buildQuery(params || {})}`);
 }
 
 export async function getFacility(id) {
@@ -66,4 +65,28 @@ export async function deleteFacility(id) {
 
 export async function removeFacilityImage(id) {
   return apiRequest(`/admin/facilities/${id}/image`, { method: "DELETE" });
+}
+
+export async function listFacilityCategories() {
+  return apiRequest("/admin/facility-categories");
+}
+
+export async function createFacilityCategory(data) {
+  return apiRequest("/admin/facility-categories", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateFacilityCategory(id, data) {
+  return apiRequest(`/admin/facility-categories/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteFacilityCategory(id) {
+  return apiRequest(`/admin/facility-categories/${id}`, {
+    method: "DELETE",
+  });
 }

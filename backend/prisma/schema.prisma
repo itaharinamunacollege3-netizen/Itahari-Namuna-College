@@ -388,27 +388,41 @@ model JournalEntry {
   @@index([slug])
 }
 
+model FacilityCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  facilities  Facility[]
+
+  @@index([slug])
+}
+
 model Facility {
-  id                     Int      @id @default(autoincrement())
-  slug                   String   @unique
+  id                     Int               @id @default(autoincrement())
+  slug                   String            @unique
   index                  String
-  category               String
+  categoryId             Int
+  category               FacilityCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   title                  String
   tagline                String
-  descriptionPart1       String
-  descriptionPart2       String
+  descriptions           Json
   imageUrl               String?
   imageCloudinaryId      String?
   specs                  Json
-  featured               Boolean  @default(false)
-  published              Boolean  @default(true)
-  sortOrder              Int      @default(0)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  featured               Boolean           @default(false)
+  published              Boolean           @default(true)
+  sortOrder              Int               @default(0)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
 
   @@index([published, featured])
   @@index([published, sortOrder])
-  @@index([category])
+  @@index([categoryId])
   @@index([slug])
 }
 

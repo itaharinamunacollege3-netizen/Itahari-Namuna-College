@@ -6,6 +6,8 @@ import {
   updateStaffCategorySchema,
   createFacultyDepartmentSchema,
   updateFacultyDepartmentSchema,
+  createFacilityCategorySchema,
+  updateFacilityCategorySchema,
 } from "./categories.schema";
 import { authenticate } from "../../middleware/authenticate";
 import { requireAdmin } from "../../middleware/adminGuard";
@@ -48,5 +50,19 @@ adminRouter.patch(
   categoryController.updateFacultyDepartment
 );
 adminRouter.delete("/faculty-departments/:id", categoryController.deleteFacultyDepartment);
+
+// Facility categories
+adminRouter.get("/facility-categories", categoryController.listAllFacilityCategories);
+adminRouter.post(
+  "/facility-categories",
+  validateBody(createFacilityCategorySchema),
+  categoryController.createFacilityCategory
+);
+adminRouter.patch(
+  "/facility-categories/:id",
+  validateBody(updateFacilityCategorySchema),
+  categoryController.updateFacilityCategory
+);
+adminRouter.delete("/facility-categories/:id", categoryController.deleteFacilityCategory);
 
 export { publicRouter as categoriesPublicRoutes, adminRouter as categoriesAdminRoutes };

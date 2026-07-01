@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as categoryService from "./categories.service";
+import * as facilitiesService from "../facilities/facilities.service";
 import { sendSuccess } from "../../utils/apiResponse";
 import { writeAuditLog } from "../../utils/audit";
 
@@ -158,6 +159,77 @@ export async function deleteFacultyDepartment(req: Request, res: Response, next:
       ipAddress: req.ip,
     });
     sendSuccess(res, { message: "Faculty department deleted" });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Facility Categories ──
+
+export async function listAllFacilityCategories(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await facilitiesService.listAllFacilityCategories();
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getFacilityCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const data = await facilitiesService.getFacilityCategory(id);
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createFacilityCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await facilitiesService.createFacilityCategory(req.body);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "CREATE_FACILITY_CATEGORY",
+      resource: "facility_category",
+      resourceId: data.id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data, undefined, 201);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateFacilityCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const data = await facilitiesService.updateFacilityCategory(id, req.body);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "UPDATE_FACILITY_CATEGORY",
+      resource: "facility_category",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteFacilityCategory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    await facilitiesService.deleteFacilityCategory(id);
+    await writeAuditLog({
+      userId: req.user?.id,
+      action: "DELETE_FACILITY_CATEGORY",
+      resource: "facility_category",
+      resourceId: id,
+      ipAddress: req.ip,
+    });
+    sendSuccess(res, { message: "Facility category deleted" });
   } catch (err) {
     next(err);
   }

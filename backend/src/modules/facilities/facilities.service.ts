@@ -1,6 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 import { prisma } from "../../config/prisma";
-import { uniqueSlug } from "../../utils/slug";
+import { slugify } from "../../utils/slug";
 import { AppError } from "../../utils/apiResponse";
 import { deleteCloudinaryAsset, uploadFacilityImage } from "../../services/cloudinary.service";
 import { formatFacilityDetail, formatFacilityListItem } from "./facilities.formatter";
@@ -13,7 +13,7 @@ function sanitizeText(value: string) {
 function buildWhere(params: ListFacilitiesParams) {
   const where: Record<string, unknown> = {};
   if (params.publishedOnly !== false) where.published = true;
-  if (params.category) where.category = params.category;
+  if (params.categoryId) where.categoryId = params.categoryId;
   return where;
 }
 
@@ -24,11 +24,13 @@ async function findFacilityRecord(idOrSlug: string, publishedOnly = true) {
   if (isNumeric) {
     return prisma.facility.findFirst({
       where: { ...where, id: Number(idOrSlug) },
+      include: { category: true },
     });
   }
 
   return prisma.facility.findFirst({
     where: { ...where, slug: idOrSlug },
+    include: { category: true },
   });
 }
 
@@ -61,11 +63,10 @@ async function resolveMediaFields(
 function mapWriteInputToDb(data: FacilityWriteInput, mediaFields: Record<string, unknown>) {
   return {
     index: data.index.trim(),
-    category: data.category.trim(),
+    categoryId: data.categoryId,
     title: data.title.trim(),
     tagline: sanitizeText(data.tagline),
-    descriptionPart1: sanitizeText(data.descriptionPart1),
-    descriptionPart2: sanitizeText(data.descriptionPart2),
+    descriptions: data.descriptions.map((desc) => sanitizeText(desc)),
     specs: data.specs.map((spec) => sanitizeText(spec)),
     featured: data.featured ?? false,
     published: data.published ?? true,
@@ -82,6 +83,7 @@ export async function listFacilities(params: ListFacilitiesParams = {}) {
   const [items, total] = await Promise.all([
     prisma.facility.findMany({
       where,
+      include: { category: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * limit,
       take: limit,
@@ -113,6 +115,7 @@ export async function getFacilityById(id: number, publishedOnly = true) {
 
   const facility = await prisma.facility.findFirst({
     where: { id, ...(publishedOnly ? { published: true } : {}) },
+    include: { category: true },
   });
 
   if (!facility) throw new AppError(404, "Facility not found");
@@ -122,6 +125,7 @@ export async function getFacilityById(id: number, publishedOnly = true) {
 export async function getFeaturedFacility() {
   const featured = await prisma.facility.findFirst({
     where: { published: true, featured: true },
+    include: { category: true },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }, { id: "desc" }],
   });
 
@@ -129,6 +133,7 @@ export async function getFeaturedFacility() {
 
   const newest = await prisma.facility.findFirst({
     where: { published: true },
+    include: { category: true },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
 
@@ -137,20 +142,99 @@ export async function getFeaturedFacility() {
 }
 
 export async function listFacilityCategories() {
-  const rows = await prisma.facility.findMany({
-    where: { published: true },
-    select: { category: true },
-    distinct: ["category"],
-    orderBy: { category: "asc" },
+  const rows = await prisma.facilityCategory.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
 
-  return rows.map((row) => row.category);
+  return rows.map((row) => row.name);
+}
+
+export async function listAllFacilityCategories() {
+  return prisma.facilityCategory.findMany({
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    include: { _count: { select: { facilities: true } } },
+  });
+}
+
+export async function getFacilityCategory(id: number) {
+  const category = await prisma.facilityCategory.findUnique({
+    where: { id },
+    include: { _count: { select: { facilities: true } } },
+  });
+  if (!category) throw new AppError(404, "Facility category not found");
+  return category;
+}
+
+export async function createFacilityCategory(data: {
+  name: string;
+  slug?: string;
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+}) {
+  const slug = data.slug || slugify(data.name);
+
+  const existing = await prisma.facilityCategory.findUnique({ where: { slug } });
+  if (existing) throw new AppError(409, `Category with slug "${slug}" already exists`);
+
+  return prisma.facilityCategory.create({
+    data: {
+      name: data.name,
+      slug,
+      description: data.description ?? null,
+      sortOrder: data.sortOrder,
+      isActive: data.isActive,
+    },
+  });
+}
+
+export async function updateFacilityCategory(
+  id: number,
+  data: Partial<{
+    name: string;
+    slug: string;
+    description?: string;
+    sortOrder: number;
+    isActive: boolean;
+  }>
+) {
+  const existing = await prisma.facilityCategory.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, "Facility category not found");
+
+  if (data.slug && data.slug !== existing.slug) {
+    const conflict = await prisma.facilityCategory.findUnique({ where: { slug: data.slug } });
+    if (conflict) throw new AppError(409, `Category with slug "${data.slug}" already exists`);
+  }
+
+  return prisma.facilityCategory.update({
+    where: { id },
+    data: {
+      ...data,
+      description: data.description === undefined ? undefined : data.description ?? null,
+    },
+  });
+}
+
+export async function deleteFacilityCategory(id: number) {
+  const existing = await prisma.facilityCategory.findUnique({
+    where: { id },
+    include: { _count: { select: { facilities: true } } },
+  });
+  if (!existing) throw new AppError(404, "Facility category not found");
+  if (existing._count.facilities > 0) {
+    throw new AppError(
+      409,
+      `Cannot delete category "${existing.name}" — ${existing._count.facilities} facility(-ies) assigned to it. Reassign or delete them first.`
+    );
+  }
+  await prisma.facilityCategory.delete({ where: { id } });
 }
 
 export async function createFacility(data: FacilityWriteInput, files?: FacilityUploadFiles) {
   const slug =
     data.slug ||
-    (await uniqueSlug(data.title, async (s) => !!(await prisma.facility.findUnique({ where: { slug: s } }))));
+    (await slugify(data.title));
 
   const mediaFields = await resolveMediaFields(data, files, slug);
   const dbData = mapWriteInputToDb(data, mediaFields);
@@ -165,6 +249,7 @@ export async function createFacility(data: FacilityWriteInput, files?: FacilityU
 
     return tx.facility.create({
       data: { ...dbData, slug },
+      include: { category: true },
     });
   });
 
@@ -182,10 +267,7 @@ export async function updateFacility(
   const facilitySlug =
     data.slug ||
     (data.title
-      ? await uniqueSlug(data.title, async (s) => {
-          const found = await prisma.facility.findUnique({ where: { slug: s } });
-          return !!found && found.id !== id;
-        })
+      ? await slugify(data.title)
       : existing.slug);
 
   const mediaFields = await resolveMediaFields(data, files, facilitySlug, existing);
@@ -193,11 +275,10 @@ export async function updateFacility(
   const updateData: Record<string, unknown> = {};
 
   if (data.index !== undefined) updateData.index = data.index.trim();
-  if (data.category !== undefined) updateData.category = data.category.trim();
+  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
   if (data.title !== undefined) updateData.title = data.title.trim();
   if (data.tagline !== undefined) updateData.tagline = sanitizeText(data.tagline);
-  if (data.descriptionPart1 !== undefined) updateData.descriptionPart1 = sanitizeText(data.descriptionPart1);
-  if (data.descriptionPart2 !== undefined) updateData.descriptionPart2 = sanitizeText(data.descriptionPart2);
+  if (data.descriptions !== undefined) updateData.descriptions = data.descriptions.map((desc) => sanitizeText(desc));
   if (data.specs !== undefined) updateData.specs = data.specs.map((spec) => sanitizeText(spec));
   if (data.featured !== undefined) updateData.featured = data.featured;
   if (data.published !== undefined) updateData.published = data.published;
@@ -220,7 +301,10 @@ export async function updateFacility(
     }
 
     await tx.facility.update({ where: { id }, data: updateData });
-    return tx.facility.findUniqueOrThrow({ where: { id } });
+    return tx.facility.findUniqueOrThrow({
+      where: { id },
+      include: { category: true },
+    });
   });
 
   return formatFacilityDetail(facility);
@@ -241,6 +325,7 @@ export async function uploadFacilityCover(id: number, file: Express.Multer.File)
       imageUrl: upload.url,
       imageCloudinaryId: upload.publicId,
     },
+    include: { category: true },
   });
 
   return formatFacilityDetail(facility);
@@ -260,6 +345,7 @@ export async function removeFacilityCover(id: number) {
       imageUrl: null,
       imageCloudinaryId: null,
     },
+    include: { category: true },
   });
 
   return formatFacilityDetail(facility);

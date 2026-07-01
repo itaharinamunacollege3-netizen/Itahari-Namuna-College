@@ -2,11 +2,11 @@ export interface FacilityListItemDto {
   id: number;
   slug: string;
   index: string;
+  categoryId: number;
   category: string;
   title: string;
   tagline: string;
-  descriptionPart1: string;
-  descriptionPart2: string;
+  descriptions: string[];
   imageUrl: string;
   specs: string[];
   featured: boolean;
@@ -19,17 +19,16 @@ export interface FacilityDetailDto extends FacilityListItemDto {}
 export interface ListFacilitiesParams {
   page?: number;
   limit?: number;
-  category?: string;
+  categoryId?: number;
   publishedOnly?: boolean;
 }
 
 export interface FacilityWriteInput {
   index: string;
-  category: string;
+  categoryId: number;
   title: string;
   tagline: string;
-  descriptionPart1: string;
-  descriptionPart2: string;
+  descriptions: string[];
   specs: string[];
   featured?: boolean;
   published?: boolean;

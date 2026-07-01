@@ -3,7 +3,7 @@ import { apiClient } from '../../../api/apiClient';
 export async function getFacilities(params = {}) {
   try {
     const query = new URLSearchParams();
-    if (params.category) query.set('category', params.category);
+    if (params.categoryId) query.set('categoryId', params.categoryId);
     const qs = query.toString();
     const res = await apiClient.get(`/facilities${qs ? `?${qs}` : ''}`);
     return res.data ?? [];

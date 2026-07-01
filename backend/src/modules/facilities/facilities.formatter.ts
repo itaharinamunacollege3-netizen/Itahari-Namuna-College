@@ -1,29 +1,29 @@
 import type { Facility } from "../../generated/prisma/client";
 import type { FacilityDetailDto, FacilityListItemDto } from "./facilities.types";
 
-function parseSpecs(value: unknown): string[] {
+function parseStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.map(String).map((s) => s.trim()).filter(Boolean) : [];
 }
 
-export function formatFacilityListItem(facility: Facility): FacilityListItemDto {
+export function formatFacilityListItem(facility: Facility & { category?: { name: string } }): FacilityListItemDto {
   return {
     id: facility.id,
     slug: facility.slug,
     index: facility.index,
-    category: facility.category,
+    categoryId: facility.categoryId,
+    category: facility.category?.name ?? "",
     title: facility.title,
     tagline: facility.tagline,
-    descriptionPart1: facility.descriptionPart1,
-    descriptionPart2: facility.descriptionPart2,
+    descriptions: parseStringArray(facility.descriptions),
     imageUrl: facility.imageUrl ?? "",
-    specs: parseSpecs(facility.specs),
+    specs: parseStringArray(facility.specs),
     featured: facility.featured,
     published: facility.published,
     sortOrder: facility.sortOrder,
   };
 }
 
-export function formatFacilityDetail(facility: Facility): FacilityDetailDto {
+export function formatFacilityDetail(facility: Facility & { category?: { name: string } }): FacilityDetailDto {
   return {
     ...formatFacilityListItem(facility),
   };
