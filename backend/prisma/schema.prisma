@@ -388,3 +388,27 @@ model JournalEntry {
   @@index([slug])
 }
 
+model Facility {
+  id                     Int      @id @default(autoincrement())
+  slug                   String   @unique
+  index                  String
+  category               String
+  title                  String
+  tagline                String
+  descriptionPart1       String
+  descriptionPart2       String
+  imageUrl               String?
+  imageCloudinaryId      String?
+  specs                  Json
+  featured               Boolean  @default(false)
+  published              Boolean  @default(true)
+  sortOrder              Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([published, featured])
+  @@index([published, sortOrder])
+  @@index([category])
+  @@index([slug])
+}
+

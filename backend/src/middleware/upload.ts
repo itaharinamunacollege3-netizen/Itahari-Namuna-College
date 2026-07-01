@@ -270,3 +270,40 @@ export function getBlogUploadFiles(req: Request) {
   };
 }
 
+function facilityFileFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) {
+  if (file.fieldname === "image") {
+    if (!isAllowedImageMime(file.mimetype)) {
+      return cb(new AppError(400, "Only JPEG, PNG, and WebP images are allowed for the image field"));
+    }
+  } else {
+    return cb(new AppError(400, `Unexpected file field: ${file.fieldname}`));
+  }
+  cb(null, true);
+}
+
+export const facilityFileUpload = multer({
+  storage,
+  limits: { fileSize: env.maxUploadBytes, files: 1 },
+  fileFilter: facilityFileFilter,
+});
+
+export function runFacilityFileUpload() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    facilityFileUpload.fields([{ name: "image", maxCount: 1 }])(req, res, (err) => {
+      if (err) return handleMulterError(err, req, res, next);
+      next();
+    });
+  };
+}
+
+export function getFacilityUploadFiles(req: Request) {
+  const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+  return {
+    image: files?.image?.[0],
+  };
+}
+
