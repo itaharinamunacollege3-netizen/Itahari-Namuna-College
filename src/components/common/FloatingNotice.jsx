@@ -1,21 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Bell, ChevronRight, ChevronLeft } from "lucide-react";
+import { Bell, ChevronRight, ChevronLeft, ExternalLink } from "lucide-react";
 import { getNotices } from "../../features/notices/services/noticesService";
-
-const TAG_ICONS = {
-  IMPORTANT: Calendar,
-  "TU Exams": Calendar,
-  Admissions: Calendar,
-  Holidays: Calendar,
-};
 
 export default function FloatingNotice() {
   const [notices, setNotices] = useState([]);
   const [noticeExpanded, setNoticeExpanded] = useState(false);
   
-  // Initialize unreadCount from localStorage, or default to notices.length if localStorage doesn't exist yet
   const [unreadCount, setUnreadCount] = useState(() => {
     const savedCount = localStorage.getItem("unreadNoticeCount");
     return savedCount ? parseInt(savedCount, 10) : 0;
@@ -26,7 +18,6 @@ export default function FloatingNotice() {
     getNotices().then((data) => {
       if (active) {
         setNotices(data);
-        // Only update unreadCount from data if there's nothing in localStorage yet
         const savedCount = localStorage.getItem("unreadNoticeCount");
         if (!savedCount) {
           setUnreadCount(data.length);
@@ -48,6 +39,8 @@ export default function FloatingNotice() {
   };
 
   if (notices.length === 0) return null;
+
+  const latestNotice = notices[0];
 
   return (
     <motion.div
@@ -100,7 +93,7 @@ export default function FloatingNotice() {
             exit={{ opacity: 0, x: 60 }}
             transition={{ duration: 0.45, type: "spring", stiffness: 350, damping: 25 }}
           >
-            <div className="bg-brand-white rounded-tl-2xl rounded-bl-2xl rounded-tr-xl rounded-br-xl shadow-[0_25px_80px_-20px_rgba(0,0,0,0.25)] border border-brand-gray/20 overflow-hidden">
+            <div className="bg-brand-white rounded-tl-2xl rounded-bl-2xl rounded-tr-xl rounded-br-xl shadow-[0_25px_80px_-20px_rgba(0,0,0,0.25)] border border-brand-gray/20 overflow-hidden w-72">
               <div className="bg-linear-to-b from-brand-primary to-brand-blue px-5 py-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-3">
@@ -135,23 +128,56 @@ export default function FloatingNotice() {
                   </button>
                 </div>
               </div>
-              <Link
-                to={`/notices/${notices[0].id}`}
-                onClick={handleMarkAsRead}
-                className="block px-5 py-4 hover:bg-brand-gray/10 transition-colors"
-              >
-                <div className="space-y-2">
-                  <h4 className="font-heading font-extrabold text-brand-dark text-lg leading-snug hover:text-brand-primary transition-colors">
-                    {notices[0].title}
+
+              {/* Notice content with title + tags as links */}
+              <div className="px-5 py-4 space-y-3">
+                {/* Tags as clickable links */}
+                {latestNotice.tags && latestNotice.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {latestNotice.tags.map((tag) => (
+                      <Link
+                        key={tag}
+                        to={`/notices/${latestNotice.id}`}
+                        onClick={handleMarkAsRead}
+                        className={`text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full transition-all duration-200 hover:scale-105 ${
+                          tag === 'IMPORTANT'
+                            ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                            : 'bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20'
+                        }`}
+                      >
+                        {tag}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
+                {/* Title as clickable link */}
+                <Link
+                  to={`/notices/${latestNotice.id}`}
+                  onClick={handleMarkAsRead}
+                  className="block group"
+                >
+                  <h4 className="font-heading font-extrabold text-brand-dark text-[15px] leading-snug group-hover:text-brand-primary transition-colors duration-200">
+                    {latestNotice.title}
                   </h4>
-                  {notices[0].publishedDate && (
-                    <p className="text-brand-dark/60 text-xs font-medium flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(notices[0].publishedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                    </p>
-                  )}
-                </div>
-              </Link>
+                </Link>
+
+                {/* Published date */}
+                {latestNotice.publishedDate && (
+                  <p className="text-brand-dark/50 text-[11px] font-medium">
+                    {new Date(latestNotice.publishedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                )}
+
+                {/* Read full notice link */}
+                <Link
+                  to={`/notices/${latestNotice.id}`}
+                  onClick={handleMarkAsRead}
+                  className="flex items-center gap-1.5 text-brand-primary text-xs font-bold hover:text-brand-primary/80 transition-colors pt-1"
+                >
+                  Read full notice <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

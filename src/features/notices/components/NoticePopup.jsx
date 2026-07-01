@@ -87,12 +87,12 @@ export default function NoticePopup() {
           <button
             onClick={handleRead}
             aria-label={`Open ${notice.title}`}
-            className="block w-full"
+            className="block w-full bg-brand-gray/10 border-b border-brand-gray/5"
           >
             <img
               src={notice.image}
               alt={notice.title}
-              className="w-auto max-w-full max-h-[24rem] object-contain mx-auto"
+              className="w-full max-h-[24rem] object-contain"
             />
           </button>
         )}

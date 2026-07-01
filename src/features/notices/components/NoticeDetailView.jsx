@@ -1,4 +1,4 @@
-import { Download, Printer, User, Calendar, BookOpen } from 'lucide-react';
+import { Download, User, Calendar, BookOpen } from 'lucide-react';
 
 export default function NoticeDetailView({ notice }) {
   if (!notice) return <div className="text-center py-20 text-brand-dark/40">Select a notice to view details</div>;
@@ -37,9 +37,6 @@ export default function NoticeDetailView({ notice }) {
               <Download size={14} /> Download
             </a>
           )}
-          <button onClick={() => window.print()} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brand-gray/10 text-brand-dark text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-gray/20 transition">
-            <Printer size={14} /> Print
-          </button>
         </div>
       </div>
 
@@ -51,7 +48,7 @@ export default function NoticeDetailView({ notice }) {
           <img
             src={notice.image}
             alt={notice.title}
-            className="w-auto max-w-full max-h-[32rem] object-contain rounded-xl mb-6 border border-brand-gray/20 mx-auto"
+            className="w-full max-h-[32rem] object-contain bg-brand-gray/5 rounded-xl mb-6 border border-brand-gray/20"
           />
         )}
         <p>{notice.description}</p>

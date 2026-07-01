@@ -4,6 +4,8 @@ import Footer from "../components/common/Footer";
 import Navbar from "../components/common/Navbar";
 import FloatingNotice from "../components/common/FloatingNotice";
 import ScrollToTop from "../components/common/ScrollToTop";
+import NoticePopup from "../features/notices/components/NoticePopup";
+
 export default function PublicLayout() {
   return (
       <div className="min-h-screen flex flex-col bg-brand-gray text-brand-dark font-body">
@@ -17,6 +19,7 @@ export default function PublicLayout() {
 
         <Footer />
         <FloatingNotice />
+        <NoticePopup />
         <ScrollToTop />
       </div>
   );
