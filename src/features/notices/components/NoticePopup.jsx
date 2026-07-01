@@ -92,7 +92,7 @@ export default function NoticePopup() {
             <img
               src={notice.image}
               alt={notice.title}
-              className="w-full max-h-72 object-cover"
+              className="w-auto max-w-full max-h-[24rem] object-contain mx-auto"
             />
           </button>
         )}

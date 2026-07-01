@@ -51,7 +51,7 @@ export default function NoticeDetailView({ notice }) {
           <img
             src={notice.image}
             alt={notice.title}
-            className="w-full max-h-96 object-cover rounded-xl mb-6 border border-brand-gray/20"
+            className="w-auto max-w-full max-h-[32rem] object-contain rounded-xl mb-6 border border-brand-gray/20 mx-auto"
           />
         )}
         <p>{notice.description}</p>
