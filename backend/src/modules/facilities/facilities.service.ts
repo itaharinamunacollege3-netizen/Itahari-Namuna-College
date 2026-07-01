@@ -142,12 +142,10 @@ export async function getFeaturedFacility() {
 }
 
 export async function listFacilityCategories() {
-  const rows = await prisma.facilityCategory.findMany({
+  return prisma.facilityCategory.findMany({
     where: { isActive: true },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
-
-  return rows.map((row) => row.name);
 }
 
 export async function listAllFacilityCategories() {

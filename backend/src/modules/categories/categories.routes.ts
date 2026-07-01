@@ -18,6 +18,7 @@ publicRouter.get("/staff-categories", categoryController.listStaffCategories);
 publicRouter.get("/staff-categories/:id", categoryController.getStaffCategory);
 publicRouter.get("/faculty-departments", categoryController.listFacultyDepartments);
 publicRouter.get("/faculty-departments/:id", categoryController.getFacultyDepartment);
+publicRouter.get("/facility-categories", categoryController.listAllFacilityCategories);
 
 // ── Admin routes (full CRUD, requires access token + admin role) ──
 const adminRouter = Router();

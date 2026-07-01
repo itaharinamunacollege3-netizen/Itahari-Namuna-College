@@ -68,25 +68,25 @@ export async function removeFacilityImage(id) {
 }
 
 export async function listFacilityCategories() {
-  return apiRequest("/admin/facility-categories");
+  return apiRequest("/admin/categories/facility-categories");
 }
 
 export async function createFacilityCategory(data) {
-  return apiRequest("/admin/facility-categories", {
+  return apiRequest("/admin/categories/facility-categories", {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
 export async function updateFacilityCategory(id, data) {
-  return apiRequest(`/admin/facility-categories/${id}`, {
+  return apiRequest(`/admin/categories/facility-categories/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteFacilityCategory(id) {
-  return apiRequest(`/admin/facility-categories/${id}`, {
+  return apiRequest(`/admin/categories/facility-categories/${id}`, {
     method: "DELETE",
   });
 }

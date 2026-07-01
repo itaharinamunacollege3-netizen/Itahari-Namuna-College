@@ -5,9 +5,9 @@ import PageBanner from "../../../components/common/PageBanner";
 import AnimatedSection from "../../../components/animations/AnimatedSection";
 
 const FacilitiesPage = () => {
-  const [activeFilter, setActiveFilter] = useState("All Facilities");
+  const [activeFilter, setActiveFilter] = useState(null);
   const [facilities, setFacilities] = useState([]);
-  const [categories, setCategories] = useState(["All Facilities"]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const FacilitiesPage = () => {
 
         if (!active) return;
         setFacilities(allFacilities);
-        setCategories(["All Facilities", ...cats]);
+        setCategories(cats);
       } catch (err) {
         console.error("Failed to load facilities:", err);
       } finally {
@@ -37,9 +37,9 @@ const FacilitiesPage = () => {
     };
   }, []);
 
-  const filteredData = activeFilter === "All Facilities"
-    ? facilities
-    : facilities.filter(item => item.category === activeFilter);
+  const filteredData = activeFilter
+    ? facilities.filter(item => item.categoryId === activeFilter)
+    : facilities;
 
   return (
 
@@ -50,19 +50,31 @@ const FacilitiesPage = () => {
           {/* Tab Filter - Responsive Grid */}
           <div className="flex justify-center lg:justify-start">
           <div className="grid grid-cols-1 lg:flex gap-2 p-2 bg-stone-200/60 rounded-xl w-full md:flex lg:w-fit">
-              {categories.map((filter) => (
               <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-xs sm:text-sm transition-all ease-in-out whitespace-nowrap ${
-                  activeFilter === filter
+                key="all"
+                onClick={() => setActiveFilter(null)}
+                className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-xs sm:text-sm transition-all ease-in-out whitespace-nowrap ${
+                  !activeFilter
                   ? "bg-[#006A38] text-white shadow-md"
                   : "text-stone-600 hover:text-stone-800 bg-white/50 lg:bg-transparent"
-                  }`}
+                }`}
               >
-                  {filter}
+                All Facilities
+              </button>
+              {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveFilter(cat.id)}
+                className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-xs sm:text-sm transition-all ease-in-out whitespace-nowrap ${
+                  activeFilter === cat.id
+                  ? "bg-[#006A38] text-white shadow-md"
+                  : "text-stone-600 hover:text-stone-800 bg-white/50 lg:bg-transparent"
+                }`}
+              >
+                {cat.name}
               </button>
               ))}
+            
           </div>
           </div>
 

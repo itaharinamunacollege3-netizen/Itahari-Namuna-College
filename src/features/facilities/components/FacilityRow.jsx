@@ -10,7 +10,7 @@ const FacilityRow = ({ data, isReversed }) => {
         <div className="w-full lg:w-1/2 relative">
             <div className="overflow-hidden rounded-2xl lg:rounded-3xl border border-stone-200 shadow-lg">
             <img 
-                src={data.image} 
+                src={data.imageUrl} 
                 alt={data.title} 
                 // Changed h-[400px] to aspect-video for fluid scaling
                 className="w-full aspect-4/3 lg:aspect-video object-cover hover:scale-105 transition-transform duration-700" 
@@ -34,15 +34,16 @@ const FacilityRow = ({ data, isReversed }) => {
             </div>
 
             <div className="text-sm lg:text-base text-stone-600 leading-relaxed space-y-3 lg:space-y-4">
-            <p>{data.descriptionPart1}</p>
-            <p>{data.descriptionPart2}</p>
+            {Array.isArray(data.descriptions) && data.descriptions.map((desc, i) => (
+              <p key={i}>{desc}</p>
+            ))}
             </div>
 
             {/* TECH SPECS LIST - Responsive Grid */}
             <div className="pt-2 lg:pt-4 border-t border-stone-200">
             <h4 className="font-bold text-stone-800 mb-3 uppercase text-[10px] lg:text-sm">Technical Specs</h4>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                {data.specs.map((spec, i) => (
+                {Array.isArray(data.specs) && data.specs.map((spec, i) => (
                 <li key={i} className="flex items-center text-xs lg:text-sm font-mono text-stone-700">
                     <span className="text-[#006A38] mr-2">➜</span> {spec}
                 </li>
