@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, ChevronRight, ChevronLeft, ExternalLink } from "lucide-react";
+import { Bell, ChevronRight, ExternalLink } from "lucide-react";
 import { getNotices } from "../../features/notices/services/noticesService";
 
 export default function FloatingNotice() {
   const [notices, setNotices] = useState([]);
   const [noticeExpanded, setNoticeExpanded] = useState(false);
-  
+
   const [unreadCount, setUnreadCount] = useState(() => {
     const savedCount = localStorage.getItem("unreadNoticeCount");
     return savedCount ? parseInt(savedCount, 10) : 0;
@@ -60,29 +60,20 @@ export default function FloatingNotice() {
           >
             <button
               onClick={() => setNoticeExpanded(true)}
-              className="relative group bg-linear-to-b from-brand-primary to-brand-blue backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_-15px_rgba(4,93,48,0.4)] border border-brand-white/20 hover:border-brand-white/40 transition-all duration-500 hover:shadow-[0_25px_70px_-20px_rgba(4,93,48,0.5)] hover:scale-105 active:scale-95"
+              aria-label="Open notices"
+              className="relative group w-12 h-12 bg-linear-to-b from-brand-primary to-brand-blue backdrop-blur-xl rounded-full shadow-[0_10px_30px_-8px_rgba(4,93,48,0.4)] border border-brand-white/20 hover:border-brand-white/40 transition-all duration-300 hover:shadow-[0_14px_36px_-8px_rgba(4,93,48,0.5)] hover:scale-105 active:scale-95 flex items-center justify-center"
             >
-              <div className="flex flex-col items-center gap-2 px-4 py-5">
-                <div className="relative">
-                  <div className="w-10 h-10 bg-brand-white/20 rounded-full flex items-center justify-center group-hover:bg-brand-white/30 transition-colors">
-                    <Bell className="w-5 h-5 text-brand-white group-hover:rotate-12 transition-transform duration-500" />
-                  </div>
-                  {unreadCount > 0 && (
-                    <motion.span
-                      key={unreadCount}
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="absolute -top-1 -right-1 w-6 h-6 bg-brand-crimson text-brand-white text-[11px] font-bold rounded-full flex items-center justify-center border-2 border-brand-white shadow-lg"
-                    >
-                      {unreadCount}
-                    </motion.span>
-                  )}
-                </div>
-                <div className="w-7 h-px bg-brand-white/30" />
-                <div className="w-10 h-10 bg-brand-white/15 rounded-full flex items-center justify-center group-hover:bg-brand-white/25 transition-colors">
-                  <ChevronLeft className="w-5 h-5 text-brand-white/90 group-hover:translate-y-[-2px] transition-transform duration-300" />
-                </div>
-              </div>
+              <Bell className="w-5 h-5 text-brand-white group-hover:rotate-12 transition-transform duration-500" />
+              {unreadCount > 0 && (
+                <motion.span
+                  key={unreadCount}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-brand-crimson text-brand-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-brand-white shadow-lg"
+                >
+                  {unreadCount}
+                </motion.span>
+              )}
             </button>
           </motion.div>
         ) : (
