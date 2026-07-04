@@ -35,9 +35,6 @@ export function LogoMark({ size = "md", light = false, className }) {
     <div
       className={cn(
         "brand-logo-mark flex shrink-0 items-center justify-center overflow-hidden rounded-lg",
-        light
-          ? "bg-white/95 shadow-lg ring-1 ring-white/40"
-          : "bg-white shadow-sm ring-1 ring-[var(--border-subtle)] dark:bg-[var(--color-surface)]",
         s.wrap,
         className
       )}
@@ -45,7 +42,8 @@ export function LogoMark({ size = "md", light = false, className }) {
       <img
         src={logo}
         alt="Itahari Namuna College"
-        className={cn(s.img, "object-contain p-1")}
+        className={cn(s.img, "object-contain")}
+        style={light ? { filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' } : undefined}
       />
     </div>
   );
