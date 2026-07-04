@@ -99,7 +99,7 @@ export default function JournalList() {
         className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-[60vh] flex items-end"
         style={{ backgroundImage: 'url(' + Journal + ')' }}
       >
-        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#075F6C]/40 via-[#054a55]/0 to-[#075F6C]/40 z-10" />
         <div
           className="absolute inset-0 opacity-5 z-10"
           style={{
@@ -111,23 +111,23 @@ export default function JournalList() {
         <div className="max-w-7xl mx-auto relative z-20 space-y-4 pb-2">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors font-body"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-gold hover:text-brand-gold/80 transition-colors font-body"
           >
             <ArrowRight className="w-3.5 h-3.5 rotate-180" /> Home
           </Link>
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-body font-semibold tracking-widest uppercase text-emerald-300/70">
+            <span className="text-xs font-body font-semibold tracking-widest uppercase text-brand-white">
               Publications
             </span>
-            <span className="text-emerald-300/40 text-xs">/</span>
-            <span className="text-xs font-body font-semibold tracking-widest uppercase text-emerald-200">
+            <span className="text-brand-white/40 text-xs">/</span>
+            <span className="text-xs font-body font-semibold tracking-widest uppercase text-brand-white">
               Journal
             </span>
           </div>
           <h1 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl text-white leading-tight">
             Academic Research & Scholarship
           </h1>
-          <p className="font-heading italic text-emerald-100/80 text-base sm:text-lg max-w-xl">
+          <p className="font-heading italic text-brand-white text-base sm:text-lg max-w-xl">
             "Peer-reviewed work advancing knowledge across disciplines."
           </p>
           <div className="flex flex-wrap gap-3 pt-1">

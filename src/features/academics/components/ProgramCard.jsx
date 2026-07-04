@@ -83,7 +83,7 @@ const ProgramCard = ({ program, onExplore }) => {
             e.stopPropagation();
             onExplore(program.id);
           }}
-          className="w-full py-2.5 px-4 border border-[#006A38] text-[#006A38] font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-50/40 transition-all duration-200 cursor-pointer mt-auto"
+          className="w-full py-2.5 px-4 border border-brand-primary text-brand-primary font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-50/40 transition-all duration-200 cursor-pointer mt-auto"
         >
           <span>Explore {displayCode} Program</span>
           <ArrowRight className="w-4 h-4" />

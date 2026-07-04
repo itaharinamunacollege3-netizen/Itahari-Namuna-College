@@ -39,9 +39,9 @@ const UnitDetailPage = () => {
         className="w-full relative bg-stone-900 text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center"
         style={{ backgroundImage: `url(${unit.iconUrl || ''})` }}
       >
-        <div className="absolute inset-0 bg-black/60 z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#075F6C]/40 via-[#054a55]/0 to-[#075F6C]/40 z-10" />
         <div className="max-w-7xl mx-auto relative z-20 space-y-4">
-          <Link to="/cells-and-units" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white">
+          <Link to="/cells-and-units" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-gold hover:text-brand-gold/80 duration-300">
             <ArrowLeft className="w-3.5 h-3.5" /> <span>Back to Committees</span>
           </Link>
           <h1 className="font-bold text-3xl sm:text-5xl text-white">{unit.title}</h1>

@@ -29,7 +29,6 @@ const AboutPage = () => {
           <AnimatedSection>
         <div className="max-w-7xl mx-auto px-6 mt-12 text-left">
           {/* PREMIUM SLIDING PILL SWITCHER CONTAINER */}
-          {/* PREMIUM SLIDING PILL SWITCHER CONTAINER */}
           <div className="inline-block w-full sm:w-auto bg-stone-200/60 p-1.5 rounded-2xl border border-stone-200/60 relative overflow-hidden backdrop-blur-xs">
 
             {/* GRID CONTAINER: Ensures perfect alignment for the sliding pill */}
@@ -53,8 +52,8 @@ const AboutPage = () => {
                   role="tab"
                   aria-selected={activeTab === tab.id}
                   className={`relative z-10 font-heading font-bold cursor-pointer text-xs sm:text-sm px-4 h-9 transition-colors duration-300 focus:outline-hidden whitespace-nowrap flex items-center justify-center ${activeTab === tab.id
-                      ? "text-emerald-800"
-                      : "text-stone-500 hover:text-stone-800"
+                      ? "text-brand-primary"
+                      : "text-stone-500 hover:text-brand-primary"
                     }`}
                   onClick={() => setActiveTab(tab.id)}
                 >

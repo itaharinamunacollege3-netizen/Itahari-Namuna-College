@@ -40,7 +40,7 @@ export default function CellOverviewCard({ unit, borderColor }) {
       {/* View Details Button as per image_84bf45.png */}
       <Link
         to={`/cells-and-units/${unit.id}`}
-        className="block w-full text-center py-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 font-semibold text-sm transition-colors"
+        className="block w-full text-center py-2.5 rounded-lg border border-brand-primary text-brand-primary duration-300 hover:text-brand-white hover:bg-brand-primary font-semibold text-sm transition-colors"
       >
         View Details
       </Link>

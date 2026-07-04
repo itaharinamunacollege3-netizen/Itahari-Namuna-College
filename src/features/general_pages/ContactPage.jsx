@@ -11,7 +11,7 @@ export default function ContactPage() {
         <PageBanner title="Contact Us" subtitle="Reach our admissions, academic, or administrative teams. We respond within 1 working day." />
         <AnimatedSection>
 
-        <div className="max-w-7xl mx-auto px-6 -mt-10 grid lg:grid-cols-2 gap-8">
+        <div className="max-w-7xl mx-auto px-6 mt-10 grid lg:grid-cols-2 gap-8">
           {/* Left: Map & Info */}
           <div className="space-y-6">
             <div className="h-96 w-full rounded-3xl overflow-hidden border border-stone-200">

@@ -34,7 +34,7 @@ export default function HomeWhyChooseUs() {
                 className="group flex flex-col items-start p-8 rounded-3xl bg-brand-gray/50 hover:bg-brand-gray transition-all duration-300"
               >
                 {/* Icon */}
-                <div className="mb-6 p-3 rounded-2xl bg-brand-white shadow-sm text-brand-primary">
+                <div className="mb-6 p-3 rounded-2xl bg-brand-white shadow-sm text-brand-gold">
                   <IconComponent className="w-6 h-6 stroke-[1.8]" />
                 </div>
                 

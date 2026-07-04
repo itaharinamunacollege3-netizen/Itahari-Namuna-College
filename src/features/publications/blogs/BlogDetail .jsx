@@ -89,7 +89,7 @@ export default function BlogDetail() {
         className="w-full relative text-white py-20 px-6 sm:px-12 md:px-16 overflow-hidden bg-cover bg-center min-h-100 flex items-end"
         style={bannerStyle}
       >
-        <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#075F6C]/50 via-[#054a55]/0 to-[#075F6C]/50 z-10" />
         <div
           className="absolute inset-0 opacity-5 z-10"
           style={{
@@ -104,7 +104,7 @@ export default function BlogDetail() {
         <div className="max-w-7xl mx-auto relative z-20 space-y-4 pb-2 w-full">
           <Link
             to="/publications/blog"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors font-body"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-gold hover:text-brand-gold/80 transition-colors font-body"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Blog
           </Link>

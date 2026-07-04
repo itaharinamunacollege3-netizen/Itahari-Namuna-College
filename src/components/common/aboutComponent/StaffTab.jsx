@@ -42,7 +42,7 @@ const StaffTab = () => {
               onClick={() => setActiveCategory(categoryName)}
               className={`px-5 py-2 cursor-pointer rounded-full text-[12px] md:text-sm font-bold transition-all duration-300 whitespace-nowrap border ${
                 activeCategory === categoryName
-                  ? "bg-[#006A38] text-white border-[#006A38]"
+                  ? "bg-brand-primary text-white border-brand-primary"
                   : "bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200"
               }`}
             >

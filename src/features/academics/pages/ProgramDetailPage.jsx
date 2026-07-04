@@ -72,13 +72,13 @@ const ProgramDetailPage = () => {
             backgroundImage: `url(${program.image || "/placeholder.png"})`
           }}
         >
-          <div className="absolute inset-0 bg-linear-to-r from-[#006A38]/50 via-[#00522b]/15 to-[#006a38]/50 z-10" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#075F6C]/40 via-[#054a55]/0 to-[#075F6C]/40 z-10" />
           <div className="max-w-7xl mx-auto relative z-20 space-y-4">
-            <Link to="/academic" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-200/80 hover:text-white transition-colors">
+            <Link to="/academic" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-gold hover:text-brand-gold/80 transition-colors">
               <ArrowLeft className="w-3.5 h-3.5" /> <span>Academic Programs</span>
             </Link>
             <h1 className="font-heading font-bold text-3xl sm:text-5xl text-white">{program.title}</h1>
-            <p className="font-heading italic text-emerald-100/90 text-lg">"{program.tagline}"</p>
+            <p className="font-heading italic text-brand-white text-lg">"{program.tagline}"</p>
 
             {/* Quick info pills */}
             <div className="flex flex-wrap gap-3 pt-2">
@@ -96,7 +96,7 @@ const ProgramDetailPage = () => {
             </div>
           </div>
         </div>
-<AnimatedSection>
+      <AnimatedSection>
         {/* 2. SLIDING PILL SWITCHER */}
         <div className="max-w-7xl mx-auto px-6 mt-10">
           <div className="inline-block bg-stone-200/60 p-1.5 rounded-2xl border border-stone-200/60 relative overflow-hidden backdrop-blur-xs">
@@ -116,7 +116,7 @@ const ProgramDetailPage = () => {
                     role="tab"
                     aria-selected={activeTab === tab.id}
                     className={`relative z-10 font-heading font-bold cursor-pointer text-xs sm:text-sm px-5 sm:px-6 h-10 transition-colors duration-300 flex items-center gap-2 ${
-                      activeTab === tab.id ? "text-emerald-800" : "text-stone-500 hover:text-stone-800"
+                      activeTab === tab.id ? "text-brand-primary" : "text-stone-500 hover:text-stone-800"
                     }`}
                     onClick={() => setActiveTab(tab.id)}
                   >
@@ -139,14 +139,14 @@ const ProgramDetailPage = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* CTA card */}
-              <div className="bg-white border border-stone-200 rounded-3xl p-6 space-y-4 shadow-2xs h-fit sticky top-15">
+              <div className="bg-white border border-stone-200 rounded-3xl p-6 space-y-4 shadow-2xs h-fit">
                 <h4 className="font-heading font-bold text-stone-800 text-lg">Admissions Open</h4>
                 <p className="text-sm text-stone-500 leading-relaxed">
                   Enrollment pathways are active under TU guidelines. Apply now to secure your seat.
                 </p>
                 <Link
                   to={`/admissions?program=${id}`}
-                  className="block text-center w-full bg-[#006A38] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#00522b] transition-colors shadow-sm"
+                  className="block text-center w-full bg-brand-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-brand-primary/80 transition-colors shadow-sm"
                 >
                   Apply For Admission
                 </Link>
@@ -188,7 +188,7 @@ const ProgramDetailPage = () => {
                   <h4 className="font-heading font-bold text-stone-800 text-sm">Program Highlights</h4>
                   <div className="flex flex-wrap gap-2">
                     {program.highlights.map((h, i) => (
-                      <span key={i} className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-medium text-emerald-700">
+                      <span key={i} className="inline-flex items-center rounded-full bg-brand-primary/10 border border-brand-primary px-3 py-1 text-xs font-medium text-brand-primary">
                         {h}
                       </span>
                     ))}

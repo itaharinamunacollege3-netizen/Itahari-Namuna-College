@@ -55,7 +55,7 @@ const FacilitiesPage = () => {
                 onClick={() => setActiveFilter(null)}
                 className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-xs sm:text-sm transition-all ease-in-out whitespace-nowrap ${
                   !activeFilter
-                  ? "bg-[#006A38] text-white shadow-md"
+                  ? "bg-brand-primary text-white shadow-md"
                   : "text-stone-600 hover:text-stone-800 bg-white/50 lg:bg-transparent"
                 }`}
               >
@@ -67,7 +67,7 @@ const FacilitiesPage = () => {
                 onClick={() => setActiveFilter(cat.id)}
                 className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-xs sm:text-sm transition-all ease-in-out whitespace-nowrap ${
                   activeFilter === cat.id
-                  ? "bg-[#006A38] text-white shadow-md"
+                  ? "bg-brand-primary text-white shadow-md"
                   : "text-stone-600 hover:text-stone-800 bg-white/50 lg:bg-transparent"
                 }`}
               >

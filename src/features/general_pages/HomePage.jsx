@@ -112,7 +112,7 @@ export default function HomePage() {
   return (
     <div className="w-full bg-brand-gray min-h-screen">
       <AnimatedSection>
-        <section className="relative w-full h-[calc(100vh-64px-41.6px)] min-h-137.5 flex items-center justify-center bg-brand-dark/70 overflow-hidden">
+        <section className="relative w-full h-[calc(100vh-31.8px-104px-52px)] min-h-137.5 flex items-center justify-center bg-brand-dark/70 overflow-hidden">
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <AnimatePresence>
               <motion.img
@@ -168,7 +168,7 @@ export default function HomePage() {
                 {carouselContent[index % carouselContent.length].cta && (
                   <Link
                     to={carouselContent[index % carouselContent.length].link}
-                    className="w-full sm:w-auto bg-brand-primary text-brand-white font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-primary/90 hover:scale-103 active:scale-97 shadow-md transition-all duration-300 text-center"
+                    className="w-full sm:w-auto bg-brand-gold text-brand-white font-heading font-bold text-sm tracking-wide px-8 py-3.5 rounded-xl hover:bg-brand-gold/90 hover:scale-103 active:scale-97 shadow-md transition-all duration-300 text-center"
                   >
                     {carouselContent[index % carouselContent.length].cta}
                   </Link>
@@ -209,8 +209,8 @@ export default function HomePage() {
             <div className="lg:col-span-7 space-y-8 text-left">
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
-                  <span className="w-6 h-0.5 bg-brand-primary rounded-full block" />
-                  <span className="text-xs font-bold text-brand-primary tracking-widest uppercase block">
+                  <span className="w-6 h-0.5 bg-brand-gold rounded-full block" />
+                  <span className="text-xs font-bold text-brand-gold tracking-widest uppercase block">
                     A Decade of Excellence
                   </span>
                 </div>
@@ -266,7 +266,7 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-5 relative pt-6 lg:pt-0">
-              <div className="absolute -bottom-6 -left-6 w-36 h-36 bg-brand-gold/10 rounded-2xl blur-xl pointer-events-none" />
+              <div className="absolute -bottom-6 -left-6 w-36 h-36 bg-brand-gold/20 rounded-2xl blur-xl pointer-events-none" />
               <div className="absolute -top-10 -right-6 text-brand-gray/40 pointer-events-none hidden sm:block opacity-60">
                 <svg
                   width="100"

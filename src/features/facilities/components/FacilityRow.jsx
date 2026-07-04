@@ -17,20 +17,20 @@ const FacilityRow = ({ data, isReversed }) => {
             />
             </div>
             {/* Index Badge - slightly smaller on mobile */}
-            <div className="absolute -top-4 -left-4 lg:-top-6 lg:-left-6 bg-[#006A38] text-white w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center rounded-xl lg:rounded-2xl font-bold text-xl lg:text-2xl shadow-lg z-10">
+            <div className="absolute -top-4 -left-4 lg:-top-6 lg:-left-6 bg-brand-primary text-white w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center rounded-xl lg:rounded-2xl font-bold text-xl lg:text-2xl shadow-lg z-10">
             {data.index}
             </div>
         </div>
 
         {/* CONTENT SIDE */}
         <div className="w-full lg:w-1/2 space-y-4 lg:space-y-6">
-            <span className="inline-block text-[#006A38] font-bold tracking-wider uppercase text-[10px] lg:text-xs border border-[#006A38] px-3 py-1 rounded-full">
+            <span className="inline-block text-brand-primary font-bold tracking-wider uppercase text-[10px] lg:text-xs border border-brand-primary px-3 py-1 rounded-full">
             {data.category}
             </span>
             
             <div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-stone-800 leading-tight">{data.title}</h2>
-            <p className="text-sm lg:text-lg italic text-[#006A38] mt-2">{data.tagline}</p>
+            <p className="text-sm lg:text-lg italic text-brand-primary mt-2">{data.tagline}</p>
             </div>
 
             <div className="text-sm lg:text-base text-stone-600 leading-relaxed space-y-3 lg:space-y-4">
@@ -45,7 +45,7 @@ const FacilityRow = ({ data, isReversed }) => {
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                 {Array.isArray(data.specs) && data.specs.map((spec, i) => (
                 <li key={i} className="flex items-center text-xs lg:text-sm font-mono text-stone-700">
-                    <span className="text-[#006A38] mr-2">➜</span> {spec}
+                    <span className="text-brand-primary mr-2">➜</span> {spec}
                 </li>
                 ))}
             </ul>

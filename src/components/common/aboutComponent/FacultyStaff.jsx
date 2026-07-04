@@ -42,7 +42,7 @@ const FacultyStaff = () => {
                             key={key}
                             onClick={() => setActiveFaculty(key)}
                             className={`px-3 py-2 md:px-5 md:py-2  cursor-pointer rounded-full text-[12px] md:text-sm font-bold transition-all duration-300 whitespace-nowrap border ${activeFaculty === key
-                                ? "bg-[#006A38] text-white border-[#006A38]"
+                                ? "bg-brand-primary text-white border-brand-primary"
                                 : "bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200"
                                 }`}
 
@@ -68,7 +68,7 @@ const FacultyStaff = () => {
                                 </div>
                                 <div className="text-center px-1">
                                     <h4 className="font-bold text-stone-800 text-sm leading-snug">{m.name}</h4>
-                                    <p className="text-xs font-medium text-[#006A38] uppercase mt-1">{m.role}</p>
+                                    <p className="text-xs font-extrabold text-brand-primary uppercase mt-1">{m.role}</p>
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, BookOpen, FileText } from 'lucide-react';
 import logo from "../../assets/others/onlylogo.webp";
-
+import incLogo from '../../assets/others/INC LOGO.png'
 const publicationsDropdown = [
   {
     name: 'Blog',
@@ -33,7 +33,6 @@ export default function Navbar() {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Programs', path: '/academic' },
-    { name: 'Notices', path: '/notices' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Cells & Units', path: '/cells-and-units' },
     { name: 'Facilities', path: '/facilities' },
@@ -67,21 +66,25 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <header className={`sticky top-0 z-50 px-8 py-2 flex justify-between items-center transition-all duration-500 border-brand-gray/50 ${isScrolled
-      ? 'bg-brand-white/70 backdrop-blur-md shadow-md border-b'
-      : 'bg-brand-white'
+    <header className={`sticky top-0 z-50 transition-all duration-500 border-brand-gray/50 ${isScrolled
+      ? 'bg-brand-white/70 backdrop-blur-md shadow-md border-b py-3'
+      : 'bg-brand-white py-5'
     }`}>
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 flex justify-between items-center">
 
-      {/* Logo */}
-      <Link to="/" className="flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/95 p-1.5 shadow-md">
-          <img src={logo} alt="Itahari Namuna College" className="h-full w-full object-contain" />
-        </div>
-        <div className="hidden sm:block">
-          <p className="font-heading text-sm font-bold leading-tight text-brand-dark">Itahari Namuna</p>
-          <p className="text-[11px] text-brand-dark">College</p>
-        </div>
-      </Link>
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3">
+          {/* <img
+            src={logo}
+            alt="Itahari Namuna College"
+            className="h-16 w-16 shrink-0 object-contain"
+          />
+          <div className="hidden sm:flex flex-col justify-center">
+            <p className="font-heading text-[17px] font-bold leading-tight tracking-tight text-brand-dark">Itahari Namuna </p>
+            <span className='text-[15px] font-bold leading-tight tracking-tight text-brand-dark/80'>College</span>
+          </div> */}
+          <img src={incLogo} alt="" className="w-45 shrink-0 object-contain bg-blend-screen" />
+        </Link>
 
       {/* Desktop Links */}
       <nav className="hidden xl:flex items-center space-x-8 font-medium text-sm tracking-wide">
@@ -168,7 +171,7 @@ export default function Navbar() {
           );
         })}
 
-        <Link to="/admissions" className="ml-4 px-4 py-2 bg-brand-primary text-white rounded-md font-medium hover:opacity-90 transition-all duration-300 shadow-md">
+        <Link to="/admissions" className="ml-4 px-4 py-2 bg-brand-gold text-white rounded-md font-medium hover:opacity-90 transition-all duration-300 shadow-md">
           <span>Apply Now</span>
         </Link>
       </nav>
@@ -180,6 +183,7 @@ export default function Navbar() {
       >
         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
+      </div>{/* end max-w-7xl container */}
 
       {/* Mobile Menu */}
       <div
@@ -238,7 +242,7 @@ export default function Navbar() {
           <Link
             to="/admissions"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="mt-4 w-full text-center bg-linear-to-r from-brand-blue to-emerald-600 text-white px-4 py-3 rounded-md font-medium shadow-lg hover:opacity-90 transition-all"
+            className="mt-4 w-full text-center bg-linear-to-tr from-[#075F6C]/90 via-[#054a55] to-[#0a0a0a]/90 text-white px-4 py-3 rounded-md font-medium shadow-lg hover:opacity-90 transition-all"
           >
             <span>Apply Now</span>
           </Link>
