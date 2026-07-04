@@ -464,3 +464,50 @@ model Unit {
   @@index([slug])
 }
 
+
+enum ExamType {
+  PLUS2_ENTRANCE
+  BACHELOR_ENTRANCE
+}
+
+enum ResultStatus {
+  PASS
+  FAIL
+  ABSENT
+}
+
+model ExamSession {
+  id          String       @id @default(cuid())
+  examName    String       // "e.g. +2 Entrance Exam 2026"
+  examType    ExamType
+  program     String       // "BCA", "BHM", "+2 Science", etc.
+  examDate    DateTime
+  isPublished Boolean      @default(false)
+  publishedAt DateTime?
+  createdBy   String       // admin user id
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  results     ExamResult[]
+
+  @@map("exam_sessions")
+}
+
+model ExamResult {
+  id             String       @id @default(cuid())
+  examSessionId  String
+  symbolNumber   String
+  studentName    String
+  program        String
+  obtainedMarks  Float
+  totalMarks     Float
+  percentage     Float
+  status         ResultStatus
+  createdAt      DateTime     @default(now())
+
+  examSession    ExamSession  @relation(fields: [examSessionId], references: [id], onDelete: Cascade)
+
+  @@unique([examSessionId, symbolNumber]) // no duplicate symbol per session
+  @@index([symbolNumber])                  // fast public lookup
+  @@map("exam_results")
+}

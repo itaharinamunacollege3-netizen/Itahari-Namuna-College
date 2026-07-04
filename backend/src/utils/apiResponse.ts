@@ -8,9 +8,13 @@ export interface ApiMeta {
   unreadCount?: number;
 }
 
-export function sendSuccess<T>(res: Response, data: T, meta?: ApiMeta, status = 200) {
+export function sendSuccess<T>(res: Response, data: T, messageOrMeta?: string | ApiMeta, status: number = 200) {
+  const meta = typeof messageOrMeta === 'object' ? messageOrMeta : undefined;
+  const message = typeof messageOrMeta === 'string' ? messageOrMeta : undefined;
+
   return res.status(status).json({
     success: true,
+    ...(message && { message }),
     data,
     ...(meta ? { meta } : {}),
   });

@@ -13,6 +13,8 @@ import { journalsPublicRoutes, journalsAdminRoutes } from "../modules/journals/j
 import { facilitiesPublicRoutes, facilitiesAdminRoutes } from "../modules/facilities/facilities.routes";
 import { unitsPublicRoutes, unitsAdminRoutes } from "../modules/units/units.routes";
 import { notificationsAdminRoutes } from "../modules/notifications/notifications.routes";
+import examResultAdminRoutes from "../modules/examResult/examResult.admin.routes";
+import examResultPublicRoutes from "../modules/examResult/examResult.public.routes";
 import { sendSuccess } from "../utils/apiResponse";
 
 const router = Router();
@@ -48,5 +50,7 @@ router.use("/admin/journals", journalsAdminRoutes);
 router.use("/admin/facilities", facilitiesAdminRoutes);
 router.use("/admin/units", unitsAdminRoutes);
 router.use("/admin/notifications", notificationsAdminRoutes);
+router.use("/admin/results", examResultAdminRoutes);
+router.use("/results", examResultPublicRoutes);
 
 export default router;
