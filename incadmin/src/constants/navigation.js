@@ -14,6 +14,7 @@ import {
   FlaskConical,
   Building2,
   Briefcase,
+  ClipboardCheck,
 } from "lucide-react";
 
 export const NAV_SECTIONS = [
@@ -45,6 +46,7 @@ export const NAV_SECTIONS = [
     title: "SUBMISSIONS",
     items: [
       { label: "Admissions", path: "/admissions", icon: GraduationCap },
+      { label: "Exam Results", path: "/exam-results", icon: ClipboardCheck },
       { label: "Contacts", path: "/contacts", icon: Mail },
     ],
   },

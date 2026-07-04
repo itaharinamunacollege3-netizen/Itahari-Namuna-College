@@ -22,6 +22,7 @@ const BlogsPage = lazy(() => import("@/pages/BlogsPage"));
 const JournalsPage = lazy(() => import("@/pages/JournalsPage"));
 const NotificationsPage = lazy(() => import("@/pages/NotificationsPage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const ExamResultsPage = lazy(() => import("@/pages/ExamResultsPage"));
 
 function PageLoader() {
   return (
@@ -57,6 +58,7 @@ export default function App() {
                   <Route path="/staff" element={<StaffPage />} />
                   <Route path="/categories" element={<CategoriesPage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/exam-results" element={<ExamResultsPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Route>
               </Route>

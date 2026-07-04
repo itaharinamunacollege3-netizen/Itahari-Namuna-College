@@ -8,14 +8,14 @@ import { prisma } from "../../config/prisma";
 const stagingStore = new Map<string, ParsedResultRow[]>();
 
 export const examResultService = {
-  createSession: (input: CreateExamSessionInput, adminId: string) => {
+  createSession: (input: CreateExamSessionInput, adminId: string | number) => {
     return prisma.examSession.create({
       data: {
         examName: input.examName,
         examType: input.examType,
         program: input.program,
         examDate: new Date(input.examDate),
-        createdBy: adminId,
+        createdBy: String(adminId),
       },
     });
   },

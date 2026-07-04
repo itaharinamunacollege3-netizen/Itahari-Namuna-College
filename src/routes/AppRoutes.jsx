@@ -21,6 +21,7 @@ const GalleryHubPage = lazy(() => import('../features/gallery/pages/GalleryHubPa
 const CategoryGridPage = lazy(() => import('../features/gallery/pages/CategoryGridPage'));
 const ContactPage = lazy(() => import('../features/general_pages/ContactPage'));
 const AdmissionWizardPage = lazy(() => import('../features/admissions/pages/AdmissionWizardPage'));
+const ExamResultsPage = lazy(() => import('../features/results/pages/ExamResultsPage'));
 
 
 const router = createBrowserRouter([
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
 
       { path: 'contact', element: <ContactPage /> },
       { path: 'admissions', element: <AdmissionWizardPage /> },
+      { path: 'results', element: <ExamResultsPage /> },
 
       // facilities page
       { path: 'facilities', element: <FacilitiesPage /> },
