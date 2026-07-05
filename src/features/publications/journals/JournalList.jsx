@@ -10,7 +10,7 @@ import {
   getPopularJournals,
 } from './journalsService';
 
-import Journal from '../../../assets/banner images/Journal.jpg';
+import Journal from '../../../assets/banner images/journal.jpg';
 function FieldBadge({ field, small = false }) {
   return (
     <span
